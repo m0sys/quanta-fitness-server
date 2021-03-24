@@ -2,19 +2,41 @@
 
 package model
 
-type NewTodo struct {
-	Text   string `json:"text"`
-	UserID string `json:"userId"`
+import (
+	"time"
+)
+
+type Login struct {
+	Username *string `json:"username"`
+	Email    *string `json:"email"`
+	Password string  `json:"password"`
 }
 
-type Todo struct {
-	ID   string `json:"id"`
-	Text string `json:"text"`
-	Done bool   `json:"done"`
-	User *User  `json:"user"`
+type NewUser struct {
+	Username string `json:"username"`
+	Email    string `json:"email"`
+	Password string `json:"password"`
+	Confirm  string `json:"confirm"`
+}
+
+type NewWorkout struct {
+	Title string `json:"title"`
 }
 
 type User struct {
-	ID   string `json:"id"`
-	Name string `json:"name"`
+	ID       string  `json:"id"`
+	Username string  `json:"username"`
+	Email    string  `json:"email"`
+	Password string  `json:"password"`
+	Weight   float64 `json:"weight"`
+	Height   float64 `json:"height"`
+	Gender   string  `json:"gender"`
+}
+
+type Workout struct {
+	ID        string    `json:"id"`
+	Title     string    `json:"title"`
+	CreatedAt time.Time `json:"createdAt"`
+	UpdatedAt time.Time `json:"updatedAt"`
+	User      *User     `json:"user"`
 }
