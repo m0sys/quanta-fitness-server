@@ -5,14 +5,16 @@ import (
 	"github.com/go-playground/validator/v10"
 	"log"
 
-	"github.com/mhd53/quanta-fitness-server/crypto"
-	"github.com/mhd53/quanta-fitness-server/datastore"
-	"github.com/mhd53/quanta-fitness-server/entity"
+	"github.com/mhd53/quanta-fitness-server/internal/datastore"
+	"github.com/mhd53/quanta-fitness-server/pkg/crypto"
 )
 
 var (
 	validate = validator.New()
+	valStore datastore.UserStore
 )
+
+type authValidator struct{}
 
 type AuthValidator interface {
 	ValidateRegisteration(uname, email, pwd, confirm string) error
@@ -20,26 +22,31 @@ type AuthValidator interface {
 	ValidateLoginWithEmail(email, pwd string) error
 }
 
-func (*service) ValidateRegisteration(uname, email, pwd, confirm string) error {
-	if uname != pwd {
+func NewAuthValidator(userStore datastore.UserStore) AuthValidator {
+	valStore = userStore
+	return &authValidator{}
+}
+
+func (*authValidator) ValidateRegisteration(uname, email, pwd, confirm string) error {
+	if pwd != confirm {
 		return errors.New("Password must equal Confirm!")
 	}
 
-	user, err1 := ds.FindUserByUsername(uname)
+	_, found, err1 := valStore.FindUserByUsername(uname)
 
 	if err1 != nil {
 		log.Fatal(err1)
 		return errors.New("Internal Error!")
 	}
 
-	if user != nil {
-		return errors.New("Username already exists!")
+	if found {
+		return errors.New("User already exists!")
 	}
 
 	err2 := validateEmail(email)
-	if err != nil {
+	if err2 != nil {
 		log.Print(err2)
-		return errrors.New("Invalid email!")
+		return errors.New("Invalid email!")
 	}
 
 	return nil
@@ -53,19 +60,19 @@ func validateEmail(email string) error {
 	return nil
 }
 
-func (*service) ValidateLoginWithUname(uname, pwd string) error {
-	user, err1 := ds.FindUserByUsername(uname)
+func (*authValidator) ValidateLoginWithUname(uname, pwd string) error {
+	user, found, err1 := valStore.FindUserByUsername(uname)
 
 	if err1 != nil {
 		log.Fatal(err1)
 		return errors.New("Internal Error!")
 	}
 
-	if user == nil {
+	if !found {
 		return errors.New("Username doesn't exist!")
 	}
 
-	if crypto.CheckPwdHash(pwd, user.password) == false {
+	if crypto.CheckPwdHash(pwd, user.Password) == false {
 		return errors.New("Incorrect password!")
 	}
 
@@ -73,19 +80,19 @@ func (*service) ValidateLoginWithUname(uname, pwd string) error {
 
 }
 
-func (*service) ValidateLoginWithEmail(email, pwd string) error {
-	user, err1 := ds.FindUserByEmail(email)
+func (*authValidator) ValidateLoginWithEmail(email, pwd string) error {
+	user, found, err1 := valStore.FindUserByEmail(email)
 
 	if err1 != nil {
 		log.Fatal(err1)
 		return errors.New("Internal Error!")
 	}
 
-	if user == nil {
+	if !found {
 		return errors.New("Username doesn't exist!")
 	}
 
-	if crypto.CheckPwdHash(pwd, user.password) == false {
+	if crypto.CheckPwdHash(pwd, user.Password) == false {
 		return errors.New("Incorrect password!")
 	}
 

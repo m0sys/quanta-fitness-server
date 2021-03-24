@@ -4,9 +4,9 @@ import (
 	"errors"
 	"log"
 
-	"github.com/mhd53/quanta-fitness-server/crypto"
-	"github.com/mhd53/quanta-fitness-server/datastore"
-	"github.com/mhd53/quanta-fitness-server/entity"
+	"github.com/mhd53/quanta-fitness-server/internal/datastore"
+	"github.com/mhd53/quanta-fitness-server/internal/entity"
+	"github.com/mhd53/quanta-fitness-server/pkg/crypto"
 )
 
 type AuthService interface {
@@ -36,20 +36,26 @@ func (*service) Register(uname, email, pwd, confirm string) (string, error) {
 
 	if err != nil {
 		log.Print(err)
-		return nil,  err
+		return "", err
 	}
 
-	token, err2 := crypto.GenerateToken(user.Username)
+	token, err2 := crypto.GenerateToken(uname)
 
 	if err2 != nil {
 		log.Fatal(err2)
-		return nil, mainErr
+		return "", mainErr
+	}
+
+	user := entity.BaseUser{
+		Username: uname,
+		Email:    email,
+		Password: pwd,
 	}
 
 	_, err3 := ds.Save(user)
 	if err3 != nil {
 		log.Fatal(err3)
-		return nil, mainErr
+		return "", mainErr
 	}
 
 	return token, nil
@@ -60,13 +66,13 @@ func (*service) LoginWithUname(uname, pwd string) (string, error) {
 	err := val.ValidateLoginWithUname(uname, pwd)
 
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
-	token. err2 := crypto.GenerateToken(uname)
+	token, err2 := crypto.GenerateToken(uname)
 	if err2 != nil {
 		log.Fatal(err2)
-		return nil, mainErr
+		return "", mainErr
 	}
 
 	return token, nil
@@ -74,22 +80,22 @@ func (*service) LoginWithUname(uname, pwd string) (string, error) {
 
 func (*service) LoginWithEmail(email, pwd string) (string, error) {
 	mainErr := errors.New("Failed to log user in! Please try again later.")
-	err := val.ValidateLoginWithEmail(uname, pwd)
+	err := val.ValidateLoginWithEmail(email, pwd)
 
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
-	user, err2 := ds.FindUserByEmail(email)
+	user, _, err2 := ds.FindUserByEmail(email)
 	if err2 != nil {
 		log.Fatal(err2)
-		return nil, mainErr
+		return "", mainErr
 	}
 
-	token. err3 := crypto.GenerateToken(user.username)
+	token, err3 := crypto.GenerateToken(user.Username)
 	if err2 != nil {
 		log.Fatal(err3)
-		return nil, mainErr
+		return "", mainErr
 	}
 
 	return token, nil
