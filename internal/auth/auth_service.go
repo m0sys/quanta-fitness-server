@@ -30,7 +30,6 @@ func NewAuthService(datastore datastore.UserStore, validator AuthValidator) Auth
 }
 
 func (*service) Register(uname, email, pwd, confirm string) (string, error) {
-	mainErr := errors.New("Failed to register user! Please try again later.")
 
 	err := val.ValidateRegisteration(uname, email, pwd, confirm)
 
@@ -43,14 +42,14 @@ func (*service) Register(uname, email, pwd, confirm string) (string, error) {
 
 	if err2 != nil {
 		log.Fatal(err2)
-		return "", mainErr
+		return "", errors.New("Failed to register user! Please try again later.")
 	}
 
 	hashedPwd, err3 := crypto.HashPwd(pwd)
 
 	if err3 != nil {
 		log.Fatal(err3)
-		return "", mainErr
+		return "", errors.New("Failed to register user! Please try again later.")
 	}
 
 	user := entity.BaseUser{
@@ -62,14 +61,13 @@ func (*service) Register(uname, email, pwd, confirm string) (string, error) {
 	_, err4 := ds.Save(user)
 	if err4 != nil {
 		log.Fatal(err4)
-		return "", mainErr
+		return "", errors.New("Failed to register user! Please try again later.")
 	}
 
 	return token, nil
 }
 
 func (*service) LoginWithUname(uname, pwd string) (string, error) {
-	mainErr := errors.New("Failed to log user in! Please try again later.")
 	err := val.ValidateLoginWithUname(uname, pwd)
 
 	if err != nil {
@@ -79,14 +77,13 @@ func (*service) LoginWithUname(uname, pwd string) (string, error) {
 	token, err2 := crypto.GenerateToken(uname)
 	if err2 != nil {
 		log.Fatal(err2)
-		return "", mainErr
+		return "", errors.New("Failed to register user! Please try again later.")
 	}
 
 	return token, nil
 }
 
 func (*service) LoginWithEmail(email, pwd string) (string, error) {
-	mainErr := errors.New("Failed to log user in! Please try again later.")
 	err := val.ValidateLoginWithEmail(email, pwd)
 
 	if err != nil {
@@ -96,13 +93,13 @@ func (*service) LoginWithEmail(email, pwd string) (string, error) {
 	user, _, err2 := ds.FindUserByEmail(email)
 	if err2 != nil {
 		log.Fatal(err2)
-		return "", mainErr
+		return "", errors.New("Failed to register user! Please try again later.")
 	}
 
 	token, err3 := crypto.GenerateToken(user.Username)
 	if err2 != nil {
 		log.Fatal(err3)
-		return "", mainErr
+		return "", errors.New("Failed to register user! Please try again later.")
 	}
 
 	return token, nil

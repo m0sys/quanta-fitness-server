@@ -72,7 +72,7 @@ func (*authValidator) ValidateLoginWithUname(uname, pwd string) error {
 		return errors.New("Username doesn't exist!")
 	}
 
-	if crypto.CheckPwdHash(pwd, user.Password) == false {
+	if !crypto.CheckPwdHash(pwd, user.Password) {
 		return errors.New("Incorrect password!")
 	}
 
@@ -98,7 +98,7 @@ func (*authValidator) ValidateLoginWithEmail(email, pwd string) error {
 		return errors.New("Email doesn't exist!")
 	}
 
-	if crypto.CheckPwdHash(pwd, user.Password) == false {
+	if !crypto.CheckPwdHash(pwd, user.Password) {
 		return errors.New("Incorrect password!")
 	}
 
