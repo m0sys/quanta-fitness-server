@@ -81,6 +81,12 @@ func (*authValidator) ValidateLoginWithUname(uname, pwd string) error {
 }
 
 func (*authValidator) ValidateLoginWithEmail(email, pwd string) error {
+	err := validateEmail(email)
+	if err != nil {
+		log.Print(err)
+		return errors.New("Invalid email!")
+	}
+
 	user, found, err1 := valStore.FindUserByEmail(email)
 
 	if err1 != nil {
@@ -89,7 +95,7 @@ func (*authValidator) ValidateLoginWithEmail(email, pwd string) error {
 	}
 
 	if !found {
-		return errors.New("Username doesn't exist!")
+		return errors.New("Email doesn't exist!")
 	}
 
 	if crypto.CheckPwdHash(pwd, user.Password) == false {

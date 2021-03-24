@@ -46,15 +46,22 @@ func (*service) Register(uname, email, pwd, confirm string) (string, error) {
 		return "", mainErr
 	}
 
+	hashedPwd, err3 := crypto.HashPwd(pwd)
+
+	if err3 != nil {
+		log.Fatal(err3)
+		return "", mainErr
+	}
+
 	user := entity.BaseUser{
 		Username: uname,
 		Email:    email,
-		Password: pwd,
+		Password: hashedPwd,
 	}
 
-	_, err3 := ds.Save(user)
-	if err3 != nil {
-		log.Fatal(err3)
+	_, err4 := ds.Save(user)
+	if err4 != nil {
+		log.Fatal(err4)
 		return "", mainErr
 	}
 
