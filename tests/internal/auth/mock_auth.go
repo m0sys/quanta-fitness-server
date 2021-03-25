@@ -1,4 +1,4 @@
-package auth
+package authtests
 
 import (
 	"errors"

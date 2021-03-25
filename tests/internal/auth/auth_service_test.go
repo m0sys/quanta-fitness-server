@@ -1,9 +1,10 @@
-package auth
+package authtests
 
 import (
 	"github.com/stretchr/testify/assert"
 	"testing"
 
+	"github.com/mhd53/quanta-fitness-server/internal/auth"
 	"github.com/mhd53/quanta-fitness-server/internal/entity"
 )
 
@@ -16,8 +17,8 @@ func TestRegisterWhenUserExists(t *testing.T) {
 	mockStore.On("FindUserByUsername").Return(user, true, nil)
 	mockStore.On("Save").Return(entity.User{}, nil)
 
-	testValidator := NewAuthValidator(mockStore)
-	testService := NewAuthService(mockStore, testValidator)
+	testValidator := auth.NewAuthValidator(mockStore)
+	testService := auth.NewAuthService(mockStore, testValidator)
 
 	user, err := testService.Register(MOCK_USERNAME, MOCK_EMAIL, MOCK_PWD, MOCK_PWD)
 
@@ -35,8 +36,8 @@ func TestRegisterSuccess(t *testing.T) {
 	mockStore.On("FindUserByUsername").Return(entity.User{}, false, nil)
 	mockStore.On("Save").Return(user, nil)
 
-	testValidator := NewAuthValidator(mockStore)
-	testService := NewAuthService(mockStore, testValidator)
+	testValidator := auth.NewAuthValidator(mockStore)
+	testService := auth.NewAuthService(mockStore, testValidator)
 
 	userDS, err := testService.Register(MOCK_USERNAME, MOCK_EMAIL, MOCK_PWD, MOCK_PWD)
 
@@ -51,8 +52,8 @@ func TestLoginWithUnameWhenUserNotExist(t *testing.T) {
 	mockStore.On("FindUserByUsername").Return(entity.User{}, false, nil)
 	mockStore.On("Save").Return(entity.User{}, nil)
 
-	testValidator := NewAuthValidator(mockStore)
-	testService := NewAuthService(mockStore, testValidator)
+	testValidator := auth.NewAuthValidator(mockStore)
+	testService := auth.NewAuthService(mockStore, testValidator)
 
 	userDS, err := testService.LoginWithUname(MOCK_USERNAME, MOCK_PWD)
 
@@ -69,8 +70,8 @@ func TestLoginWithUnameWhenIncorrectPwd(t *testing.T) {
 
 	mockStore.On("FindUserByUsername").Return(user, true, nil)
 
-	testValidator := NewAuthValidator(mockStore)
-	testService := NewAuthService(mockStore, testValidator)
+	testValidator := auth.NewAuthValidator(mockStore)
+	testService := auth.NewAuthService(mockStore, testValidator)
 
 	userDS, err := testService.LoginWithUname(MOCK_USERNAME, "bobin")
 
@@ -87,8 +88,8 @@ func TestLoginWithUnameSuccess(t *testing.T) {
 
 	mockStore.On("FindUserByUsername").Return(user, true, nil)
 
-	testValidator := NewAuthValidator(mockStore)
-	testService := NewAuthService(mockStore, testValidator)
+	testValidator := auth.NewAuthValidator(mockStore)
+	testService := auth.NewAuthService(mockStore, testValidator)
 
 	userDS, err := testService.LoginWithUname(MOCK_USERNAME, MOCK_PWD)
 
@@ -102,8 +103,8 @@ func TestLoginWithEmailWhenUserNotExist(t *testing.T) {
 
 	mockStore.On("FindUserByEmail").Return(entity.User{}, false, nil)
 
-	testValidator := NewAuthValidator(mockStore)
-	testService := NewAuthService(mockStore, testValidator)
+	testValidator := auth.NewAuthValidator(mockStore)
+	testService := auth.NewAuthService(mockStore, testValidator)
 
 	userDS, err := testService.LoginWithEmail(MOCK_EMAIL, MOCK_PWD)
 
@@ -120,8 +121,8 @@ func TestLoginWithEmailWhenIncorrectPwd(t *testing.T) {
 
 	mockStore.On("FindUserByEmail").Return(user, true, nil)
 
-	testValidator := NewAuthValidator(mockStore)
-	testService := NewAuthService(mockStore, testValidator)
+	testValidator := auth.NewAuthValidator(mockStore)
+	testService := auth.NewAuthService(mockStore, testValidator)
 
 	userDS, err := testService.LoginWithEmail(MOCK_EMAIL, "bobin")
 
@@ -138,8 +139,8 @@ func TestLoginWithEmailWhenInvalidEmail(t *testing.T) {
 
 	mockStore.On("FindUserByEmail").Return(user, true, nil)
 
-	testValidator := NewAuthValidator(mockStore)
-	testService := NewAuthService(mockStore, testValidator)
+	testValidator := auth.NewAuthValidator(mockStore)
+	testService := auth.NewAuthService(mockStore, testValidator)
 
 	userDS, err := testService.LoginWithEmail("notanemail", "bobin")
 
@@ -156,8 +157,8 @@ func TestLoginWithEmailSuccess(t *testing.T) {
 
 	mockStore.On("FindUserByEmail").Return(user, true, nil)
 
-	testValidator := NewAuthValidator(mockStore)
-	testService := NewAuthService(mockStore, testValidator)
+	testValidator := auth.NewAuthValidator(mockStore)
+	testService := auth.NewAuthService(mockStore, testValidator)
 
 	userDS, err := testService.LoginWithEmail(MOCK_EMAIL, MOCK_PWD)
 

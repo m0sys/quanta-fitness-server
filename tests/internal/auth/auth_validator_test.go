@@ -1,15 +1,16 @@
-package auth
+package authtests
 
 import (
 	"github.com/stretchr/testify/assert"
 	"testing"
 
+	"github.com/mhd53/quanta-fitness-server/internal/auth"
 	"github.com/mhd53/quanta-fitness-server/internal/entity"
 )
 
 func TestValidateRegisterationMismatch(t *testing.T) {
 
-	testValidator := NewAuthValidator(nil)
+	testValidator := auth.NewAuthValidator(nil)
 
 	err := testValidator.ValidateRegisteration(MOCK_USERNAME, MOCK_EMAIL, MOCK_PWD, "hadio")
 
@@ -25,7 +26,7 @@ func TestValidateRegisterationUserExists(t *testing.T) {
 
 	mockStore.On("FindUserByUsername").Return(user, true, nil)
 
-	testValidator := NewAuthValidator(mockStore)
+	testValidator := auth.NewAuthValidator(mockStore)
 
 	err := testValidator.ValidateRegisteration(MOCK_USERNAME, MOCK_EMAIL, MOCK_PWD, MOCK_PWD)
 
@@ -38,7 +39,7 @@ func TestValidateRegisterationSuccess(t *testing.T) {
 
 	mockStore.On("FindUserByUsername").Return(entity.User{}, false, nil)
 
-	testValidator := NewAuthValidator(mockStore)
+	testValidator := auth.NewAuthValidator(mockStore)
 
 	err := testValidator.ValidateRegisteration(MOCK_USERNAME, MOCK_EMAIL, MOCK_PWD, MOCK_PWD)
 
@@ -64,7 +65,7 @@ func TestValidateRegisterationWithInvalidEmail(t *testing.T) {
 
 	mockStore.On("FindUserByUsername").Return(user, false, nil)
 
-	testValidator := NewAuthValidator(mockStore)
+	testValidator := auth.NewAuthValidator(mockStore)
 
 	err := testValidator.ValidateRegisteration(MOCK_USERNAME, notEmail, MOCK_PWD, MOCK_PWD)
 
@@ -77,7 +78,7 @@ func TestValidateLoginWithUnameWhenUserNotExist(t *testing.T) {
 
 	mockStore.On("FindUserByUsername").Return(entity.User{}, false, nil)
 
-	testValidator := NewAuthValidator(mockStore)
+	testValidator := auth.NewAuthValidator(mockStore)
 
 	err := testValidator.ValidateLoginWithUname(MOCK_USERNAME, MOCK_PWD)
 
@@ -93,7 +94,7 @@ func TestValidateLoginWithUnameWhenIncorrectPwd(t *testing.T) {
 
 	mockStore.On("FindUserByUsername").Return(user, true, nil)
 
-	testValidator := NewAuthValidator(mockStore)
+	testValidator := auth.NewAuthValidator(mockStore)
 
 	err := testValidator.ValidateLoginWithUname(MOCK_USERNAME, "bobin")
 
@@ -108,7 +109,7 @@ func TestValidateLoginWithUnameSuccess(t *testing.T) {
 	user := CreateValidMockUser(id)
 	mockStore.On("FindUserByUsername").Return(user, true, nil)
 
-	testValidator := NewAuthValidator(mockStore)
+	testValidator := auth.NewAuthValidator(mockStore)
 
 	err := testValidator.ValidateLoginWithUname(MOCK_USERNAME, MOCK_PWD)
 
@@ -120,7 +121,7 @@ func TestValidateLoginWithEmaileWhenUserNotExist(t *testing.T) {
 
 	mockStore.On("FindUserByEmail").Return(entity.User{}, false, nil)
 
-	testValidator := NewAuthValidator(mockStore)
+	testValidator := auth.NewAuthValidator(mockStore)
 
 	err := testValidator.ValidateLoginWithEmail(MOCK_EMAIL, MOCK_PWD)
 
@@ -136,7 +137,7 @@ func TestValidateLoginWithEmailWhenIncorrectPwd(t *testing.T) {
 
 	mockStore.On("FindUserByEmail").Return(user, true, nil)
 
-	testValidator := NewAuthValidator(mockStore)
+	testValidator := auth.NewAuthValidator(mockStore)
 
 	err := testValidator.ValidateLoginWithEmail(MOCK_EMAIL, "bobin")
 
@@ -152,7 +153,7 @@ func TestValidateLoginWithEmailWhenInvalidEmail(t *testing.T) {
 
 	mockStore.On("FindUserByEmail").Return(user, true, nil)
 
-	testValidator := NewAuthValidator(mockStore)
+	testValidator := auth.NewAuthValidator(mockStore)
 
 	err := testValidator.ValidateLoginWithEmail("notanemail.com", MOCK_PWD)
 
@@ -167,7 +168,7 @@ func TestValidateLoginWithEmailSuccess(t *testing.T) {
 	user := CreateValidMockUser(id)
 	mockStore.On("FindUserByEmail").Return(user, true, nil)
 
-	testValidator := NewAuthValidator(mockStore)
+	testValidator := auth.NewAuthValidator(mockStore)
 
 	err := testValidator.ValidateLoginWithEmail(MOCK_EMAIL, MOCK_PWD)
 
