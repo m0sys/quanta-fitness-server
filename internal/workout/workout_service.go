@@ -96,6 +96,21 @@ func (*service) UpdateWorkout(wid int64, workout entity.BaseWorkout, uname strin
 }
 
 func (*service) DeleteWorkout(wid int64, uname string) error {
+	authorized, err := auth.AuthorizeAccessWorkout(uname, wid)
+	if err != nil {
+		return err
+	}
+
+	if !authorized {
+		return errors.New("Access Denied!")
+	}
+
+	err2 := ws.DeleteWorkout(wid)
+
+	if err2 != nil {
+		return errors.New("Internal Error!")
+	}
+
 	return nil
 
 }

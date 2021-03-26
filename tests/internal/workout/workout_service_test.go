@@ -16,7 +16,7 @@ func TestCreateWorkoutWhenUnauthorized(t *testing.T) {
 	mockUS.On("FindUserByUsername").Return(entity.User{}, false, nil)
 
 	testAuthorizer := workout.NewWorkoutAuthorizer(mockWS, mockUS)
-	testValidator := workout.NewWorkoutValidator(mockWS)
+	testValidator := workout.NewWorkoutValidator()
 	testService := workout.NewWorkoutService(
 		mockWS,
 		testAuthorizer,
@@ -39,7 +39,7 @@ func TestCreateWorkoutWhenTitleIsInvalid(t *testing.T) {
 	mockUS.On("FindUserByUsername").Return(user, true, nil)
 
 	testAuthorizer := workout.NewWorkoutAuthorizer(mockWS, mockUS)
-	testValidator := workout.NewWorkoutValidator(mockWS)
+	testValidator := workout.NewWorkoutValidator()
 	testService := workout.NewWorkoutService(
 		mockWS,
 		testAuthorizer,
@@ -62,7 +62,7 @@ func TestCreateWorkoutSuccess(t *testing.T) {
 	mockUS.On("FindUserByUsername").Return(user, true, nil)
 
 	testAuthorizer := workout.NewWorkoutAuthorizer(mockWS, mockUS)
-	testValidator := workout.NewWorkoutValidator(mockWS)
+	testValidator := workout.NewWorkoutValidator()
 	testService := workout.NewWorkoutService(
 		mockWS,
 		testAuthorizer,
@@ -89,7 +89,7 @@ func TestUpdateWorkoutWhenUnauthorized(t *testing.T) {
 	mockWS.Save(mockBaseWorkout)
 
 	testAuthorizer := workout.NewWorkoutAuthorizer(mockWS, mockUS)
-	testValidator := workout.NewWorkoutValidator(mockWS)
+	testValidator := workout.NewWorkoutValidator()
 	testService := workout.NewWorkoutService(
 		mockWS,
 		testAuthorizer,
@@ -115,7 +115,7 @@ func TestUpdateWorkoutInvalidWorkout(t *testing.T) {
 	mockBaseWorkout := CreateInvalidMockBaseWorkout()
 
 	testAuthorizer := workout.NewWorkoutAuthorizer(mockWS, mockUS)
-	testValidator := workout.NewWorkoutValidator(mockWS)
+	testValidator := workout.NewWorkoutValidator()
 	testService := workout.NewWorkoutService(
 		mockWS,
 		testAuthorizer,
@@ -144,7 +144,7 @@ func TestUpdateWorkoutSuccess(t *testing.T) {
 	}
 
 	testAuthorizer := workout.NewWorkoutAuthorizer(mockWS, mockUS)
-	testValidator := workout.NewWorkoutValidator(mockWS)
+	testValidator := workout.NewWorkoutValidator()
 	testService := workout.NewWorkoutService(
 		mockWS,
 		testAuthorizer,
@@ -173,7 +173,7 @@ func TestGetWorkoutWhenUnauthorized(t *testing.T) {
 	mockUS.On("FindUserByUsername").Return(user, true, nil)
 
 	testAuthorizer := workout.NewWorkoutAuthorizer(mockWS, mockUS)
-	testValidator := workout.NewWorkoutValidator(mockWS)
+	testValidator := workout.NewWorkoutValidator()
 	testService := workout.NewWorkoutService(
 		mockWS,
 		testAuthorizer,
@@ -183,7 +183,8 @@ func TestGetWorkoutWhenUnauthorized(t *testing.T) {
 	title := "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur vivamus."
 	uname := "robin"
 
-	testService.CreateWorkout(title, uname)
+	created, _ := testService.CreateWorkout(title, uname)
+	assert.NotEmpty(t, created)
 
 	got, err := testService.GetWorkout(0, "bobin")
 
@@ -200,7 +201,7 @@ func TestGetWorkoutWhenNotExist(t *testing.T) {
 	mockUS.On("FindUserByUsername").Return(user, true, nil)
 
 	testAuthorizer := workout.NewWorkoutAuthorizer(mockWS, mockUS)
-	testValidator := workout.NewWorkoutValidator(mockWS)
+	testValidator := workout.NewWorkoutValidator()
 	testService := workout.NewWorkoutService(
 		mockWS,
 		testAuthorizer,
@@ -210,7 +211,8 @@ func TestGetWorkoutWhenNotExist(t *testing.T) {
 	title := "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur vivamus."
 	uname := "robin"
 
-	testService.CreateWorkout(title, uname)
+	created, _ := testService.CreateWorkout(title, uname)
+	assert.NotEmpty(t, created)
 
 	got, err := testService.GetWorkout(1, uname)
 
@@ -227,7 +229,7 @@ func TestGetWorkoutSuccess(t *testing.T) {
 	mockUS.On("FindUserByUsername").Return(user, true, nil)
 
 	testAuthorizer := workout.NewWorkoutAuthorizer(mockWS, mockUS)
-	testValidator := workout.NewWorkoutValidator(mockWS)
+	testValidator := workout.NewWorkoutValidator()
 	testService := workout.NewWorkoutService(
 		mockWS,
 		testAuthorizer,
@@ -238,7 +240,8 @@ func TestGetWorkoutSuccess(t *testing.T) {
 	uname := "robin"
 	var id2 int64 = 0
 
-	testService.CreateWorkout(title, uname)
+	created, _ := testService.CreateWorkout(title, uname)
+	assert.NotEmpty(t, created)
 
 	got, err := testService.GetWorkout(id2, uname)
 
@@ -248,4 +251,64 @@ func TestGetWorkoutSuccess(t *testing.T) {
 	assert.Equal(t, title, got.Title)
 	assert.Equal(t, id2, got.ID)
 	assert.NotEmpty(t, got.CreatedAt)
+}
+
+func TestDeleteWorkoutWhenUnauthorized(t *testing.T) {
+	mockUS := new(authtests.MockStore)
+	mockWS := ws.NewMockWorkoutStore()
+	var id int64 = 1
+	user := authtests.CreateValidMockUser(id)
+	mockUS.On("FindUserByUsername").Return(user, true, nil)
+
+	testAuthorizer := workout.NewWorkoutAuthorizer(mockWS, mockUS)
+	testValidator := workout.NewWorkoutValidator()
+	testService := workout.NewWorkoutService(
+		mockWS,
+		testAuthorizer,
+		testValidator,
+	)
+
+	title := "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur vivamus."
+	uname := "robin"
+
+	testService.CreateWorkout(title, uname)
+
+	err := testService.DeleteWorkout(0, "bobin")
+
+	assert.NotNil(t, err)
+	assert.Equal(t, "Access Denied!", err.Error())
+
+	got, _ := testService.GetWorkout(0, "robin")
+	assert.NotEmpty(t, got)
+	assert.Equal(t, int64(0), got.ID)
+}
+
+func TestDeleteWorkoutSuccess(t *testing.T) {
+	mockUS := new(authtests.MockStore)
+	mockWS := ws.NewMockWorkoutStore()
+	var id int64 = 1
+	user := authtests.CreateValidMockUser(id)
+	mockUS.On("FindUserByUsername").Return(user, true, nil)
+
+	testAuthorizer := workout.NewWorkoutAuthorizer(mockWS, mockUS)
+	testValidator := workout.NewWorkoutValidator()
+	testService := workout.NewWorkoutService(
+		mockWS,
+		testAuthorizer,
+		testValidator,
+	)
+
+	title := "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur vivamus."
+	uname := "robin"
+
+	testService.CreateWorkout(title, uname)
+
+	err := testService.DeleteWorkout(0, "robin")
+
+	assert.Nil(t, err)
+
+	got, err2 := testService.GetWorkout(0, "robin")
+	assert.NotEmpty(t, err2)
+	assert.Equal(t, "Access Denied!", err2.Error())
+	assert.Empty(t, got)
 }

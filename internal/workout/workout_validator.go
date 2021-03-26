@@ -4,7 +4,6 @@ import (
 	"errors"
 	"github.com/go-playground/validator/v10"
 
-	"github.com/mhd53/quanta-fitness-server/internal/datastore/workoutstore"
 	"github.com/mhd53/quanta-fitness-server/internal/entity"
 )
 
@@ -17,12 +16,9 @@ type workoutValidator struct{}
 
 var (
 	validate = validator.New()
-	vws      workoutstore.WorkoutStore
 )
 
-func NewWorkoutValidator(
-	workoutstore workoutstore.WorkoutStore) WorkoutValidator {
-	vws = workoutstore
+func NewWorkoutValidator() WorkoutValidator {
 	return &workoutValidator{}
 }
 

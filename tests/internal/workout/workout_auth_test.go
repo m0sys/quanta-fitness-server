@@ -47,7 +47,9 @@ func TestAuthorizeAccessWorkoutWhenUnauthorized(t *testing.T) {
 	mockWS := ws.NewMockWorkoutStore()
 	mockUS.On("FindUserByUsername").Return(entity.User{}, false, nil)
 
-	mockWS.Save(createWorkout())
+	created, _ := mockWS.Save(createWorkout())
+	assert.NotEmpty(t, created)
+
 	testAuthorizer := workout.NewWorkoutAuthorizer(mockWS, mockUS)
 
 	ok, err := testAuthorizer.AuthorizeAccessWorkout("hello", 1)
@@ -67,7 +69,8 @@ func TestAuthorizeAccessWorkoutWhenUserNotOwnWorkout(t *testing.T) {
 	skipTest(t)
 	mockUS := new(authtests.MockStore)
 	mockWS := ws.NewMockWorkoutStore()
-	mockWS.Save(createWorkout())
+	created, _ := mockWS.Save(createWorkout())
+	assert.NotEmpty(t, created)
 
 	var id int64 = 1
 	user := authtests.CreateValidMockUser(id)
@@ -102,7 +105,8 @@ func TestAuthorizeAccessWorkoutSuccess(t *testing.T) {
 	skipTest(t)
 	mockUS := new(authtests.MockStore)
 	mockWS := ws.NewMockWorkoutStore()
-	mockWS.Save(createWorkout())
+	created, _ := mockWS.Save(createWorkout())
+	assert.NotEmpty(t, created)
 
 	var id int64 = 1
 	user := authtests.CreateValidMockUser(id)

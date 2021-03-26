@@ -17,7 +17,7 @@ type User struct {
 	Height    float32   `json:"height"`
 	Gender    string    `json:"gender"`
 	Joined    time.Time `json:"joined"`
-	updatedAt time.Time `json:"updated_at"`
+	UpdatedAt time.Time `json:"updated_at"`
 }
 
 type UserRegister struct {

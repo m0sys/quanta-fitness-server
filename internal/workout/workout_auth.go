@@ -63,7 +63,7 @@ func (*authorizer) AuthorizeAccessWorkout(uname string, wid int64) (bool, error)
 }
 
 func checkUserOwnsWorkout(uname string, wid int64) (bool, error) {
-	workoutDS, found, err := ws.FindWorkoutById(wid)
+	workoutDS, found, err := aws.FindWorkoutById(wid)
 	if err != nil {
 		log.Fatal(err)
 		return false, errors.New("Internal error! Please try again later.")
