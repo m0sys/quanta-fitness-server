@@ -1,15 +1,10 @@
 package authtests
 
 import (
-	"errors"
 	"github.com/stretchr/testify/mock"
 
 	"github.com/mhd53/quanta-fitness-server/internal/entity"
 	"github.com/mhd53/quanta-fitness-server/pkg/crypto"
-)
-
-var (
-	MOCK_ERROR = errors.New("Mock Error")
 )
 
 const (
