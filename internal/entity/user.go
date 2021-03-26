@@ -7,7 +7,7 @@ import (
 type BaseUser struct {
 	Username string `json:"username"`
 	Email    string `json:"email"`
-	Password string `json:"password"`
+	Password string `json:"password"` // NOTE: this must be hashed!
 }
 
 type User struct {
