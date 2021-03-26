@@ -5,6 +5,7 @@ import (
 	"github.com/stretchr/testify/mock"
 	"time"
 
+	// "github.com/mhd53/quanta-fitness-server/internal/datastore/workoutstore"
 	"github.com/mhd53/quanta-fitness-server/internal/entity"
 )
 
@@ -13,8 +14,10 @@ var (
 )
 
 const (
-	MOCK_UNAME = "robin"
-	MOCK_TITLE = "Chest Day"
+	MOCK_UNAME       = "robin"
+	MOCK_TITLE       = "Chest Day"
+	MOCK_VAL_TITLE   = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur vivamus."
+	MOCK_INVAL_TITLE = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur vivamus.."
 )
 
 type MockStore struct {
@@ -43,7 +46,7 @@ func (mock *MockStore) DeleteWorkout(wid int64) error {
 	return args.Error(0)
 }
 
-func (mock *MockStore) FindAllWorkoutsByUid(uid int64) ([]entity.Workout, error) {
+func (mock *MockStore) FindAllWorkoutsByUname(uname string) ([]entity.Workout, error) {
 	args := mock.Called()
 	result := args.Get(0)
 	return result.([]entity.Workout), args.Error(1)
@@ -62,4 +65,18 @@ func CreateValidMockWorkout(id int64) entity.Workout {
 	}
 
 	return workout
+}
+
+func CreateValidMockBaseWorkout() entity.BaseWorkout {
+	return entity.BaseWorkout{
+		Title:    MOCK_VAL_TITLE,
+		Username: MOCK_UNAME,
+	}
+}
+
+func CreateInvalidMockBaseWorkout() entity.BaseWorkout {
+	return entity.BaseWorkout{
+		Title:    MOCK_INVAL_TITLE,
+		Username: MOCK_UNAME,
+	}
 }
