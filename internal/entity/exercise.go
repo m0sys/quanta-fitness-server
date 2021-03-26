@@ -7,7 +7,14 @@ import (
 type BaseExercise struct {
 	Name     string `json:"name"`
 	WID      int64  `json:"wid"`
-	Username int64  `json:"username"`
+	Username string `json:"username"`
+}
+
+type Metrics struct {
+	Weight    float32 `json:"weight"`
+	TargetRep int     `json:"target_rep"`
+	RestTime  float32 `json:"rest_time"`
+	NumSets   int     `json:"num_sets"`
 }
 
 type Exercise struct {
@@ -15,8 +22,10 @@ type Exercise struct {
 	ID        int64     `json:"id"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
-	Weight    float32   `json:"weight"`
-	TargetRep int       `json:"target_rep"`
-	RestTime  float32   `json:"rest_time"`
-	NumSets   int       `json:"num_sets"`
+	Metrics
+}
+
+type ExerciseUpdate struct {
+	BaseExercise
+	Metrics
 }
