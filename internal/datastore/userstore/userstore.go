@@ -1,4 +1,4 @@
-package datastore
+package userstore
 
 import (
 	"github.com/mhd53/quanta-fitness-server/internal/entity"

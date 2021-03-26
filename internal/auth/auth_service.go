@@ -4,52 +4,45 @@ import (
 	"errors"
 	"log"
 
-	"github.com/mhd53/quanta-fitness-server/internal/datastore"
+	"github.com/mhd53/quanta-fitness-server/internal/datastore/userstore"
 	"github.com/mhd53/quanta-fitness-server/internal/entity"
 	"github.com/mhd53/quanta-fitness-server/pkg/crypto"
 )
 
 type AuthService interface {
-	Register(uname, email, pwd, confirm string) (string, error)
-	LoginWithUname(uname, pwd string) (string, error)
-	LoginWithEmail(email, pwd string) (string, error)
+	Register(uname, email, pwd, confirm string) (entity.User, error)
+	LoginWithUname(uname, pwd string) (entity.User, error)
+	LoginWithEmail(email, pwd string) (entity.User, error)
 	Logout(token string) error
 }
 
 type service struct{}
 
 var (
-	ds  datastore.UserStore
+	ds  userstore.UserStore
 	val AuthValidator
 )
 
-func NewAuthService(datastore datastore.UserStore, validator AuthValidator) AuthService {
-	ds = datastore
+func NewAuthService(userstore userstore.UserStore, validator AuthValidator) AuthService {
+	ds = userstore
 	val = validator
 	return &service{}
 }
 
-func (*service) Register(uname, email, pwd, confirm string) (string, error) {
+func (*service) Register(uname, email, pwd, confirm string) (entity.User, error) {
 
 	err := val.ValidateRegisteration(uname, email, pwd, confirm)
 
 	if err != nil {
 		log.Print(err)
-		return "", err
-	}
-
-	token, err2 := crypto.GenerateToken(uname)
-
-	if err2 != nil {
-		log.Fatal(err2)
-		return "", errors.New("Failed to register user! Please try again later.")
+		return entity.User{}, err
 	}
 
 	hashedPwd, err3 := crypto.HashPwd(pwd)
 
 	if err3 != nil {
 		log.Fatal(err3)
-		return "", errors.New("Failed to register user! Please try again later.")
+		return entity.User{}, errors.New("Failed to register user! Please try again later.")
 	}
 
 	user := entity.BaseUser{
@@ -58,51 +51,45 @@ func (*service) Register(uname, email, pwd, confirm string) (string, error) {
 		Password: hashedPwd,
 	}
 
-	_, err4 := ds.Save(user)
+	userDS, err4 := ds.Save(user)
 	if err4 != nil {
 		log.Fatal(err4)
-		return "", errors.New("Failed to register user! Please try again later.")
+		return entity.User{}, errors.New("Failed to register user! Please try again later.")
 	}
 
-	return token, nil
+	return userDS, nil
 }
 
-func (*service) LoginWithUname(uname, pwd string) (string, error) {
+func (*service) LoginWithUname(uname, pwd string) (entity.User, error) {
 	err := val.ValidateLoginWithUname(uname, pwd)
 
 	if err != nil {
-		return "", err
+		return entity.User{}, err
 	}
 
-	token, err2 := crypto.GenerateToken(uname)
+	userDS, _, err2 := ds.FindUserByUsername(uname)
 	if err2 != nil {
 		log.Fatal(err2)
-		return "", errors.New("Failed to register user! Please try again later.")
+		return entity.User{}, errors.New("Failed to login! Please try again later.")
 	}
 
-	return token, nil
+	return userDS, nil
 }
 
-func (*service) LoginWithEmail(email, pwd string) (string, error) {
+func (*service) LoginWithEmail(email, pwd string) (entity.User, error) {
 	err := val.ValidateLoginWithEmail(email, pwd)
 
 	if err != nil {
-		return "", err
+		return entity.User{}, err
 	}
 
-	user, _, err2 := ds.FindUserByEmail(email)
+	userDS, _, err2 := ds.FindUserByEmail(email)
 	if err2 != nil {
 		log.Fatal(err2)
-		return "", errors.New("Failed to register user! Please try again later.")
+		return entity.User{}, errors.New("Failed to register user! Please try again later.")
 	}
 
-	token, err3 := crypto.GenerateToken(user.Username)
-	if err2 != nil {
-		log.Fatal(err3)
-		return "", errors.New("Failed to register user! Please try again later.")
-	}
-
-	return token, nil
+	return userDS, nil
 }
 
 func (*service) Logout(string) error {

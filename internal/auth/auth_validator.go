@@ -5,13 +5,13 @@ import (
 	"github.com/go-playground/validator/v10"
 	"log"
 
-	"github.com/mhd53/quanta-fitness-server/internal/datastore"
+	"github.com/mhd53/quanta-fitness-server/internal/datastore/userstore"
 	"github.com/mhd53/quanta-fitness-server/pkg/crypto"
 )
 
 var (
 	validate = validator.New()
-	valStore datastore.UserStore
+	valStore userstore.UserStore
 )
 
 type authValidator struct{}
@@ -22,7 +22,7 @@ type AuthValidator interface {
 	ValidateLoginWithEmail(email, pwd string) error
 }
 
-func NewAuthValidator(userStore datastore.UserStore) AuthValidator {
+func NewAuthValidator(userStore userstore.UserStore) AuthValidator {
 	valStore = userStore
 	return &authValidator{}
 }
