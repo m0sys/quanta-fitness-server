@@ -9,5 +9,5 @@ type WorkoutStore interface {
 	Update(wid int64, updates entity.BaseWorkout) error
 	FindWorkoutById(wid int64) (entity.Workout, bool, error)
 	DeleteWorkout(wid int64) error
-	FindAllWorkoutsByUid(uid int64) ([]entity.Workout, error)
+	FindAllWorkoutsByUname(uname string) ([]entity.Workout, error)
 }

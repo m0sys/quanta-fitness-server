@@ -10,9 +10,7 @@ import (
 
 type WorkoutValidator interface {
 	ValidateCreateWorkout(title string) error
-	ValidateUpdateWorkout(workout entity.Workout) error
-	ValidateDeleteWorkout(wid int64) error
-	ValidateGetWorkoutExercises(wid int64) error
+	ValidateUpdateWorkout(workout entity.BaseWorkout) error
 }
 
 type workoutValidator struct{}
@@ -29,7 +27,11 @@ func NewWorkoutValidator(
 }
 
 func (*workoutValidator) ValidateCreateWorkout(title string) error {
+	return validateTitle(title)
 
+}
+
+func validateTitle(title string) error {
 	err := checkTitleLength(title)
 	if err != nil {
 		return err
@@ -46,17 +48,7 @@ func checkTitleLength(title string) error {
 	return nil
 }
 
-func (*workoutValidator) ValidateUpdateWorkout(workout entity.Workout) error {
-	return nil
-
-}
-
-func (*workoutValidator) ValidateDeleteWorkout(wid int64) error {
-	return nil
-
-}
-
-func (*workoutValidator) ValidateGetWorkoutExercises(wid int64) error {
-	return nil
+func (*workoutValidator) ValidateUpdateWorkout(workout entity.BaseWorkout) error {
+	return validateTitle(workout.Title)
 
 }

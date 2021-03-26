@@ -11,9 +11,7 @@ import (
 
 type WorkoutAuth interface {
 	AuthorizeCreateWorkout(uname string) (bool, error)
-	AuthorizeUpdateWorkout(uname string, wid int64) (bool, error)
-	AuthorizeDeleteWorkout(uname string, wid int64) (bool, error)
-	AuthorizeGetWorkoutExercises(uname string, wid int64) (bool, error)
+	AuthorizeAccessWorkout(uname string, wid int64) (bool, error)
 }
 
 type authorizer struct{}
@@ -31,6 +29,10 @@ func NewWorkoutAuthorizer(workoutstore workoutstore.WorkoutStore,
 }
 
 func (*authorizer) AuthorizeCreateWorkout(uname string) (bool, error) {
+	return checkUserExists(uname)
+}
+
+func checkUserExists(uname string) (bool, error) {
 	_, found, err := aus.FindUserByUsername(uname)
 	if err != nil {
 		log.Fatal(err)
@@ -42,16 +44,39 @@ func (*authorizer) AuthorizeCreateWorkout(uname string) (bool, error) {
 	}
 
 	return true, nil
+
 }
 
-func (*authorizer) AuthorizeUpdateWorkout(uname string, wid int64) (bool, error) {
-	return true, nil
+func (*authorizer) AuthorizeAccessWorkout(uname string, wid int64) (bool, error) {
+	ok, err := checkUserExists(uname)
+
+	if err != nil {
+		return ok, err
+	}
+
+	if !ok {
+		return false, errors.New("Access Denied!")
+	}
+
+	return checkUserOwnsWorkout(uname, wid)
+
 }
 
-func (*authorizer) AuthorizeDeleteWorkout(uname string, wid int64) (bool, error) {
-	return true, nil
-}
+func checkUserOwnsWorkout(uname string, wid int64) (bool, error) {
+	workoutDS, found, err := ws.FindWorkoutById(wid)
+	if err != nil {
+		log.Fatal(err)
+		return false, errors.New("Internal error! Please try again later.")
 
-func (*authorizer) AuthorizeGetWorkoutExercises(uname string, wid int64) (bool, error) {
+	}
+
+	if !found {
+		return false, nil
+	}
+
+	if workoutDS.Username != uname {
+		return false, nil
+	}
+
 	return true, nil
 }
