@@ -86,7 +86,8 @@ func TestUpdateWorkoutWhenUnauthorized(t *testing.T) {
 	mockUS.On("FindUserByUsername").Return(entity.User{}, false, nil)
 
 	mockBaseWorkout := CreateValidMockBaseWorkout()
-	mockWS.Save(mockBaseWorkout)
+	created, _ := mockWS.Save(mockBaseWorkout)
+	assert.NotEmpty(t, created)
 
 	testAuthorizer := workout.NewWorkoutAuthorizer(mockWS, mockUS)
 	testValidator := workout.NewWorkoutValidator()
@@ -111,7 +112,8 @@ func TestUpdateWorkoutInvalidWorkout(t *testing.T) {
 	mockUS.On("FindUserByUsername").Return(mockUser, true, nil)
 
 	mockWorkout := CreateValidMockBaseWorkout()
-	mockWS.Save(mockWorkout)
+	created, _ := mockWS.Save(mockWorkout)
+	assert.NotEmpty(t, created)
 	mockBaseWorkout := CreateInvalidMockBaseWorkout()
 
 	testAuthorizer := workout.NewWorkoutAuthorizer(mockWS, mockUS)
@@ -271,7 +273,8 @@ func TestDeleteWorkoutWhenUnauthorized(t *testing.T) {
 	title := "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur vivamus."
 	uname := "robin"
 
-	testService.CreateWorkout(title, uname)
+	created, _ := testService.CreateWorkout(title, uname)
+	assert.NotEmpty(t, created)
 
 	err := testService.DeleteWorkout(0, "bobin")
 
@@ -301,7 +304,8 @@ func TestDeleteWorkoutSuccess(t *testing.T) {
 	title := "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur vivamus."
 	uname := "robin"
 
-	testService.CreateWorkout(title, uname)
+	created, _ := testService.CreateWorkout(title, uname)
+	assert.NotEmpty(t, created)
 
 	err := testService.DeleteWorkout(0, "robin")
 

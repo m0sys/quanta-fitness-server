@@ -14,7 +14,9 @@ func TestRegisterWhenUserExists(t *testing.T) {
 	mockStore := us.NewMockUserStore()
 
 	user := createAuthUser()
-	mockStore.Save(user)
+	created, _ := mockStore.Save(user)
+
+	assert.NotEmpty(t, created)
 
 	testValidator := auth.NewAuthValidator(mockStore)
 	testService := auth.NewAuthService(mockStore, testValidator)
@@ -74,7 +76,8 @@ func TestLoginWithUnameWhenUserNotExist(t *testing.T) {
 func TestLoginWithUnameWhenIncorrectPwd(t *testing.T) {
 	mockStore := us.NewMockUserStore()
 	user := createAuthUser()
-	mockStore.Save(user)
+	created, _ := mockStore.Save(user)
+	assert.NotEmpty(t, created)
 
 	testValidator := auth.NewAuthValidator(mockStore)
 	testService := auth.NewAuthService(mockStore, testValidator)
@@ -89,7 +92,8 @@ func TestLoginWithUnameWhenIncorrectPwd(t *testing.T) {
 func TestLoginWithUnameSuccess(t *testing.T) {
 	mockStore := us.NewMockUserStore()
 	user := createAuthUser()
-	mockStore.Save(user)
+	created, _ := mockStore.Save(user)
+	assert.NotEmpty(t, created)
 
 	testValidator := auth.NewAuthValidator(mockStore)
 	testService := auth.NewAuthService(mockStore, testValidator)
@@ -117,7 +121,8 @@ func TestLoginWithEmailWhenUserNotExist(t *testing.T) {
 func TestLoginWithEmailWhenIncorrectPwd(t *testing.T) {
 	mockStore := us.NewMockUserStore()
 	user := createAuthUser()
-	mockStore.Save(user)
+	created, _ := mockStore.Save(user)
+	assert.NotEmpty(t, created)
 
 	testValidator := auth.NewAuthValidator(mockStore)
 	testService := auth.NewAuthService(mockStore, testValidator)
@@ -132,7 +137,8 @@ func TestLoginWithEmailWhenIncorrectPwd(t *testing.T) {
 func TestLoginWithEmailWhenInvalidEmail(t *testing.T) {
 	mockStore := us.NewMockUserStore()
 	user := createAuthUser()
-	mockStore.Save(user)
+	created, _ := mockStore.Save(user)
+	assert.NotEmpty(t, created)
 
 	testValidator := auth.NewAuthValidator(mockStore)
 	testService := auth.NewAuthService(mockStore, testValidator)
@@ -147,7 +153,8 @@ func TestLoginWithEmailWhenInvalidEmail(t *testing.T) {
 func TestLoginWithEmailSuccess(t *testing.T) {
 	mockStore := us.NewMockUserStore()
 	user := createAuthUser()
-	mockStore.Save(user)
+	created, _ := mockStore.Save(user)
+	assert.NotEmpty(t, created)
 
 	testValidator := auth.NewAuthValidator(mockStore)
 	testService := auth.NewAuthService(mockStore, testValidator)
