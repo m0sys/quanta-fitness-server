@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/mhd53/quanta-fitness-server/internal/auth"
-	"github.com/mhd53/quanta-fitness-server/internal/entity"
+	us "github.com/mhd53/quanta-fitness-server/internal/datastore/userstore"
 )
 
 func TestValidateRegisterationMismatch(t *testing.T) {
@@ -19,12 +19,10 @@ func TestValidateRegisterationMismatch(t *testing.T) {
 }
 
 func TestValidateRegisterationUserExists(t *testing.T) {
-	mockStore := new(MockStore)
+	mockStore := us.NewMockUserStore()
 
-	var id int64 = 1
-	user := CreateValidMockUser(id)
-
-	mockStore.On("FindUserByUsername").Return(user, true, nil)
+	ucreated, _ := mockStore.Save(CreateValidAuthBaseUser())
+	assert.NotEmpty(t, ucreated)
 
 	testValidator := auth.NewAuthValidator(mockStore)
 
@@ -35,9 +33,7 @@ func TestValidateRegisterationUserExists(t *testing.T) {
 }
 
 func TestValidateRegisterationSuccess(t *testing.T) {
-	mockStore := new(MockStore)
-
-	mockStore.On("FindUserByUsername").Return(entity.User{}, false, nil)
+	mockStore := us.NewMockUserStore()
 
 	testValidator := auth.NewAuthValidator(mockStore)
 
@@ -47,23 +43,8 @@ func TestValidateRegisterationSuccess(t *testing.T) {
 }
 
 func TestValidateRegisterationWithInvalidEmail(t *testing.T) {
-	mockStore := new(MockStore)
+	mockStore := us.NewMockUserStore()
 	notEmail := "notanemail.com"
-
-	var id int64 = 1
-	user := entity.User{
-		ID: id,
-		BaseUser: entity.BaseUser{
-			Username: MOCK_USERNAME,
-			Email:    notEmail,
-			Password: MOCK_PWD,
-		},
-		Weight: MOCK_WEIGHT,
-		Height: MOCK_HEIGHT,
-		Gender: MOCK_GENDER,
-	}
-
-	mockStore.On("FindUserByUsername").Return(user, false, nil)
 
 	testValidator := auth.NewAuthValidator(mockStore)
 
@@ -74,9 +55,7 @@ func TestValidateRegisterationWithInvalidEmail(t *testing.T) {
 }
 
 func TestValidateLoginWithUnameWhenUserNotExist(t *testing.T) {
-	mockStore := new(MockStore)
-
-	mockStore.On("FindUserByUsername").Return(entity.User{}, false, nil)
+	mockStore := us.NewMockUserStore()
 
 	testValidator := auth.NewAuthValidator(mockStore)
 
@@ -87,12 +66,10 @@ func TestValidateLoginWithUnameWhenUserNotExist(t *testing.T) {
 }
 
 func TestValidateLoginWithUnameWhenIncorrectPwd(t *testing.T) {
-	mockStore := new(MockStore)
+	mockStore := us.NewMockUserStore()
 
-	var id int64 = 1
-	user := CreateValidMockUser(id)
-
-	mockStore.On("FindUserByUsername").Return(user, true, nil)
+	ucreated, _ := mockStore.Save(CreateValidAuthBaseUser())
+	assert.NotEmpty(t, ucreated)
 
 	testValidator := auth.NewAuthValidator(mockStore)
 
@@ -103,11 +80,10 @@ func TestValidateLoginWithUnameWhenIncorrectPwd(t *testing.T) {
 }
 
 func TestValidateLoginWithUnameSuccess(t *testing.T) {
-	mockStore := new(MockStore)
+	mockStore := us.NewMockUserStore()
 
-	var id int64 = 1
-	user := CreateValidMockUser(id)
-	mockStore.On("FindUserByUsername").Return(user, true, nil)
+	ucreated, _ := mockStore.Save(CreateValidAuthBaseUser())
+	assert.NotEmpty(t, ucreated)
 
 	testValidator := auth.NewAuthValidator(mockStore)
 
@@ -117,9 +93,7 @@ func TestValidateLoginWithUnameSuccess(t *testing.T) {
 }
 
 func TestValidateLoginWithEmaileWhenUserNotExist(t *testing.T) {
-	mockStore := new(MockStore)
-
-	mockStore.On("FindUserByEmail").Return(entity.User{}, false, nil)
+	mockStore := us.NewMockUserStore()
 
 	testValidator := auth.NewAuthValidator(mockStore)
 
@@ -130,12 +104,10 @@ func TestValidateLoginWithEmaileWhenUserNotExist(t *testing.T) {
 }
 
 func TestValidateLoginWithEmailWhenIncorrectPwd(t *testing.T) {
-	mockStore := new(MockStore)
+	mockStore := us.NewMockUserStore()
 
-	var id int64 = 1
-	user := CreateValidMockUser(id)
-
-	mockStore.On("FindUserByEmail").Return(user, true, nil)
+	ucreated, _ := mockStore.Save(CreateValidAuthBaseUser())
+	assert.NotEmpty(t, ucreated)
 
 	testValidator := auth.NewAuthValidator(mockStore)
 
@@ -146,12 +118,10 @@ func TestValidateLoginWithEmailWhenIncorrectPwd(t *testing.T) {
 }
 
 func TestValidateLoginWithEmailWhenInvalidEmail(t *testing.T) {
-	mockStore := new(MockStore)
+	mockStore := us.NewMockUserStore()
 
-	var id int64 = 1
-	user := CreateValidMockUser(id)
-
-	mockStore.On("FindUserByEmail").Return(user, true, nil)
+	ucreated, _ := mockStore.Save(CreateValidAuthBaseUser())
+	assert.NotEmpty(t, ucreated)
 
 	testValidator := auth.NewAuthValidator(mockStore)
 
@@ -162,11 +132,10 @@ func TestValidateLoginWithEmailWhenInvalidEmail(t *testing.T) {
 }
 
 func TestValidateLoginWithEmailSuccess(t *testing.T) {
-	mockStore := new(MockStore)
+	mockStore := us.NewMockUserStore()
 
-	var id int64 = 1
-	user := CreateValidMockUser(id)
-	mockStore.On("FindUserByEmail").Return(user, true, nil)
+	ucreated, _ := mockStore.Save(CreateValidAuthBaseUser())
+	assert.NotEmpty(t, ucreated)
 
 	testValidator := auth.NewAuthValidator(mockStore)
 

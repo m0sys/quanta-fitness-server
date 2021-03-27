@@ -1,8 +1,6 @@
 package authtests
 
 import (
-	"github.com/stretchr/testify/mock"
-
 	"github.com/mhd53/quanta-fitness-server/internal/entity"
 	"github.com/mhd53/quanta-fitness-server/pkg/crypto"
 )
@@ -17,28 +15,6 @@ const (
 	MOCK_GENDER           = "male"
 )
 
-type MockStore struct {
-	mock.Mock
-}
-
-func (mock *MockStore) Save(user entity.BaseUser) (entity.User, error) {
-	args := mock.Called()
-	result := args.Get(0)
-	return result.(entity.User), args.Error(1)
-}
-
-func (mock *MockStore) FindUserByUsername(username string) (entity.User, bool, error) {
-	args := mock.Called()
-	result := args.Get(0)
-	return result.(entity.User), args.Bool(1), args.Error(2)
-}
-
-func (mock *MockStore) FindUserByEmail(email string) (entity.User, bool, error) {
-	args := mock.Called()
-	result := args.Get(0)
-	return result.(entity.User), args.Bool(1), args.Error(2)
-}
-
 func CreateValidMockUser(id int64) entity.User {
 	hashedPwd, _ := crypto.HashPwd(MOCK_PWD)
 
@@ -52,6 +28,18 @@ func CreateValidMockUser(id int64) entity.User {
 		Weight: MOCK_WEIGHT,
 		Height: MOCK_HEIGHT,
 		Gender: MOCK_GENDER,
+	}
+
+	return user
+}
+
+func CreateValidAuthBaseUser() entity.BaseUser {
+	hashedPwd, _ := crypto.HashPwd(MOCK_PWD)
+
+	user := entity.BaseUser{
+		Username: MOCK_USERNAME,
+		Email:    MOCK_EMAIL,
+		Password: hashedPwd,
 	}
 
 	return user

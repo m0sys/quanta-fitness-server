@@ -6,7 +6,7 @@ import (
 
 	"github.com/mhd53/quanta-fitness-server/internal/datastore/userstore"
 	"github.com/mhd53/quanta-fitness-server/internal/datastore/workoutstore"
-	// "github.com/mhd53/quanta-fitness-server/internal/entity"
+	"github.com/mhd53/quanta-fitness-server/internal/util"
 )
 
 type WorkoutAuth interface {
@@ -29,33 +29,18 @@ func NewWorkoutAuthorizer(workoutstore workoutstore.WorkoutStore,
 }
 
 func (*authorizer) AuthorizeCreateWorkout(uname string) (bool, error) {
-	return checkUserExists(uname)
-}
-
-func checkUserExists(uname string) (bool, error) {
-	_, found, err := aus.FindUserByUsername(uname)
-	if err != nil {
-		log.Fatal(err)
-		return false, errors.New("Internal error! Please try again later.")
-	}
-
-	if !found {
-		return false, nil
-	}
-
-	return true, nil
-
+	return util.CheckUserExists(aus, uname)
 }
 
 func (*authorizer) AuthorizeAccessWorkout(uname string, wid int64) (bool, error) {
-	ok, err := checkUserExists(uname)
+	ok, err := util.CheckUserExists(aus, uname)
 
 	if err != nil {
 		return ok, err
 	}
 
 	if !ok {
-		return false, errors.New("Access Denied!")
+		return false, nil
 	}
 
 	return checkUserOwnsWorkout(uname, wid)
