@@ -15,13 +15,8 @@ import (
 	wts "github.com/mhd53/quanta-fitness-server/tests/internal/workout"
 )
 
-func TestAuthorizeWorkoutAccessWhenUnauthorized(t *testing.T) {
-	mockUS := us.NewMockUserStore()
-	mockES := es.NewMockExerciseStore()
-	mockWS := ws.NewMockWorkoutStore()
-
-	testWauthorizer := w.NewWorkoutAuthorizer(mockWS, mockUS)
-	testAuthorizer := e.NewExerciseAuthorizer(mockES, mockUS, testWauthorizer)
+func TestAuthorizeWorkoutAccessWhenUnauthenticated(t *testing.T) {
+	testAuthorizer, _, _, _ := setupAuth()
 
 	ok, err := testAuthorizer.AuthorizeWorkoutAccess("hello", 0)
 
@@ -30,15 +25,10 @@ func TestAuthorizeWorkoutAccessWhenUnauthorized(t *testing.T) {
 }
 
 func TestAuthorizeWorkoutAccessWhenWorkoutNotFound(t *testing.T) {
-	mockUS := us.NewMockUserStore()
-	mockES := es.NewMockExerciseStore()
-	mockWS := ws.NewMockWorkoutStore()
+	testAuthorizer, mockUS, _, _ := setupAuth()
 
 	ucreated, _ := mockUS.Save(ats.CreateValidAuthBaseUser())
 	assert.NotEmpty(t, ucreated)
-
-	testWauthorizer := w.NewWorkoutAuthorizer(mockWS, mockUS)
-	testAuthorizer := e.NewExerciseAuthorizer(mockES, mockUS, testWauthorizer)
 
 	ok, err := testAuthorizer.AuthorizeWorkoutAccess("robin", 0)
 
@@ -47,9 +37,7 @@ func TestAuthorizeWorkoutAccessWhenWorkoutNotFound(t *testing.T) {
 }
 
 func TestAuthorizeWorkoutAccessWhenWorkoutNotOwn(t *testing.T) {
-	mockUS := us.NewMockUserStore()
-	mockES := es.NewMockExerciseStore()
-	mockWS := ws.NewMockWorkoutStore()
+	testAuthorizer, mockUS, _, mockWS := setupAuth()
 
 	ucreated, _ := mockUS.Save(ats.CreateValidAuthBaseUser())
 	assert.NotEmpty(t, ucreated)
@@ -60,9 +48,6 @@ func TestAuthorizeWorkoutAccessWhenWorkoutNotOwn(t *testing.T) {
 	})
 	assert.NotEmpty(t, wcreated)
 
-	testWauthorizer := w.NewWorkoutAuthorizer(mockWS, mockUS)
-	testAuthorizer := e.NewExerciseAuthorizer(mockES, mockUS, testWauthorizer)
-
 	ok, err := testAuthorizer.AuthorizeWorkoutAccess("robin", 0)
 
 	assert.Nil(t, err)
@@ -70,9 +55,7 @@ func TestAuthorizeWorkoutAccessWhenWorkoutNotOwn(t *testing.T) {
 }
 
 func TestAuthorizeWorkoutAccessSuccess(t *testing.T) {
-	mockUS := us.NewMockUserStore()
-	mockES := es.NewMockExerciseStore()
-	mockWS := ws.NewMockWorkoutStore()
+	testAuthorizer, mockUS, _, mockWS := setupAuth()
 
 	ucreated, _ := mockUS.Save(ats.CreateValidAuthBaseUser())
 	assert.NotEmpty(t, ucreated)
@@ -80,11 +63,29 @@ func TestAuthorizeWorkoutAccessSuccess(t *testing.T) {
 	wcreated, _ := mockWS.Save(wts.CreateValidMockBaseWorkout())
 	assert.NotEmpty(t, wcreated)
 
-	testWauthorizer := w.NewWorkoutAuthorizer(mockWS, mockUS)
-	testAuthorizer := e.NewExerciseAuthorizer(mockES, mockUS, testWauthorizer)
-
 	ok, err := testAuthorizer.AuthorizeWorkoutAccess("robin", 0)
 
 	assert.Nil(t, err)
 	assert.True(t, ok)
+}
+
+func TestAuthorizeExerciseAccessWhenUnauthenticated(t *testing.T) {
+	testAuthorizer, _, _, _ := setupAuth()
+
+	ok, err := testAuthorizer.AuthorizeWorkoutAccess("hello", 0)
+
+	assert.Nil(t, err)
+	assert.False(t, ok)
+
+}
+
+// Utility funcs.
+
+func setupAuth() (e.ExerciseAuth, us.UserStore, es.ExerciseStore, ws.WorkoutStore) {
+	mockUS := us.NewMockUserStore()
+	mockES := es.NewMockExerciseStore()
+	mockWS := ws.NewMockWorkoutStore()
+
+	testWauthorizer := w.NewWorkoutAuthorizer(mockWS, mockUS)
+	return e.NewExerciseAuthorizer(mockES, mockUS, testWauthorizer), mockUS, mockES, mockWS
 }

@@ -16,15 +16,7 @@ import (
 )
 
 func TestAddExerciseToWorkoutWhenUnauthenticated(t *testing.T) {
-	mockUS := us.NewMockUserStore()
-	mockES := es.NewMockExerciseStore()
-	mockWS := ws.NewMockWorkoutStore()
-
-	testWauthorizer := w.NewWorkoutAuthorizer(mockWS, mockUS)
-	testAuthorizer := e.NewExerciseAuthorizer(mockES, mockUS, testWauthorizer)
-	testValidator := e.NewExerciseValidator()
-
-	testService := e.NewExerciseService(mockES, testAuthorizer, testValidator)
+	testService, _, _, _ := setupService()
 
 	created, err := testService.AddExerciseToWorkout(MOCK_VALID_NAME, "bobin", 0)
 
@@ -35,9 +27,7 @@ func TestAddExerciseToWorkoutWhenUnauthenticated(t *testing.T) {
 }
 
 func TestAddExerciseToWorkoutWhenWorkoutNotOwned(t *testing.T) {
-	mockUS := us.NewMockUserStore()
-	mockES := es.NewMockExerciseStore()
-	mockWS := ws.NewMockWorkoutStore()
+	testService, mockUS, _, mockWS := setupService()
 
 	ucreated, _ := mockUS.Save(ats.CreateValidAuthBaseUser())
 	assert.NotEmpty(t, ucreated)
@@ -48,12 +38,6 @@ func TestAddExerciseToWorkoutWhenWorkoutNotOwned(t *testing.T) {
 	})
 	assert.NotEmpty(t, wcreated)
 
-	testWauthorizer := w.NewWorkoutAuthorizer(mockWS, mockUS)
-	testAuthorizer := e.NewExerciseAuthorizer(mockES, mockUS, testWauthorizer)
-	testValidator := e.NewExerciseValidator()
-
-	testService := e.NewExerciseService(mockES, testAuthorizer, testValidator)
-
 	created, err := testService.AddExerciseToWorkout(MOCK_VALID_NAME, "robin", 0)
 
 	assert.NotNil(t, err)
@@ -63,21 +47,13 @@ func TestAddExerciseToWorkoutWhenWorkoutNotOwned(t *testing.T) {
 }
 
 func TestAddExerciseToWorkoutWhenInvalidName(t *testing.T) {
-	mockUS := us.NewMockUserStore()
-	mockES := es.NewMockExerciseStore()
-	mockWS := ws.NewMockWorkoutStore()
+	testService, mockUS, _, mockWS := setupService()
 
 	ucreated, _ := mockUS.Save(ats.CreateValidAuthBaseUser())
 	assert.NotEmpty(t, ucreated)
 
 	wcreated, _ := mockWS.Save(wts.CreateValidMockBaseWorkout())
 	assert.NotEmpty(t, wcreated)
-
-	testWauthorizer := w.NewWorkoutAuthorizer(mockWS, mockUS)
-	testAuthorizer := e.NewExerciseAuthorizer(mockES, mockUS, testWauthorizer)
-	testValidator := e.NewExerciseValidator()
-
-	testService := e.NewExerciseService(mockES, testAuthorizer, testValidator)
 
 	created, err := testService.AddExerciseToWorkout(MOCK_INVALID_NAME, "robin", 0)
 
@@ -88,21 +64,13 @@ func TestAddExerciseToWorkoutWhenInvalidName(t *testing.T) {
 }
 
 func TestAddExerciseToWorkoutSuccesss(t *testing.T) {
-	mockUS := us.NewMockUserStore()
-	mockES := es.NewMockExerciseStore()
-	mockWS := ws.NewMockWorkoutStore()
+	testService, mockUS, _, mockWS := setupService()
 
 	ucreated, _ := mockUS.Save(ats.CreateValidAuthBaseUser())
 	assert.NotEmpty(t, ucreated)
 
 	wcreated, _ := mockWS.Save(wts.CreateValidMockBaseWorkout())
 	assert.NotEmpty(t, wcreated)
-
-	testWauthorizer := w.NewWorkoutAuthorizer(mockWS, mockUS)
-	testAuthorizer := e.NewExerciseAuthorizer(mockES, mockUS, testWauthorizer)
-	testValidator := e.NewExerciseValidator()
-
-	testService := e.NewExerciseService(mockES, testAuthorizer, testValidator)
 
 	created, err := testService.AddExerciseToWorkout(MOCK_VALID_NAME, "robin", 0)
 
@@ -111,4 +79,18 @@ func TestAddExerciseToWorkoutSuccesss(t *testing.T) {
 
 	// TODO: Test by checking database.
 
+}
+
+// Utility funcs.
+
+func setupService() (e.ExerciseService, us.UserStore, es.ExerciseStore, ws.WorkoutStore) {
+	mockUS := us.NewMockUserStore()
+	mockES := es.NewMockExerciseStore()
+	mockWS := ws.NewMockWorkoutStore()
+
+	testWauthorizer := w.NewWorkoutAuthorizer(mockWS, mockUS)
+	testAuthorizer := e.NewExerciseAuthorizer(mockES, mockUS, testWauthorizer)
+	testValidator := e.NewExerciseValidator()
+
+	return e.NewExerciseService(mockES, testAuthorizer, testValidator), mockUS, mockES, mockWS
 }
