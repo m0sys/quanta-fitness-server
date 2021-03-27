@@ -4,12 +4,10 @@ import (
 	"github.com/stretchr/testify/assert"
 	"testing"
 
-	// ws "github.com/mhd53/quanta-fitness-server/internal/datastore/workoutstore"
 	"github.com/mhd53/quanta-fitness-server/internal/workout"
 )
 
 func TestValidateCreateWorkoutWhenTitleLengthMaxed(t *testing.T) {
-	// mockWS := ws.NewMockWorkoutStore()
 	testValidator := workout.NewWorkoutValidator()
 
 	err := testValidator.ValidateCreateWorkout("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur vivamus..")
@@ -19,7 +17,6 @@ func TestValidateCreateWorkoutWhenTitleLengthMaxed(t *testing.T) {
 }
 
 func TestValidateCreateWorkoutWhenTitleIsValid(t *testing.T) {
-	// mockWS := ws.NewMockWorkoutStore()
 	testValidator := workout.NewWorkoutValidator()
 
 	err := testValidator.ValidateCreateWorkout("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur vivamus.")
@@ -28,7 +25,6 @@ func TestValidateCreateWorkoutWhenTitleIsValid(t *testing.T) {
 }
 
 func TestValidateUpdateWorkoutWhenTitleLengthMaxed(t *testing.T) {
-	// mockWS := ws.NewMockWorkoutStore()
 	testValidator := workout.NewWorkoutValidator()
 
 	mockWorkout := CreateInvalidMockBaseWorkout()
@@ -39,7 +35,6 @@ func TestValidateUpdateWorkoutWhenTitleLengthMaxed(t *testing.T) {
 }
 
 func TestValidateUpdateWorkoutWhenTitleIsValid(t *testing.T) {
-	// mockWS := ws.NewMockWorkoutStore()
 	testValidator := workout.NewWorkoutValidator()
 
 	mockWorkout := CreateValidMockBaseWorkout()

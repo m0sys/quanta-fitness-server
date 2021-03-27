@@ -4,20 +4,16 @@ import (
 	"github.com/stretchr/testify/assert"
 	"testing"
 
+	us "github.com/mhd53/quanta-fitness-server/internal/datastore/userstore"
 	ws "github.com/mhd53/quanta-fitness-server/internal/datastore/workoutstore"
 	"github.com/mhd53/quanta-fitness-server/internal/entity"
 	"github.com/mhd53/quanta-fitness-server/internal/workout"
 	"github.com/mhd53/quanta-fitness-server/tests/internal/auth"
 )
 
-func skipTest(t *testing.T) {
-	t.Skip("Focusing on Authentication.")
-}
-
 func TestAuthorizeCreateWorkoutWhenUnauthorized(t *testing.T) {
-	mockUS := new(authtests.MockStore)
+	mockUS := us.NewMockUserStore()
 	mockWS := ws.NewMockWorkoutStore()
-	mockUS.On("FindUserByUsername").Return(entity.User{}, false, nil)
 	testAuthorizer := workout.NewWorkoutAuthorizer(mockWS, mockUS)
 
 	ok, err := testAuthorizer.AuthorizeCreateWorkout("hello")
@@ -27,12 +23,14 @@ func TestAuthorizeCreateWorkoutWhenUnauthorized(t *testing.T) {
 }
 
 func TestAuthorizeCreateWorkoutWhenAuthorized(t *testing.T) {
-	mockUS := new(authtests.MockStore)
+	mockUS := us.NewMockUserStore()
 	mockWS := ws.NewMockWorkoutStore()
 
-	var id int64 = 1
-	user := authtests.CreateValidMockUser(id)
-	mockUS.On("FindUserByUsername").Return(user, true, nil)
+	user := authtests.CreateValidAuthBaseUser()
+
+	ucreated, _ := mockUS.Save(user)
+	assert.NotEmpty(t, ucreated)
+
 	testAuthorizer := workout.NewWorkoutAuthorizer(mockWS, mockUS)
 
 	ok, err := testAuthorizer.AuthorizeCreateWorkout("robin")
@@ -42,17 +40,15 @@ func TestAuthorizeCreateWorkoutWhenAuthorized(t *testing.T) {
 }
 
 func TestAuthorizeAccessWorkoutWhenUnauthorized(t *testing.T) {
-	skipTest(t)
-	mockUS := new(authtests.MockStore)
+	mockUS := us.NewMockUserStore()
 	mockWS := ws.NewMockWorkoutStore()
-	mockUS.On("FindUserByUsername").Return(entity.User{}, false, nil)
 
 	created, _ := mockWS.Save(CreateWorkout())
 	assert.NotEmpty(t, created)
 
 	testAuthorizer := workout.NewWorkoutAuthorizer(mockWS, mockUS)
 
-	ok, err := testAuthorizer.AuthorizeAccessWorkout("hello", 1)
+	ok, err := testAuthorizer.AuthorizeAccessWorkout("hello", 0)
 
 	assert.Nil(t, err)
 	assert.False(t, ok)
@@ -66,51 +62,55 @@ func CreateWorkout() entity.BaseWorkout {
 }
 
 func TestAuthorizeAccessWorkoutWhenUserNotOwnWorkout(t *testing.T) {
-	skipTest(t)
-	mockUS := new(authtests.MockStore)
+	mockUS := us.NewMockUserStore()
 	mockWS := ws.NewMockWorkoutStore()
-	created, _ := mockWS.Save(CreateWorkout())
+
+	created, _ := mockWS.Save(
+		entity.BaseWorkout{
+			Username: "bobin",
+			Title:    MOCK_TITLE,
+		},
+	)
 	assert.NotEmpty(t, created)
 
-	var id int64 = 1
-	user := authtests.CreateValidMockUser(id)
-	mockUS.On("FindUserByUsername").Return(user, true, nil)
+	ucreated, _ := mockUS.Save(authtests.CreateValidAuthBaseUser())
+	assert.NotEmpty(t, ucreated)
 
 	testAuthorizer := workout.NewWorkoutAuthorizer(mockWS, mockUS)
 
-	ok, err := testAuthorizer.AuthorizeAccessWorkout("bobin", 0)
+	ok, err := testAuthorizer.AuthorizeAccessWorkout("robin", 0)
 
 	assert.Nil(t, err)
 	assert.False(t, ok)
 }
 
 func TestAuthorizeAccessWorkoutWhenWorkoutNotFound(t *testing.T) {
-	skipTest(t)
-	mockUS := new(authtests.MockStore)
+	mockUS := us.NewMockUserStore()
 	mockWS := ws.NewMockWorkoutStore()
 
-	var id int64 = 1
-	user := authtests.CreateValidMockUser(id)
-	mockUS.On("FindUserByUsername").Return(user, true, nil)
+	created, _ := mockWS.Save(CreateWorkout())
+	assert.NotEmpty(t, created)
+
+	ucreated, _ := mockUS.Save(authtests.CreateValidAuthBaseUser())
+	assert.NotEmpty(t, ucreated)
 
 	testAuthorizer := workout.NewWorkoutAuthorizer(mockWS, mockUS)
 
-	ok, err := testAuthorizer.AuthorizeAccessWorkout("bobin", 1)
+	ok, err := testAuthorizer.AuthorizeAccessWorkout("robin", 1)
 
 	assert.Nil(t, err)
 	assert.False(t, ok)
 }
 
 func TestAuthorizeAccessWorkoutSuccess(t *testing.T) {
-	skipTest(t)
-	mockUS := new(authtests.MockStore)
+	mockUS := us.NewMockUserStore()
 	mockWS := ws.NewMockWorkoutStore()
+
 	created, _ := mockWS.Save(CreateWorkout())
 	assert.NotEmpty(t, created)
 
-	var id int64 = 1
-	user := authtests.CreateValidMockUser(id)
-	mockUS.On("FindUserByUsername").Return(user, true, nil)
+	ucreated, _ := mockUS.Save(authtests.CreateValidAuthBaseUser())
+	assert.NotEmpty(t, ucreated)
 
 	testAuthorizer := workout.NewWorkoutAuthorizer(mockWS, mockUS)
 
