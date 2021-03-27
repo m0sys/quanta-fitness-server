@@ -76,6 +76,20 @@ func (s *store) FindExerciseById(eid int64) (entity.Exercise, bool, error) {
 	return found, true, nil
 }
 
+func (s *store) FindAllExercisesByWID(wid int64) ([]entity.Exercise, error) {
+	var entries []entity.Exercise
+
+	for k := range s.exercises {
+		entry := s.exercises[k]
+		if entry.WID == wid {
+			entries = append(entries, entry)
+		}
+	}
+
+	return entries, nil
+
+}
+
 func (s *store) FindAllExercisesByUname(uname string) ([]entity.Exercise, error) {
 	var entries []entity.Exercise
 
