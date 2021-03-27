@@ -11,10 +11,6 @@ import (
 	"github.com/mhd53/quanta-fitness-server/tests/internal/auth"
 )
 
-func skipTest(t *testing.T) {
-	t.Skip("Focusing on Authentication.")
-}
-
 func TestAuthorizeCreateWorkoutWhenUnauthorized(t *testing.T) {
 	mockUS := us.NewMockUserStore()
 	mockWS := ws.NewMockWorkoutStore()
@@ -31,7 +27,10 @@ func TestAuthorizeCreateWorkoutWhenAuthorized(t *testing.T) {
 	mockWS := ws.NewMockWorkoutStore()
 
 	user := authtests.CreateValidAuthBaseUser()
-	mockUS.Save(user)
+
+	ucreated, _ := mockUS.Save(user)
+	assert.NotEmpty(t, ucreated)
+
 	testAuthorizer := workout.NewWorkoutAuthorizer(mockWS, mockUS)
 
 	ok, err := testAuthorizer.AuthorizeCreateWorkout("robin")
