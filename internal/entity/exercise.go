@@ -10,6 +10,7 @@ type BaseExercise struct {
 	Username string `json:"username"`
 }
 
+// NOTE: All units will be in SI units.
 type Metrics struct {
 	Weight    float32 `json:"weight"`
 	TargetRep int     `json:"target_rep"`
@@ -26,6 +27,6 @@ type Exercise struct {
 }
 
 type ExerciseUpdate struct {
-	BaseExercise
+	Name string `json:"name"`
 	Metrics
 }
