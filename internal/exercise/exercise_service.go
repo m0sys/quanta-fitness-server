@@ -65,6 +65,29 @@ func (*service) AddExerciseToWorkout(name, uname string, wid int64) (entity.Exer
 }
 
 func (*service) UpdateExercise(eid int64, uname string, updates entity.ExerciseUpdate) error {
+	ok, err := auth.AuthorizeExerciseAccess(uname, eid)
+
+	if err != nil {
+		log.Fatal(err)
+		return errors.New("Internal Error!")
+	}
+
+	if !ok {
+		return errors.New("Access Denied!")
+	}
+
+	err2 := val.ValidateUpdateExercise(updates)
+
+	if err2 != nil {
+		return err2
+	}
+
+	err3 := ses.Update(eid, updates)
+
+	if err3 != nil {
+		return err3
+	}
+
 	return nil
 }
 

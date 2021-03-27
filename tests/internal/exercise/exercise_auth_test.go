@@ -72,10 +72,46 @@ func TestAuthorizeWorkoutAccessSuccess(t *testing.T) {
 func TestAuthorizeExerciseAccessWhenUnauthenticated(t *testing.T) {
 	testAuthorizer, _, _, _ := setupAuth()
 
-	ok, err := testAuthorizer.AuthorizeWorkoutAccess("hello", 0)
+	ok, err := testAuthorizer.AuthorizeExerciseAccess("hello", 0)
 
 	assert.Nil(t, err)
 	assert.False(t, ok)
+
+}
+
+func TestAuthorizeExerciseAccessWhenNotOwnExercise(t *testing.T) {
+	testAuthorizer, mockUS, mockES, _ := setupAuth()
+
+	ucreated, _ := mockUS.Save(ats.CreateValidAuthBaseUser())
+	assert.NotEmpty(t, ucreated)
+
+	created, _ := mockES.Save(entity.BaseExercise{
+		Name:     MOCK_VALID_NAME,
+		WID:      0,
+		Username: "bobin",
+	})
+	assert.NotEmpty(t, created)
+
+	ok, err := testAuthorizer.AuthorizeExerciseAccess("robin", 0)
+
+	assert.Nil(t, err)
+	assert.False(t, ok)
+
+}
+
+func TestAuthorizeExerciseAccessSuccess(t *testing.T) {
+	testAuthorizer, mockUS, mockES, _ := setupAuth()
+
+	ucreated, _ := mockUS.Save(ats.CreateValidAuthBaseUser())
+	assert.NotEmpty(t, ucreated)
+
+	created, _ := mockES.Save(CreateMockValidBaseExercise())
+	assert.NotEmpty(t, created)
+
+	ok, err := testAuthorizer.AuthorizeExerciseAccess("robin", 0)
+
+	assert.Nil(t, err)
+	assert.True(t, ok)
 
 }
 

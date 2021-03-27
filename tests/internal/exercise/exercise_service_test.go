@@ -81,6 +81,46 @@ func TestAddExerciseToWorkoutSuccesss(t *testing.T) {
 
 }
 
+func TestUpdateExerciseWhenUnauthenticated(t *testing.T) {
+	testService, _, _, _ := setupService()
+
+	err := testService.UpdateExercise(0, "bobin", CreateMockValidUpdateExercise())
+
+	assert.NotNil(t, err)
+	assert.Equal(t, "Access Denied!", err.Error())
+}
+
+func TestUpdateExerciseWhenInvalidUpdate(t *testing.T) {
+	testService, mockUS, mockES, _ := setupService()
+
+	ucreated, _ := mockUS.Save(ats.CreateValidAuthBaseUser())
+	assert.NotEmpty(t, ucreated)
+
+	created, _ := mockES.Save(CreateMockValidBaseExercise())
+	assert.NotEmpty(t, created)
+
+	err := testService.UpdateExercise(0, "robin", CreateMockInvalidUpdateExercise())
+
+	assert.NotNil(t, err)
+	assert.Equal(t, "Name must be less than 38 characters!", err.Error())
+}
+
+func TestUpdateExerciseWhenSuccess(t *testing.T) {
+	testService, mockUS, mockES, _ := setupService()
+
+	ucreated, _ := mockUS.Save(ats.CreateValidAuthBaseUser())
+	assert.NotEmpty(t, ucreated)
+
+	created, _ := mockES.Save(CreateMockValidBaseExercise())
+	assert.NotEmpty(t, created)
+
+	err := testService.UpdateExercise(0, "robin", CreateMockValidUpdateExercise())
+
+	assert.Nil(t, err)
+
+	// TODO: Test update fields.
+}
+
 // Utility funcs.
 
 func setupService() (e.ExerciseService, us.UserStore, es.ExerciseStore, ws.WorkoutStore) {
