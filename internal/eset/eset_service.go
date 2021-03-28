@@ -22,7 +22,6 @@ var (
 	val         EsetValidator
 	deniedErr   = errors.New("Access Denied!")
 	internalErr = errors.New("Internal Error!")
-	notImplErr  = errors.New("Not Implemented!")
 )
 
 type service struct{}
