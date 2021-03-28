@@ -14,9 +14,9 @@ type BaseEset struct {
 }
 
 type SMetric struct {
-	ActualRepCount    int     `json:"actual_rep_count"`
-	Duraction         float32 `json:"duraction"`
-	RestTimeDuraction float32 `json:"rest_time_dur"`
+	ActualRepCount   int     `json:"actual_rep_count"`
+	Duration         float32 `json:"duration"`
+	RestTimeDuration float32 `json:"rest_time_dur"`
 }
 
 type EsetUpdate struct {

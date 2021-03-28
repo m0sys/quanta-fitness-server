@@ -41,7 +41,25 @@ func (*validator) ValidateAddEsetToExercise(actualRC int, dur, restDur float32) 
 }
 
 func (*validator) ValidateUpdateEset(updates entity.EsetUpdate) error {
-	return errors.New("Not Implemented!")
+	err := validateActualRC(updates.SMetric.ActualRepCount)
+
+	if err != nil {
+		return err
+	}
+
+	err2 := validateDur(updates.SMetric.Duration)
+
+	if err2 != nil {
+		return err2
+	}
+
+	err3 := validateRestDur(updates.SMetric.RestTimeDuration)
+
+	if err3 != nil {
+		return err3
+	}
+
+	return nil
 }
 
 // Helper funcs.
@@ -59,7 +77,7 @@ func isNegativeInt(i int) bool {
 
 func validateDur(dur float32) error {
 	if isNegativeFloat(dur) {
-		return errors.New("Sign Error: Duraction must be positive or zero!")
+		return errors.New("Sign Error: Duration must be positive or zero!")
 	}
 	return nil
 }
@@ -70,7 +88,7 @@ func isNegativeFloat(f float32) bool {
 
 func validateRestDur(restDur float32) error {
 	if isNegativeFloat(restDur) {
-		return errors.New("Sign Error: Rest duraction must be positive or zero!")
+		return errors.New("Sign Error: Rest duration must be positive or zero!")
 	}
 	return nil
 }

@@ -72,6 +72,50 @@ func TestAddEsetToExerciseSuccess(t *testing.T) {
 	assert.Equal(t, int64(0), created.ID)
 }
 
+func TestUpdateEsetWhenUnauthenticated(t *testing.T) {
+	testService, _, _, _ := setupService()
+
+	err := testService.UpdateEset(0, "robin", CreateValidEsetUpdate())
+
+	assert.NotNil(t, err)
+	assert.Equal(t, "Access Denied!", err.Error())
+}
+
+func TestUpdateEsetWhenInvalidUpdate(t *testing.T) {
+	testService, mockUS, mockESS, _ := setupService()
+
+	ucreated, _ := mockUS.Save(ats.CreateValidAuthBaseUser())
+	assert.NotEmpty(t, ucreated)
+
+	created, _ := mockESS.Save(CreateValidBaseRobinSet())
+	assert.NotEmpty(t, created)
+
+	err := testService.UpdateEset(0, "robin", CreateInvalidEsetUpdate())
+
+	assert.NotNil(t, err)
+	assert.Equal(t, "Sign Error: Actual rep count must be positive or zero!", err.Error())
+}
+
+func TestUpdateEsetSuccess(t *testing.T) {
+	testService, mockUS, mockESS, _ := setupService()
+
+	ucreated, _ := mockUS.Save(ats.CreateValidAuthBaseUser())
+	assert.NotEmpty(t, ucreated)
+
+	created, _ := mockESS.Save(CreateValidBaseRobinSet())
+	assert.NotEmpty(t, created)
+
+	updates := CreateValidEsetUpdate()
+	err := testService.UpdateEset(0, "robin", updates)
+
+	assert.Nil(t, err)
+
+	got, _, _ := mockESS.FindEsetById(0)
+	assert.Equal(t, updates.SMetric.ActualRepCount, got.SMetric.ActualRepCount)
+	assert.Equal(t, updates.SMetric.Duration, got.SMetric.Duration)
+	assert.Equal(t, updates.SMetric.RestTimeDuration, got.SMetric.RestTimeDuration)
+}
+
 // Utility funcs.
 
 func setupService() (s.EsetService, us.UserStore, ess.EsetStore, es.ExerciseStore) {

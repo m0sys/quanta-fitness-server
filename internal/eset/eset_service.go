@@ -59,9 +59,9 @@ func (*service) AddEsetToExercise(uname string, eid int64, actualRC int, dur, re
 		Username: uname,
 		EID:      eid,
 		SMetric: entity.SMetric{
-			ActualRepCount:    actualRC,
-			Duraction:         dur,
-			RestTimeDuraction: restDur,
+			ActualRepCount:   actualRC,
+			Duration:         dur,
+			RestTimeDuration: restDur,
 		},
 	})
 	if err3 != nil {
@@ -74,7 +74,29 @@ func (*service) AddEsetToExercise(uname string, eid int64, actualRC int, dur, re
 }
 
 func (*service) UpdateEset(esid int64, uname string, updates entity.EsetUpdate) error {
-	return notImplErr
+	authorized, err := auth.AuthorizeEsetAccess(uname, esid)
+
+	if err != nil {
+		log.Panic(err)
+		return internalErr
+	}
+
+	if !authorized {
+		return deniedErr
+	}
+
+	err2 := val.ValidateUpdateEset(updates)
+	if err2 != nil {
+		return err2
+	}
+
+	err3 := sess.Update(esid, updates)
+	if err3 != nil {
+		log.Panic(err3)
+		return internalErr
+	}
+
+	return nil
 }
 
 func (*service) DeleteEset(esid int64, uname string) error {
