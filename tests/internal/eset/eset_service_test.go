@@ -126,6 +126,18 @@ func TestDeleteEsetWhenUnauthenticated(t *testing.T) {
 }
 
 func TestDeleteEsetWhenEsetNotFound(t *testing.T) {
+	testService, mockUS, _, _ := setupService()
+
+	ucreated, _ := mockUS.Save(ats.CreateValidAuthBaseUser())
+	assert.NotEmpty(t, ucreated)
+
+	err := testService.DeleteEset(0, "robin")
+
+	assert.NotNil(t, err)
+	assert.Equal(t, "Access Denied!", err.Error())
+}
+
+func TestDeleteEsetSuccess(t *testing.T) {
 	testService, mockUS, mockESS, _ := setupService()
 
 	ucreated, _ := mockUS.Save(ats.CreateValidAuthBaseUser())
@@ -142,16 +154,91 @@ func TestDeleteEsetWhenEsetNotFound(t *testing.T) {
 	assert.Empty(t, got)
 }
 
-func TestDeleteEsetSuccess(t *testing.T) {
+func TestGetEsetWhenUnauthenticated(t *testing.T) {
+	testService, _, _, _ := setupService()
+
+	got, err := testService.GetEset(0, "robin")
+
+	assert.NotNil(t, err)
+	assert.Equal(t, "Access Denied!", err.Error())
+	assert.Empty(t, got)
+}
+
+func TestGetEsetWhenEsetNotFound(t *testing.T) {
 	testService, mockUS, _, _ := setupService()
 
 	ucreated, _ := mockUS.Save(ats.CreateValidAuthBaseUser())
 	assert.NotEmpty(t, ucreated)
 
-	err := testService.DeleteEset(0, "robin")
+	got, err := testService.GetEset(0, "robin")
 
 	assert.NotNil(t, err)
 	assert.Equal(t, "Access Denied!", err.Error())
+	assert.Empty(t, got)
+}
+
+func TestGetEsetSuccess(t *testing.T) {
+	testService, mockUS, mockESS, _ := setupService()
+
+	ucreated, _ := mockUS.Save(ats.CreateValidAuthBaseUser())
+	assert.NotEmpty(t, ucreated)
+
+	created, _ := mockESS.Save(CreateValidBaseRobinSet())
+	assert.NotEmpty(t, created)
+
+	got, err := testService.GetEset(0, "robin")
+
+	assert.Nil(t, err)
+	assert.NotEmpty(t, got)
+	assert.Equal(t, int64(0), got.ID)
+}
+
+func TestGetEsetsForExerciseWhenUnauthenticated(t *testing.T) {
+	testService, _, _, _ := setupService()
+
+	got, err := testService.GetEsetsForExercise(0, "robin")
+
+	assert.NotNil(t, err)
+	assert.Equal(t, "Access Denied!", err.Error())
+	assert.Empty(t, got)
+}
+
+func TestGetEsetsForExerciseWhenExerciseNotFound(t *testing.T) {
+	testService, mockUS, _, _ := setupService()
+
+	ucreated, _ := mockUS.Save(ats.CreateValidAuthBaseUser())
+	assert.NotEmpty(t, ucreated)
+
+	got, err := testService.GetEsetsForExercise(0, "robin")
+
+	assert.NotNil(t, err)
+	assert.Equal(t, "Access Denied!", err.Error())
+	assert.Empty(t, got)
+}
+
+func TestGetEsetsForExerciseSuccess(t *testing.T) {
+	testService, mockUS, mockESS, mockES := setupService()
+
+	ucreated, _ := mockUS.Save(ats.CreateValidAuthBaseUser())
+	assert.NotEmpty(t, ucreated)
+
+	ecreated, _ := mockES.Save(ets.CreateMockValidBaseExercise())
+	assert.NotEmpty(t, ecreated)
+
+	created1, _ := mockESS.Save(CreateValidBaseRobinSet())
+	assert.NotEmpty(t, created1)
+
+	created2, _ := mockESS.Save(CreateValidBaseRobinSet())
+	assert.NotEmpty(t, created2)
+
+	created3, _ := mockESS.Save(CreateValidBaseRobinSet())
+	assert.NotEmpty(t, created3)
+
+	got, err := testService.GetEsetsForExercise(0, "robin")
+
+	assert.Nil(t, err)
+	assert.NotEmpty(t, got)
+	assert.Equal(t, 3, len(got))
 }
 
 // Utility funcs.

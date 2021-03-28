@@ -122,10 +122,47 @@ func (*service) DeleteEset(esid int64, uname string) error {
 }
 
 func (*service) GetEset(esid int64, uname string) (entity.Eset, error) {
-	return entity.Eset{}, notImplErr
+	authorized, err := auth.AuthorizeEsetAccess(uname, esid)
+
+	if err != nil {
+		log.Panic(err)
+		return entity.Eset{}, internalErr
+	}
+
+	if !authorized {
+		return entity.Eset{}, deniedErr
+	}
+
+	got, _, err2 := sess.FindEsetById(esid)
+
+	if err2 != nil {
+		return entity.Eset{}, internalErr
+	}
+
+	return got, nil
+
 }
 
 func (*service) GetEsetsForExercise(eid int64, uname string) ([]entity.Eset, error) {
 	var esets []entity.Eset
-	return esets, notImplErr
+
+	authorized, err := auth.AuthorizeExerciseAccess(uname, eid)
+
+	if err != nil {
+		log.Panic(err)
+		return esets, internalErr
+	}
+
+	if !authorized {
+		return esets, deniedErr
+	}
+
+	esets, err2 := sess.FindAllEsetByEID(eid)
+
+	if err2 != nil {
+		log.Panic(err2)
+		return esets, internalErr
+	}
+
+	return esets, nil
 }
