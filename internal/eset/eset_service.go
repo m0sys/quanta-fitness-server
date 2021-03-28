@@ -100,7 +100,25 @@ func (*service) UpdateEset(esid int64, uname string, updates entity.EsetUpdate) 
 }
 
 func (*service) DeleteEset(esid int64, uname string) error {
-	return notImplErr
+	authorized, err := auth.AuthorizeEsetAccess(uname, esid)
+
+	if err != nil {
+		log.Panic(err)
+		return internalErr
+	}
+
+	if !authorized {
+		return deniedErr
+	}
+
+	err2 := sess.Delete(esid)
+
+	if err2 != nil {
+		log.Panic(err2)
+		return internalErr
+	}
+
+	return nil
 }
 
 func (*service) GetEset(esid int64, uname string) (entity.Eset, error) {

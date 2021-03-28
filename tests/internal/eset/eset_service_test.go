@@ -116,6 +116,44 @@ func TestUpdateEsetSuccess(t *testing.T) {
 	assert.Equal(t, updates.SMetric.RestTimeDuration, got.SMetric.RestTimeDuration)
 }
 
+func TestDeleteEsetWhenUnauthenticated(t *testing.T) {
+	testService, _, _, _ := setupService()
+
+	err := testService.DeleteEset(0, "robin")
+
+	assert.NotNil(t, err)
+	assert.Equal(t, "Access Denied!", err.Error())
+}
+
+func TestDeleteEsetWhenEsetNotFound(t *testing.T) {
+	testService, mockUS, mockESS, _ := setupService()
+
+	ucreated, _ := mockUS.Save(ats.CreateValidAuthBaseUser())
+	assert.NotEmpty(t, ucreated)
+
+	created, _ := mockESS.Save(CreateValidBaseRobinSet())
+	assert.NotEmpty(t, created)
+
+	err := testService.DeleteEset(0, "robin")
+	got, found, _ := mockESS.FindEsetById(0)
+
+	assert.Nil(t, err)
+	assert.False(t, found)
+	assert.Empty(t, got)
+}
+
+func TestDeleteEsetSuccess(t *testing.T) {
+	testService, mockUS, _, _ := setupService()
+
+	ucreated, _ := mockUS.Save(ats.CreateValidAuthBaseUser())
+	assert.NotEmpty(t, ucreated)
+
+	err := testService.DeleteEset(0, "robin")
+
+	assert.NotNil(t, err)
+	assert.Equal(t, "Access Denied!", err.Error())
+}
+
 // Utility funcs.
 
 func setupService() (s.EsetService, us.UserStore, ess.EsetStore, es.ExerciseStore) {
