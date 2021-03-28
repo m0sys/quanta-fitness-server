@@ -1,8 +1,9 @@
 package esetstore
 
 import (
-	"errors"
 	"time"
+
+	"github.com/mhd53/quanta-fitness-server/internal/entity"
 )
 
 type store struct {
