@@ -4,12 +4,23 @@ import (
 	"time"
 )
 
+// The only time when you should be creating a exercise set is when you are
+// executing the workout. That's why SMetric is required @BaseEset.
+
 type BaseEset struct {
-	Username          int64   `json:"username"`
-	EID               int64   `json:"eid"`
+	Username string `json:"username"`
+	EID      int64  `json:"eid"`
+	SMetric
+}
+
+type SMetric struct {
 	ActualRepCount    int     `json:"actual_rep_count"`
 	Duraction         float32 `json:"duraction"`
 	RestTimeDuraction float32 `json:"rest_time_dur"`
+}
+
+type EsetUpdate struct {
+	SMetric
 }
 
 type Eset struct {
