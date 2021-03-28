@@ -226,6 +226,58 @@ func TestGetExerciseForWorkoutWhenExercisesExist(t *testing.T) {
 	assert.Equal(t, 3, len(got))
 }
 
+func TestGetExerciseForUserWhenUnauthenticated(t *testing.T) {
+	skipTest(t)
+	testService, _, _, _ := setupService()
+
+	got, err := testService.GetExercisesForUser("robin")
+
+	assert.NotNil(t, err)
+	assert.Equal(t, "Access Denied!", err.Error())
+	assert.Empty(t, got)
+}
+
+func TestDeleteExerciseWhenUnauthenticated(t *testing.T) {
+	testService, _, _, _ := setupService()
+
+	err := testService.DeleteExercise(0, "robin")
+
+	assert.NotNil(t, err)
+	assert.Equal(t, "Access Denied!", err.Error())
+}
+
+func TestDeleteExerciseWhenExerciseNotExist(t *testing.T) {
+	testService, mockUS, mockES, _ := setupService()
+
+	ucreated, _ := mockUS.Save(ats.CreateValidAuthBaseUser())
+	assert.NotEmpty(t, ucreated)
+
+	created, _ := mockES.Save(CreateMockValidBaseExercise())
+	assert.NotEmpty(t, created)
+
+	err := testService.DeleteExercise(0, "robin")
+
+	assert.Nil(t, err)
+
+	exercise, found, _ := mockES.FindExerciseById(0)
+
+	assert.False(t, found)
+	assert.Empty(t, exercise)
+
+}
+
+func TestDeleteExerciseSuccess(t *testing.T) {
+	testService, mockUS, _, _ := setupService()
+
+	ucreated, _ := mockUS.Save(ats.CreateValidAuthBaseUser())
+	assert.NotEmpty(t, ucreated)
+
+	err := testService.DeleteExercise(0, "robin")
+
+	assert.NotNil(t, err)
+	assert.Equal(t, "Access Denied!", err.Error())
+}
+
 // Utility funcs.
 
 func setupService() (e.ExerciseService, us.UserStore, es.ExerciseStore, ws.WorkoutStore) {
@@ -238,17 +290,6 @@ func setupService() (e.ExerciseService, us.UserStore, es.ExerciseStore, ws.Worko
 	testValidator := e.NewExerciseValidator()
 
 	return e.NewExerciseService(mockES, testAuthorizer, testValidator), mockUS, mockES, mockWS
-}
-
-func TestGetExerciseForUserWhenUnauthenticated(t *testing.T) {
-	skipTest(t)
-	testService, _, _, _ := setupService()
-
-	got, err := testService.GetExercisesForUser("robin")
-
-	assert.NotNil(t, err)
-	assert.Equal(t, "Access Denied!", err.Error())
-	assert.Empty(t, got)
 }
 
 func skipTest(t *testing.T) {
