@@ -95,6 +95,22 @@ func (*service) UpdateExercise(eid int64, uname string, updates entity.ExerciseU
 }
 
 func (*service) DeleteExercise(eid int64, uname string) error {
+	authorized, err := auth.AuthorizeExerciseAccess(uname, eid)
+
+	if err != nil {
+		return internalErr
+	}
+
+	if !authorized {
+		return deniedErr
+	}
+
+	err2 := ses.Delete(eid)
+
+	if err2 != nil {
+		return internalErr
+	}
+
 	return nil
 }
 
