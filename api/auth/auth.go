@@ -51,9 +51,37 @@ func (*server) RegisterNewUser(uname, email, pwd, confirm string) (string, error
 }
 
 func (*server) LoginWithUname(uname, pwd string) (string, error) {
-	return "", notImplErr
+	user, err := service.LoginWithUname(uname, pwd)
+
+	if err != nil {
+		log.Printf("Server Error: %s", err.Error())
+		return "", err
+	}
+
+	token, err2 := crypto.GenerateToken(user.Username)
+
+	if err2 != nil {
+		log.Printf("Server Error: %s", err2.Error())
+		return "", err2
+	}
+
+	return token, nil
 }
 
 func (*server) LoginWithEmail(email, pwd string) (string, error) {
-	return "", notImplErr
+	user, err := service.LoginWithEmail(email, pwd)
+
+	if err != nil {
+		log.Printf("Server Error: %s", err.Error())
+		return "", err
+	}
+
+	token, err2 := crypto.GenerateToken(user.Username)
+
+	if err2 != nil {
+		log.Printf("Server Error: %s", err2.Error())
+		return "", err2
+	}
+
+	return token, nil
 }
