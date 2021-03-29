@@ -26,4 +26,28 @@ register:register(input: {username: "hero", email: "hero@gmail.com", password: "
 		}`, &resp)
 		assert.NotEmpty(t, resp.Register.Token)
 	})
+
+	t.Run("Login user with username", func(t *testing.T) {
+		var resp struct {
+			Login struct{ Token string }
+		}
+
+		c.MustPost(`mutation {
+		login:login(input: {username: "hero", password: "nero"}) {
+		token
+		}}`, &resp)
+		assert.NotEmpty(t, resp.Login.Token)
+	})
+
+	t.Run("Login user with email", func(t *testing.T) {
+		var resp struct {
+			Login struct{ Token string }
+		}
+
+		c.MustPost(`mutation {
+		login:login(input: {email: "hero@gmail.com", password: "nero"}) {
+		token
+		}}`, &resp)
+		assert.NotEmpty(t, resp.Login.Token)
+	})
 }
