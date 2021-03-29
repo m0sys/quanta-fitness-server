@@ -1,7 +1,6 @@
 package auth
 
 import (
-	"errors"
 	"log"
 
 	serv "github.com/mhd53/quanta-fitness-server/internal/auth"
@@ -13,8 +12,6 @@ var (
 	us        ustore.UserStore
 	validator serv.AuthValidator
 	service   serv.AuthService
-	// internalErr = errors.New("Internal Error!")
-	notImplErr = errors.New("Not Implemented!")
 )
 
 type ServerAuth interface {

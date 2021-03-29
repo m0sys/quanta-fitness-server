@@ -16,7 +16,7 @@ func (r *mutationResolver) Register(ctx context.Context, input model.NewUser) (*
 
 	token, err := r.AuthServer.RegisterNewUser(input.Username, input.Email, input.Password, input.Confirm)
 	return &model.Auth{
-		token,
+		Token: token,
 	}, err
 }
 
@@ -24,19 +24,19 @@ func (r *mutationResolver) Login(ctx context.Context, input model.Login) (*model
 	if input.Username != nil {
 		token, err := r.AuthServer.LoginWithUname(*input.Username, input.Password)
 		return &model.Auth{
-			token,
+			Token: token,
 		}, err
 	}
 
 	if input.Email != nil {
 		token, err := r.AuthServer.LoginWithEmail(*input.Email, input.Password)
 		return &model.Auth{
-			token,
+			Token: token,
 		}, err
 
 	}
 	return &model.Auth{
-		"",
+		Token: "",
 	}, errors.New("Error: Must provide username or email to login!")
 
 }
