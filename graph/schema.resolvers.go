@@ -5,18 +5,40 @@ package graph
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/mhd53/quanta-fitness-server/graph/generated"
 	"github.com/mhd53/quanta-fitness-server/graph/model"
 )
 
-func (r *mutationResolver) Register(ctx context.Context, input model.NewUser) (string, error) {
-	panic(fmt.Errorf("not implemented"))
+func (r *mutationResolver) Register(ctx context.Context, input model.NewUser) (*model.Auth, error) {
+
+	token, err := r.AuthServer.RegisterNewUser(input.Username, input.Email, input.Password, input.Confirm)
+	return &model.Auth{
+		Token: token,
+	}, err
 }
 
-func (r *mutationResolver) Login(ctx context.Context, input model.Login) (string, error) {
-	panic(fmt.Errorf("not implemented"))
+func (r *mutationResolver) Login(ctx context.Context, input model.Login) (*model.Auth, error) {
+	if input.Username != nil {
+		token, err := r.AuthServer.LoginWithUname(*input.Username, input.Password)
+		return &model.Auth{
+			Token: token,
+		}, err
+	}
+
+	if input.Email != nil {
+		token, err := r.AuthServer.LoginWithEmail(*input.Email, input.Password)
+		return &model.Auth{
+			Token: token,
+		}, err
+
+	}
+	return &model.Auth{
+		Token: "",
+	}, errors.New("Error: Must provide username or email to login!")
+
 }
 
 func (r *mutationResolver) CreateWorkout(ctx context.Context, input model.NewWorkout) (*model.Workout, error) {
