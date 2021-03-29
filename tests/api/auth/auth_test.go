@@ -5,10 +5,12 @@ import (
 	"testing"
 
 	"github.com/mhd53/quanta-fitness-server/api/auth"
+	ustore "github.com/mhd53/quanta-fitness-server/internal/datastore/userstore"
 )
 
 func TestRegisterNewUserWhenUserExists(t *testing.T) {
-	server := auth.NewServerAuth()
+	mockUS := ustore.NewMockUserStore()
+	server := auth.NewServerAuth(mockUS)
 
 	token, err := server.RegisterNewUser("hero", "hero@gmail.com", "nero", "nero")
 	assert.Nil(t, err)
@@ -21,7 +23,8 @@ func TestRegisterNewUserWhenUserExists(t *testing.T) {
 }
 
 func TestRegisterNewUserSuccess(t *testing.T) {
-	server := auth.NewServerAuth()
+	mockUS := ustore.NewMockUserStore()
+	server := auth.NewServerAuth(mockUS)
 
 	token, err := server.RegisterNewUser("hero", "hero@gmail.com", "nero", "nero")
 
@@ -30,7 +33,8 @@ func TestRegisterNewUserSuccess(t *testing.T) {
 }
 
 func TestLoginWithUnameWhenUserNotExists(t *testing.T) {
-	server := auth.NewServerAuth()
+	mockUS := ustore.NewMockUserStore()
+	server := auth.NewServerAuth(mockUS)
 
 	token, err := server.LoginWithUname("hero", "nero")
 
@@ -41,7 +45,8 @@ func TestLoginWithUnameWhenUserNotExists(t *testing.T) {
 }
 
 func TestLoginWithUnameWhenUserExists(t *testing.T) {
-	server := auth.NewServerAuth()
+	mockUS := ustore.NewMockUserStore()
+	server := auth.NewServerAuth(mockUS)
 
 	_, err := server.RegisterNewUser("hero", "hero@gmail.com", "nero", "nero")
 	assert.Nil(t, err)
@@ -54,7 +59,8 @@ func TestLoginWithUnameWhenUserExists(t *testing.T) {
 }
 
 func TestLoginWithEmailWhenUserNotExists(t *testing.T) {
-	server := auth.NewServerAuth()
+	mockUS := ustore.NewMockUserStore()
+	server := auth.NewServerAuth(mockUS)
 
 	token, err := server.LoginWithEmail("hero@gmail.com", "nero")
 
@@ -65,7 +71,8 @@ func TestLoginWithEmailWhenUserNotExists(t *testing.T) {
 }
 
 func TestLoginWithEmailSuccess(t *testing.T) {
-	server := auth.NewServerAuth()
+	mockUS := ustore.NewMockUserStore()
+	server := auth.NewServerAuth(mockUS)
 
 	_, err := server.RegisterNewUser("hero", "hero@gmail.com", "nero", "nero")
 	assert.Nil(t, err)

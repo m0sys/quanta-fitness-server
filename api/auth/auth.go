@@ -9,9 +9,7 @@ import (
 )
 
 var (
-	us        ustore.UserStore
-	validator serv.AuthValidator
-	service   serv.AuthService
+	service serv.AuthService
 )
 
 type ServerAuth interface {
@@ -22,9 +20,8 @@ type ServerAuth interface {
 
 type server struct{}
 
-func NewServerAuth() ServerAuth {
-	us = ustore.NewMockUserStore()
-	validator = serv.NewAuthValidator(us)
+func NewServerAuth(us ustore.UserStore) ServerAuth {
+	validator := serv.NewAuthValidator(us)
 	service = serv.NewAuthService(us, validator)
 	return &server{}
 }

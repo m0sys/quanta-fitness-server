@@ -44,3 +44,8 @@ type Workout struct {
 	UpdatedAt time.Time `json:"updatedAt"`
 	User      *User     `json:"user"`
 }
+
+type WorkoutUpdate struct {
+	ID    string `json:"id"`
+	Title string `json:"title"`
+}

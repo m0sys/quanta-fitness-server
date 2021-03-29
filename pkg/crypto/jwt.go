@@ -35,6 +35,10 @@ func ParseToken(tokenStr string) (string, error) {
 
 	})
 
+	if err != nil {
+		return "", err
+	}
+
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 		username := claims["username"].(string)
 		return username, nil
