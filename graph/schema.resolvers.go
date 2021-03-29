@@ -11,11 +11,15 @@ import (
 	"github.com/mhd53/quanta-fitness-server/graph/model"
 )
 
-func (r *mutationResolver) Register(ctx context.Context, input model.NewUser) (string, error) {
-	panic(fmt.Errorf("not implemented"))
+func (r *mutationResolver) Register(ctx context.Context, input model.NewUser) (*model.Auth, error) {
+
+	token, err := r.AuthServer.RegisterNewUser(input.Username, input.Email, input.Password, input.Confirm)
+	return &model.Auth{
+		token,
+	}, err
 }
 
-func (r *mutationResolver) Login(ctx context.Context, input model.Login) (string, error) {
+func (r *mutationResolver) Login(ctx context.Context, input model.Login) (*model.Auth, error) {
 	panic(fmt.Errorf("not implemented"))
 }
 

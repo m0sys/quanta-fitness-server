@@ -40,8 +40,12 @@ input NewWorkout {
   title: String!
 }
 
+type Auth {
+    token: String!
+}
+
 type Mutation {
-  register(input: NewUser!): String!
-  login(input: Login!): String!
+  register(input: NewUser!): Auth!
+  login(input: Login!): Auth!
   createWorkout(input: NewWorkout!): Workout!
 }

@@ -6,6 +6,10 @@ import (
 	"time"
 )
 
+type Auth struct {
+	Token string `json:"token"`
+}
+
 type Login struct {
 	Username *string `json:"username"`
 	Email    *string `json:"email"`
