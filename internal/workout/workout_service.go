@@ -20,9 +20,11 @@ type WorkoutService interface {
 type service struct{}
 
 var (
-	ws   workoutstore.WorkoutStore
-	auth WorkoutAuth
-	val  WorkoutValidator
+	ws          workoutstore.WorkoutStore
+	auth        WorkoutAuth
+	val         WorkoutValidator
+	deniedErr   = errors.New("Access Denied!")
+	internalErr = errors.New("Internal Error!")
 )
 
 func NewWorkoutService(
@@ -40,11 +42,11 @@ func (*service) CreateWorkout(title string, uname string) (entity.Workout, error
 
 	if err != nil {
 		log.Panic(err)
-		return entity.Workout{}, errors.New("Internal error!")
+		return entity.Workout{}, internalErr
 	}
 
 	if !authorized {
-		return entity.Workout{}, errors.New("Access Denied!")
+		return entity.Workout{}, deniedErr
 
 	}
 
@@ -61,7 +63,7 @@ func (*service) CreateWorkout(title string, uname string) (entity.Workout, error
 
 	if err3 != nil {
 		log.Fatal(err3)
-		return entity.Workout{}, errors.New("Internal error!")
+		return entity.Workout{}, internalErr
 	}
 
 	return workoutDS, nil
@@ -75,7 +77,7 @@ func (*service) UpdateWorkout(wid int64, workout entity.BaseWorkout, uname strin
 	}
 
 	if !authorized {
-		return errors.New("Access Denied!")
+		return deniedErr
 	}
 
 	err2 := val.ValidateUpdateWorkout(workout)
@@ -88,7 +90,7 @@ func (*service) UpdateWorkout(wid int64, workout entity.BaseWorkout, uname strin
 
 	if err3 != nil {
 		log.Panic(err3)
-		return errors.New("Internal Error!")
+		return internalErr
 	}
 
 	return nil
@@ -102,13 +104,13 @@ func (*service) DeleteWorkout(wid int64, uname string) error {
 	}
 
 	if !authorized {
-		return errors.New("Access Denied!")
+		return deniedErr
 	}
 
 	err2 := ws.DeleteWorkout(wid)
 
 	if err2 != nil {
-		return errors.New("Internal Error!")
+		return internalErr
 	}
 
 	return nil
@@ -122,14 +124,14 @@ func (*service) GetWorkout(wid int64, uname string) (entity.Workout, error) {
 	}
 
 	if !authorized {
-		return entity.Workout{}, errors.New("Access Denied!")
+		return entity.Workout{}, deniedErr
 	}
 
 	got, _, err2 := ws.FindWorkoutById(wid)
 
 	if err2 != nil {
 		log.Panic(err2)
-		return entity.Workout{}, errors.New("Internal Error!")
+		return entity.Workout{}, internalErr
 	}
 
 	return got, nil
@@ -137,6 +139,22 @@ func (*service) GetWorkout(wid int64, uname string) (entity.Workout, error) {
 
 func (*service) GetWorkoutsForUser(uname string) ([]entity.Workout, error) {
 	var workouts []entity.Workout
+
+	authorized, err := auth.AuthorizeCreateWorkout(uname)
+	if err != nil {
+		return workouts, err
+	}
+
+	if !authorized {
+		return workouts, deniedErr
+	}
+
+	workouts, err2 := ws.FindAllWorkoutsByUname(uname)
+
+	if err2 != nil {
+		return workouts, internalErr
+	}
+
 	return workouts, nil
 }
 
