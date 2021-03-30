@@ -7,13 +7,15 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strconv"
 
+	"github.com/mhd53/quanta-fitness-server/api/auth"
 	"github.com/mhd53/quanta-fitness-server/graph/generated"
 	"github.com/mhd53/quanta-fitness-server/graph/model"
+	"github.com/mhd53/quanta-fitness-server/internal/entity"
 )
 
 func (r *mutationResolver) Register(ctx context.Context, input model.NewUser) (*model.Auth, error) {
-
 	token, err := r.AuthServer.RegisterNewUser(input.Username, input.Email, input.Password, input.Confirm)
 	return &model.Auth{
 		Token: token,
@@ -38,19 +40,117 @@ func (r *mutationResolver) Login(ctx context.Context, input model.Login) (*model
 	return &model.Auth{
 		Token: "",
 	}, errors.New("Error: Must provide username or email to login!")
-
 }
 
 func (r *mutationResolver) CreateWorkout(ctx context.Context, input model.NewWorkout) (*model.Workout, error) {
-	panic(fmt.Errorf("not implemented"))
+	uname := auth.ForContext(ctx)
+
+	if uname == "" {
+		return &model.Workout{}, errors.New("Access Denied!")
+	}
+
+	created, err := r.WorkoutServer.CreateWorkout(input.Title, uname)
+
+	if err != nil {
+		return &model.Workout{}, err
+	}
+
+	return &model.Workout{
+		ID:        strconv.FormatInt(created.ID, 10),
+		Title:     created.Title,
+		CreatedAt: created.CreatedAt,
+		UpdatedAt: created.UpdatedAt,
+	}, nil
+}
+
+func (r *mutationResolver) UpdateWorkout(ctx context.Context, input model.WorkoutUpdate) (bool, error) {
+	uname := auth.ForContext(ctx)
+
+	if uname == "" {
+		return false, errors.New("Access Denied!")
+	}
+
+	updates := entity.BaseWorkout{
+		Title:    input.Title,
+		Username: uname,
+	}
+
+	success, err := r.WorkoutServer.UpdateWorkout(input.ID, updates, uname)
+	if err != nil {
+		return false, err
+
+	}
+
+	return success, nil
+}
+
+func (r *mutationResolver) DeleteWorkout(ctx context.Context, id string) (bool, error) {
+	uname := auth.ForContext(ctx)
+
+	if uname == "" {
+		return false, errors.New("Access Denied!")
+	}
+
+	success, err := r.WorkoutServer.DeleteWorkout(id, uname)
+	if err != nil {
+		return false, err
+
+	}
+
+	return success, nil
 }
 
 func (r *queryResolver) Users(ctx context.Context) ([]*model.User, error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *queryResolver) Workouts(ctx context.Context) ([]*model.Workout, error) {
-	panic(fmt.Errorf("not implemented"))
+func (r *queryResolver) Workouts(ctx context.Context, username string) ([]*model.Workout, error) {
+	var modelWorkouts []*model.Workout
+
+	uname := auth.ForContext(ctx)
+
+	if uname == "" {
+		return modelWorkouts, errors.New("Access Denied!")
+	}
+
+	got, err := r.WorkoutServer.GetWorkouts(uname)
+	if err != nil {
+		return modelWorkouts, err
+	}
+
+	for _, v := range got {
+		mWorkout := &model.Workout{
+			ID:        strconv.FormatInt(v.ID, 10),
+			Title:     v.Title,
+			CreatedAt: v.CreatedAt,
+			UpdatedAt: v.UpdatedAt}
+
+		modelWorkouts = append(modelWorkouts, mWorkout)
+	}
+
+	return modelWorkouts, nil
+
+}
+
+func (r *queryResolver) Workout(ctx context.Context, id string) (*model.Workout, error) {
+	uname := auth.ForContext(ctx)
+
+	if uname == "" {
+		return &model.Workout{}, errors.New("Access Denied!")
+	}
+
+	got, err := r.WorkoutServer.GetWorkout(id, uname)
+	if err != nil {
+		return &model.Workout{}, err
+
+	}
+
+	return &model.Workout{
+		ID:        strconv.FormatInt(got.ID, 10),
+		Title:     got.Title,
+		CreatedAt: got.CreatedAt,
+		UpdatedAt: got.UpdatedAt,
+	}, nil
 }
 
 // Mutation returns generated.MutationResolver implementation.

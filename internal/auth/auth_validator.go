@@ -40,13 +40,23 @@ func (*authValidator) ValidateRegisteration(uname, email, pwd, confirm string) e
 	}
 
 	if found {
-		return errors.New("User already exists!")
+		return errors.New("Username already exists!")
 	}
 
 	err2 := validateEmail(email)
 	if err2 != nil {
 		log.Print(err2)
 		return errors.New("Invalid email!")
+	}
+
+	_, found2, err3 := valStore.FindUserByEmail(email)
+	if err3 != nil {
+		log.Fatal(err3)
+		return errors.New("Internal Error!")
+	}
+
+	if found2 {
+		return errors.New("Email already exists!")
 	}
 
 	return nil

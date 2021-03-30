@@ -18,10 +18,6 @@ type User {
   gender: String!
 }
 
-type Query {
-  users: [User!]!
-  workouts: [Workout!]!
-}
 
 input NewUser {
   username: String!
@@ -40,12 +36,25 @@ input NewWorkout {
   title: String!
 }
 
+input WorkoutUpdate {
+    id: ID!
+    title: String!
+}
+
 type Auth {
     token: String!
+}
+
+type Query {
+  users: [User!]!
+  workouts(username: String!): [Workout!]!
+  workout(id: ID!): Workout
 }
 
 type Mutation {
   register(input: NewUser!): Auth!
   login(input: Login!): Auth!
   createWorkout(input: NewWorkout!): Workout!
+  updateWorkout(input: WorkoutUpdate!): Boolean!
+  deleteWorkout(id: ID!): Boolean! 
 }

@@ -24,7 +24,7 @@ func TestRegisterWhenUserExists(t *testing.T) {
 	userDS, err := testService.Register(MOCK_USERNAME, MOCK_EMAIL, MOCK_PWD, MOCK_PWD)
 
 	assert.NotNil(t, err)
-	assert.Equal(t, "User already exists!", err.Error())
+	assert.Equal(t, "Username already exists!", err.Error())
 	assert.Empty(t, userDS)
 }
 
