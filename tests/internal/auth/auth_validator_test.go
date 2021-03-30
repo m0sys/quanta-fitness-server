@@ -29,17 +29,21 @@ func TestValidateRegisterationUserExists(t *testing.T) {
 	err := testValidator.ValidateRegisteration(MOCK_USERNAME, MOCK_EMAIL, MOCK_PWD, MOCK_PWD)
 
 	assert.NotNil(t, err)
-	assert.Equal(t, "User already exists!", err.Error())
+	assert.Equal(t, "Username already exists!", err.Error())
 }
 
-func TestValidateRegisterationSuccess(t *testing.T) {
+func TestValidateRegisterationEmailExists(t *testing.T) {
 	mockStore := us.NewMockUserStore()
+
+	ucreated, _ := mockStore.Save(CreateValidAuthBaseUser())
+	assert.NotEmpty(t, ucreated)
 
 	testValidator := auth.NewAuthValidator(mockStore)
 
-	err := testValidator.ValidateRegisteration(MOCK_USERNAME, MOCK_EMAIL, MOCK_PWD, MOCK_PWD)
+	err := testValidator.ValidateRegisteration("bobin", MOCK_EMAIL, MOCK_PWD, MOCK_PWD)
 
-	assert.Nil(t, err)
+	assert.NotNil(t, err)
+	assert.Equal(t, "Email already exists!", err.Error())
 }
 
 func TestValidateRegisterationWithInvalidEmail(t *testing.T) {
@@ -52,6 +56,16 @@ func TestValidateRegisterationWithInvalidEmail(t *testing.T) {
 
 	assert.NotNil(t, err)
 	assert.Equal(t, "Invalid email!", err.Error())
+}
+
+func TestValidateRegisterationSuccess(t *testing.T) {
+	mockStore := us.NewMockUserStore()
+
+	testValidator := auth.NewAuthValidator(mockStore)
+
+	err := testValidator.ValidateRegisteration(MOCK_USERNAME, MOCK_EMAIL, MOCK_PWD, MOCK_PWD)
+
+	assert.Nil(t, err)
 }
 
 func TestValidateLoginWithUnameWhenUserNotExist(t *testing.T) {
