@@ -5,17 +5,25 @@ type Workout {
   title: String!
   createdAt: Time!
   updatedAt: Time!
-  user: User!
+  user: PublicUser!
 }
 
-type User {
-  id: ID!
-  username: String!
-  email: String!
-  password: String!
-  weight: Float!
-  height: Float!
-  gender: String!
+type Exercise {
+    id: ID!
+    name: String!
+    wid: ID!
+    user: PublicUser!
+    weight: Float!
+    targetRep: Int!
+    restTime: Float!
+    numSets: Int!
+}
+
+type PublicUser {
+    username: String!
+    weight: Float!
+    height: Float!
+    gender: String!
 }
 
 
@@ -41,12 +49,25 @@ input WorkoutUpdate {
     title: String!
 }
 
+input NewExercise {
+    wid: ID!
+    name: String!
+}
+
+input ExerciseUpdate {
+    name: String
+    weight: Float
+    targetRep: Int
+    restTime: Float
+    numSets: Int
+}
+
 type Auth {
     token: String!
 }
 
 type Query {
-  users: [User!]!
+  users: [PublicUser!]!
   workouts(username: String!): [Workout!]!
   workout(id: ID!): Workout
 }
@@ -57,4 +78,6 @@ type Mutation {
   createWorkout(input: NewWorkout!): Workout!
   updateWorkout(input: WorkoutUpdate!): Boolean!
   deleteWorkout(id: ID!): Boolean! 
+  addExerciseToWorkout(input: NewExercise!): Exercise!
+  updateExercise(input: ExerciseUpdate): Boolean!
 }

@@ -100,7 +100,35 @@ func (r *mutationResolver) DeleteWorkout(ctx context.Context, id string) (bool, 
 	return success, nil
 }
 
-func (r *queryResolver) Users(ctx context.Context) ([]*model.User, error) {
+func (r *mutationResolver) AddExerciseToWorkout(ctx context.Context, input model.NewExercise) (*model.Exercise, error) {
+	uname := auth.ForContext(ctx)
+
+	if uname == "" {
+		return &model.Exercise{}, errors.New("Access Denied!")
+	}
+
+	created, err := r.ExerciseServer.AddExerciseToWorkout(input.Name, uname, input.Wid)
+
+	if err != nil {
+		return &model.Exercise{}, err
+	}
+	return &model.Exercise{
+		ID:        strconv.FormatInt(created.ID, 10),
+		Wid:       strconv.FormatInt(created.WID, 10),
+		Name:      created.Name,
+		Weight:    float64(created.Metrics.Weight),
+		TargetRep: created.Metrics.TargetRep,
+		RestTime:  float64(created.Metrics.RestTime),
+		NumSets:   created.Metrics.NumSets,
+	}, nil
+
+}
+
+func (r *mutationResolver) UpdateExercise(ctx context.Context, input *model.ExerciseUpdate) (bool, error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *queryResolver) Users(ctx context.Context) ([]*model.PublicUser, error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
@@ -129,7 +157,6 @@ func (r *queryResolver) Workouts(ctx context.Context, username string) ([]*model
 	}
 
 	return modelWorkouts, nil
-
 }
 
 func (r *queryResolver) Workout(ctx context.Context, id string) (*model.Workout, error) {
