@@ -19,14 +19,17 @@ type Exercise struct {
 	TargetRep int         `json:"targetRep"`
 	RestTime  float64     `json:"restTime"`
 	NumSets   int         `json:"numSets"`
+	CreatedAt time.Time   `json:"createdAt"`
+	UpdatedAt time.Time   `json:"updatedAt"`
 }
 
 type ExerciseUpdate struct {
-	Name      *string  `json:"name"`
-	Weight    *float64 `json:"weight"`
-	TargetRep *int     `json:"targetRep"`
-	RestTime  *float64 `json:"restTime"`
-	NumSets   *int     `json:"numSets"`
+	ID        string  `json:"id"`
+	Name      string  `json:"name"`
+	Weight    float64 `json:"weight"`
+	TargetRep int     `json:"targetRep"`
+	RestTime  float64 `json:"restTime"`
+	NumSets   int     `json:"numSets"`
 }
 
 type Login struct {

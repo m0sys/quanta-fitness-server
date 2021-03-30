@@ -121,11 +121,47 @@ func (r *mutationResolver) AddExerciseToWorkout(ctx context.Context, input model
 		RestTime:  float64(created.Metrics.RestTime),
 		NumSets:   created.Metrics.NumSets,
 	}, nil
-
 }
 
 func (r *mutationResolver) UpdateExercise(ctx context.Context, input *model.ExerciseUpdate) (bool, error) {
-	panic(fmt.Errorf("not implemented"))
+	uname := auth.ForContext(ctx)
+
+	if uname == "" {
+		return false, errors.New("Access Denied!")
+	}
+
+	updates := entity.ExerciseUpdate{
+		Name: input.Name,
+		Metrics: entity.Metrics{
+			Weight:    float32(input.Weight),
+			TargetRep: input.TargetRep,
+			RestTime:  float32(input.RestTime),
+			NumSets:   input.NumSets,
+		},
+	}
+
+	success, err := r.ExerciseServer.UpdateExercise(input.ID, uname, updates)
+	if err != nil {
+		return false, err
+	}
+
+	return success, nil
+}
+
+func (r *mutationResolver) DeleteExercise(ctx context.Context, id string) (bool, error) {
+	uname := auth.ForContext(ctx)
+
+	if uname == "" {
+		return false, errors.New("Access Denied!")
+	}
+
+	success, err := r.ExerciseServer.DeleteExercise(id, uname)
+	if err != nil {
+		return false, err
+
+	}
+
+	return success, nil
 }
 
 func (r *queryResolver) Users(ctx context.Context) ([]*model.PublicUser, error) {
@@ -178,6 +214,64 @@ func (r *queryResolver) Workout(ctx context.Context, id string) (*model.Workout,
 		CreatedAt: got.CreatedAt,
 		UpdatedAt: got.UpdatedAt,
 	}, nil
+}
+
+func (r *queryResolver) Exercise(ctx context.Context, id string) (*model.Exercise, error) {
+	uname := auth.ForContext(ctx)
+
+	if uname == "" {
+		return &model.Exercise{}, errors.New("Access Denied!")
+	}
+
+	got, err := r.ExerciseServer.GetExercise(id, uname)
+	if err != nil {
+		return &model.Exercise{}, err
+
+	}
+
+	return &model.Exercise{
+		ID:        strconv.FormatInt(got.ID, 10),
+		Wid:       strconv.FormatInt(got.WID, 10),
+		Name:      got.Name,
+		Weight:    float64(got.Metrics.Weight),
+		TargetRep: got.Metrics.TargetRep,
+		RestTime:  float64(got.Metrics.RestTime),
+		NumSets:   got.Metrics.NumSets,
+		CreatedAt: got.CreatedAt,
+		UpdatedAt: got.UpdatedAt,
+	}, nil
+}
+
+func (r *queryResolver) Exercises(ctx context.Context, wid string) ([]*model.Exercise, error) {
+	var modelExercises []*model.Exercise
+
+	uname := auth.ForContext(ctx)
+
+	if uname == "" {
+		return modelExercises, errors.New("Access Denied!")
+	}
+
+	got, err := r.ExerciseServer.GetExercisesForWorkout(wid, uname)
+	if err != nil {
+		return modelExercises, err
+	}
+
+	for _, v := range got {
+		mExercise := &model.Exercise{
+			ID:        strconv.FormatInt(v.ID, 10),
+			Wid:       strconv.FormatInt(v.WID, 10),
+			Name:      v.Name,
+			Weight:    float64(v.Metrics.Weight),
+			TargetRep: v.Metrics.TargetRep,
+			RestTime:  float64(v.Metrics.RestTime),
+			NumSets:   v.Metrics.NumSets,
+			CreatedAt: v.CreatedAt,
+			UpdatedAt: v.UpdatedAt}
+
+		modelExercises = append(modelExercises, mExercise)
+	}
+
+	return modelExercises, nil
 }
 
 // Mutation returns generated.MutationResolver implementation.

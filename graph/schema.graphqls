@@ -17,6 +17,8 @@ type Exercise {
     targetRep: Int!
     restTime: Float!
     numSets: Int!
+    createdAt: Time!
+    updatedAt: Time!
 }
 
 type PublicUser {
@@ -55,11 +57,12 @@ input NewExercise {
 }
 
 input ExerciseUpdate {
-    name: String
-    weight: Float
-    targetRep: Int
-    restTime: Float
-    numSets: Int
+    id: ID!
+    name: String!
+    weight: Float!
+    targetRep: Int!
+    restTime: Float!
+    numSets: Int!
 }
 
 type Auth {
@@ -70,6 +73,8 @@ type Query {
   users: [PublicUser!]!
   workouts(username: String!): [Workout!]!
   workout(id: ID!): Workout
+  exercise(id: ID!): Exercise
+  exercises(wid: ID!): [Exercise!]!
 }
 
 type Mutation {
@@ -80,4 +85,5 @@ type Mutation {
   deleteWorkout(id: ID!): Boolean! 
   addExerciseToWorkout(input: NewExercise!): Exercise!
   updateExercise(input: ExerciseUpdate): Boolean!
+  deleteExercise(id: ID!): Boolean!
 }
