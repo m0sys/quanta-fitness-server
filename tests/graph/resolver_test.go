@@ -238,3 +238,203 @@ workout:createWorkout(input: {title: "Chest Day 2"}) {
 
 	})
 }
+
+func TestExerciseQueries(t *testing.T) {
+	srv := handler.NewDefaultServer(generated.NewExecutableSchema(graph.NewResolver()))
+	authSrv := auth.Middleware()(srv)
+	c := client.New(authSrv)
+	var token string
+
+	var resp struct {
+		Register struct{ Token string }
+	}
+
+	// First create a new user to get a valid token.
+	c.MustPost(`mutation {
+register:register(input: {username: "hero", email: "hero@gmail.com", password: "nero", confirm: "nero"}) {
+				    token
+			}
+			
+		}`, &resp)
+	assert.NotEmpty(t, resp.Register.Token)
+
+	token = resp.Register.Token
+
+	var resp2 struct {
+		Workout struct {
+			Title string
+		}
+	}
+
+	// Second create a workout.
+	c.MustPost(`mutation {
+	workout:createWorkout(input: {title: "Chest Day 2"}) {
+					 title
+			}
+	}`, &resp2, client.AddHeader("Authorization", token))
+	assert.NotEmpty(t, resp2.Workout)
+	assert.Equal(t, "Chest Day 2", resp2.Workout.Title)
+
+	// Add Exercise To Workout Query Tests.
+	t.Run("Add Exercise To Workout: When not unauthenticated", func(t *testing.T) {
+		var resp3 struct{}
+
+		err := c.Post(`mutation {
+			exercise: addExerciseToWorkout(input: {wid: 0, name: "Leg Day"}) {
+				    id
+					name
+				    wid
+			}
+			
+		}`, &resp3)
+		assert.NotEmpty(t, err)
+		assert.EqualError(t, err, `[{"message":"Access Denied!","path":["exercise"]}]`)
+	})
+
+	t.Run("Add Exercise To Workout: When authenticated", func(t *testing.T) {
+		var resp3 struct {
+			Exercise struct {
+				Id   string
+				Name string
+				Wid  string
+			}
+		}
+
+		c.MustPost(`mutation {
+			exercise: addExerciseToWorkout(input: {wid: 0, name: "Leg Day"}) {
+				    id
+					name
+				    wid
+			}
+			
+		}`, &resp3, client.AddHeader("Authorization", token))
+
+		assert.NotNil(t, resp3.Exercise)
+		assert.Equal(t, "0", resp3.Exercise.Id)
+		assert.Equal(t, "0", resp3.Exercise.Wid)
+		assert.Equal(t, "Leg Day", resp3.Exercise.Name)
+
+	})
+
+	// Update Exercise Query Tests.
+	t.Run("Update Exercise: When not unauthenticated", func(t *testing.T) {
+		var resp3 struct{}
+
+		err := c.Post(`mutation {
+			updated: updateExercise(input: {id: 0, name: "Flat Bench Press", weight: 192.0, targetRep: 5, restTime: 120.0, numSets: 3}) 
+		}`, &resp3)
+		assert.NotEmpty(t, err)
+		assert.EqualError(t, err, `[{"message":"Access Denied!","path":["updated"]}]`)
+	})
+
+	t.Run("Update Exercise: When authenticated", func(t *testing.T) {
+		var resp3 struct {
+			Updated bool
+		}
+
+		c.MustPost(`mutation {
+updated: updateExercise(input: {id: 0, name: "Flat Bench Press", weight: 192.0, targetRep: 5, restTime: 120.0, numSets: 3}) 
+		}`, &resp3, client.AddHeader("Authorization", token))
+
+		assert.True(t, resp3.Updated)
+	})
+
+	// Get Exercise Query Tests.
+	t.Run("Get Exercise: When not unauthenticated", func(t *testing.T) {
+		var resp3 struct{}
+
+		err := c.Post(`{exercise(id: 0) {
+			  id
+			  wid
+			  name
+			  weight
+		}}`, &resp3)
+		assert.NotEmpty(t, err)
+		assert.EqualError(t, err, `[{"message":"Access Denied!","path":["exercise"]}]`)
+	})
+
+	t.Run("Get Exercise: When authenticated", func(t *testing.T) {
+		var resp3 struct {
+			Exercise struct {
+				Id     string
+				Wid    string
+				Name   string
+				Weight float64
+			}
+		}
+
+		c.MustPost(`{exercise(id: 0) {
+			  id
+			  wid
+			  name
+			  weight
+		}}`, &resp3, client.AddHeader("Authorization", token))
+
+		assert.NotEmpty(t, resp3.Exercise)
+		assert.Equal(t, "0", resp3.Exercise.Id)
+		assert.Equal(t, "0", resp3.Exercise.Wid)
+		assert.Equal(t, "Flat Bench Press", resp3.Exercise.Name)
+		assert.Equal(t, 192.0, resp3.Exercise.Weight)
+	})
+
+	// Get Exercises For Workout Query Tests.
+	t.Run("Get Exercises For Workout: When not unauthenticated", func(t *testing.T) {
+		var resp3 struct{}
+
+		err := c.Post(`{exercises(wid: 0) {
+			  id
+			  wid
+			  name
+				  
+		}}`, &resp3)
+		assert.NotEmpty(t, err)
+		assert.EqualError(t, err, `[{"message":"Access Denied!","path":["exercises"]}]`)
+	})
+
+	t.Run("Get Exercises For Workout: When authenticated", func(t *testing.T) {
+		var resp3 struct {
+			Exercises []struct {
+				Id   string
+				Wid  string
+				Name string
+			}
+		}
+
+		c.MustPost(`{exercises(wid: 0) {
+			  id
+			  wid
+			  name
+				  
+		}}`, &resp3, client.AddHeader("Authorization", token))
+
+		assert.NotEmpty(t, resp3.Exercises)
+		assert.Equal(t, 1, len(resp3.Exercises))
+		assert.Equal(t, "0", resp3.Exercises[0].Id)
+		assert.Equal(t, "0", resp3.Exercises[0].Wid)
+		assert.Equal(t, "Flat Bench Press", resp3.Exercises[0].Name)
+	})
+
+	// Delete Exercise Query Tests.
+	t.Run("Delete Exercise: When not unauthenticated", func(t *testing.T) {
+		var resp3 struct{}
+
+		err := c.Post(`mutation {
+				deleted:deleteExercise(id: 0)
+		}`, &resp3)
+		assert.NotEmpty(t, err)
+		assert.EqualError(t, err, `[{"message":"Access Denied!","path":["deleted"]}]`)
+	})
+
+	t.Run("Delete Exercise: When authenticated", func(t *testing.T) {
+		var resp3 struct {
+			Deleted bool
+		}
+
+		c.MustPost(`mutation {
+				deleted:deleteExercise(id: 0)
+		}`, &resp3, client.AddHeader("Authorization", token))
+
+		assert.True(t, resp3.Deleted)
+	})
+
+}

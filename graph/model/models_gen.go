@@ -10,10 +10,37 @@ type Auth struct {
 	Token string `json:"token"`
 }
 
+type Exercise struct {
+	ID        string      `json:"id"`
+	Name      string      `json:"name"`
+	Wid       string      `json:"wid"`
+	User      *PublicUser `json:"user"`
+	Weight    float64     `json:"weight"`
+	TargetRep int         `json:"targetRep"`
+	RestTime  float64     `json:"restTime"`
+	NumSets   int         `json:"numSets"`
+	CreatedAt time.Time   `json:"createdAt"`
+	UpdatedAt time.Time   `json:"updatedAt"`
+}
+
+type ExerciseUpdate struct {
+	ID        string  `json:"id"`
+	Name      string  `json:"name"`
+	Weight    float64 `json:"weight"`
+	TargetRep int     `json:"targetRep"`
+	RestTime  float64 `json:"restTime"`
+	NumSets   int     `json:"numSets"`
+}
+
 type Login struct {
 	Username *string `json:"username"`
 	Email    *string `json:"email"`
 	Password string  `json:"password"`
+}
+
+type NewExercise struct {
+	Wid  string `json:"wid"`
+	Name string `json:"name"`
 }
 
 type NewUser struct {
@@ -27,22 +54,19 @@ type NewWorkout struct {
 	Title string `json:"title"`
 }
 
-type User struct {
-	ID       string  `json:"id"`
+type PublicUser struct {
 	Username string  `json:"username"`
-	Email    string  `json:"email"`
-	Password string  `json:"password"`
 	Weight   float64 `json:"weight"`
 	Height   float64 `json:"height"`
 	Gender   string  `json:"gender"`
 }
 
 type Workout struct {
-	ID        string    `json:"id"`
-	Title     string    `json:"title"`
-	CreatedAt time.Time `json:"createdAt"`
-	UpdatedAt time.Time `json:"updatedAt"`
-	User      *User     `json:"user"`
+	ID        string      `json:"id"`
+	Title     string      `json:"title"`
+	CreatedAt time.Time   `json:"createdAt"`
+	UpdatedAt time.Time   `json:"updatedAt"`
+	User      *PublicUser `json:"user"`
 }
 
 type WorkoutUpdate struct {
