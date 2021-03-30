@@ -59,7 +59,7 @@ type ComplexityRoot struct {
 	Query struct {
 		Users    func(childComplexity int) int
 		Workout  func(childComplexity int, id string) int
-		Workouts func(childComplexity int) int
+		Workouts func(childComplexity int, username string) int
 	}
 
 	User struct {
@@ -85,12 +85,12 @@ type MutationResolver interface {
 	Register(ctx context.Context, input model.NewUser) (*model.Auth, error)
 	Login(ctx context.Context, input model.Login) (*model.Auth, error)
 	CreateWorkout(ctx context.Context, input model.NewWorkout) (*model.Workout, error)
-	UpdateWorkout(ctx context.Context, input model.WorkoutUpdate) (*model.Workout, error)
-	DeleteWorkout(ctx context.Context, id string) (*model.Workout, error)
+	UpdateWorkout(ctx context.Context, input model.WorkoutUpdate) (bool, error)
+	DeleteWorkout(ctx context.Context, id string) (bool, error)
 }
 type QueryResolver interface {
 	Users(ctx context.Context) ([]*model.User, error)
-	Workouts(ctx context.Context) ([]*model.Workout, error)
+	Workouts(ctx context.Context, username string) ([]*model.Workout, error)
 	Workout(ctx context.Context, id string) (*model.Workout, error)
 }
 
@@ -200,7 +200,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		return e.complexity.Query.Workouts(childComplexity), true
+		args, err := ec.field_Query_workouts_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.Workouts(childComplexity, args["username"].(string)), true
 
 	case "User.email":
 		if e.complexity.User.Email == nil {
@@ -370,11 +375,6 @@ type User {
   gender: String!
 }
 
-type Query {
-  users: [User!]!
-  workouts: [Workout!]!
-  workout(id: ID!): Workout
-}
 
 input NewUser {
   username: String!
@@ -402,12 +402,18 @@ type Auth {
     token: String!
 }
 
+type Query {
+  users: [User!]!
+  workouts(username: String!): [Workout!]!
+  workout(id: ID!): Workout
+}
+
 type Mutation {
   register(input: NewUser!): Auth!
   login(input: Login!): Auth!
   createWorkout(input: NewWorkout!): Workout!
-  updateWorkout(input: WorkoutUpdate!): Workout
-  deleteWorkout(id: ID!): Workout 
+  updateWorkout(input: WorkoutUpdate!): Boolean!
+  deleteWorkout(id: ID!): Boolean! 
 }
 `, BuiltIn: false},
 }
@@ -519,6 +525,21 @@ func (ec *executionContext) field_Query_workout_args(ctx context.Context, rawArg
 		}
 	}
 	args["id"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_workouts_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["username"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("username"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["username"] = arg0
 	return args, nil
 }
 
@@ -753,11 +774,14 @@ func (ec *executionContext) _Mutation_updateWorkout(ctx context.Context, field g
 		return graphql.Null
 	}
 	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.Workout)
+	res := resTmp.(bool)
 	fc.Result = res
-	return ec.marshalOWorkout2ᚖgithubᚗcomᚋmhd53ᚋquantaᚑfitnessᚑserverᚋgraphᚋmodelᚐWorkout(ctx, field.Selections, res)
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_deleteWorkout(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -792,11 +816,14 @@ func (ec *executionContext) _Mutation_deleteWorkout(ctx context.Context, field g
 		return graphql.Null
 	}
 	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.Workout)
+	res := resTmp.(bool)
 	fc.Result = res
-	return ec.marshalOWorkout2ᚖgithubᚗcomᚋmhd53ᚋquantaᚑfitnessᚑserverᚋgraphᚋmodelᚐWorkout(ctx, field.Selections, res)
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_users(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -850,9 +877,16 @@ func (ec *executionContext) _Query_workouts(ctx context.Context, field graphql.C
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_workouts_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Workouts(rctx)
+		return ec.resolvers.Query().Workouts(rctx, args["username"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2681,8 +2715,14 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			}
 		case "updateWorkout":
 			out.Values[i] = ec._Mutation_updateWorkout(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "deleteWorkout":
 			out.Values[i] = ec._Mutation_deleteWorkout(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}

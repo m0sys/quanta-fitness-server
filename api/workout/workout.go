@@ -1,11 +1,14 @@
 package workout
 
 import (
+	"errors"
+	"log"
+
 	ustore "github.com/mhd53/quanta-fitness-server/internal/datastore/userstore"
 	wstore "github.com/mhd53/quanta-fitness-server/internal/datastore/workoutstore"
 	"github.com/mhd53/quanta-fitness-server/internal/entity"
 	serv "github.com/mhd53/quanta-fitness-server/internal/workout"
-	// "github.com/mhd53/quanta-fitness-server/pkg/crypto"
+	"github.com/mhd53/quanta-fitness-server/pkg/format"
 )
 
 var (
@@ -16,9 +19,10 @@ type server struct{}
 
 type WorkoutServer interface {
 	CreateWorkout(title, uname string) (entity.Workout, error)
-	UpdateWorkout(wid int64, workout entity.BaseWorkout, uname string) error
-	DeleteWorkout(wid int64, uname string) error
-	GetWorkout(wid int64, uname string) (entity.Workout, error)
+	UpdateWorkout(wid string, workout entity.BaseWorkout, uname string) (bool, error)
+	DeleteWorkout(wid string, uname string) (bool, error)
+	GetWorkout(wid string, uname string) (entity.Workout, error)
+	GetWorkouts(uname string) ([]entity.Workout, error)
 }
 
 func NewWorkoutServer(us ustore.UserStore, ws wstore.WorkoutStore) WorkoutServer {
@@ -28,41 +32,53 @@ func NewWorkoutServer(us ustore.UserStore, ws wstore.WorkoutStore) WorkoutServer
 	return &server{}
 }
 func (*server) CreateWorkout(title, uname string) (entity.Workout, error) {
-	created, err := service.CreateWorkout(title, uname)
-
-	if err != nil {
-		return entity.Workout{}, err
-	}
-
-	return created, nil
+	return service.CreateWorkout(title, uname)
 }
 
-func (*server) UpdateWorkout(wid int64, workout entity.BaseWorkout, uname string) error {
-	err := service.UpdateWorkout(wid, workout, uname)
+func (*server) UpdateWorkout(wid string, workout entity.BaseWorkout, uname string) (bool, error) {
 
+	intID, err := format.ConvertToBase64(wid)
 	if err != nil {
-		return err
+		log.Panic("API Error: ", err.Error())
+		return false, errors.New("Interna Error!")
+
 	}
 
-	return nil
+	err2 := service.UpdateWorkout(intID, workout, uname)
+	if err2 != nil {
+		return false, err2
+	}
+
+	return true, nil
 }
 
-func (*server) DeleteWorkout(wid int64, uname string) error {
-	err := service.DeleteWorkout(wid, uname)
+func (*server) DeleteWorkout(wid string, uname string) (bool, error) {
+	intID, err := format.ConvertToBase64(wid)
 	if err != nil {
-		return err
+		log.Panic("API Error: ", err.Error())
+		return false, errors.New("Interna Error!")
+
 	}
 
-	return nil
+	err2 := service.DeleteWorkout(intID, uname)
+	if err2 != nil {
+		return false, err2
+	}
 
+	return true, nil
 }
 
-func (*server) GetWorkout(wid int64, uname string) (entity.Workout, error) {
-	got, err := service.GetWorkout(wid, uname)
+func (*server) GetWorkout(wid string, uname string) (entity.Workout, error) {
+	intID, err := format.ConvertToBase64(wid)
 	if err != nil {
-		return entity.Workout{}, err
+		log.Panic("API Error: ", err.Error())
+		return entity.Workout{}, errors.New("Interna Error!")
+
 	}
 
-	return got, nil
+	return service.GetWorkout(intID, uname)
+}
 
+func (*server) GetWorkouts(uname string) ([]entity.Workout, error) {
+	return service.GetWorkoutsForUser(uname)
 }

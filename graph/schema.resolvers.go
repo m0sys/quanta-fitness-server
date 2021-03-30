@@ -7,14 +7,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"log"
 	"strconv"
 
 	"github.com/mhd53/quanta-fitness-server/api/auth"
 	"github.com/mhd53/quanta-fitness-server/graph/generated"
 	"github.com/mhd53/quanta-fitness-server/graph/model"
 	"github.com/mhd53/quanta-fitness-server/internal/entity"
-	"github.com/mhd53/quanta-fitness-server/pkg/format"
 )
 
 func (r *mutationResolver) Register(ctx context.Context, input model.NewUser) (*model.Auth, error) {
@@ -54,8 +52,7 @@ func (r *mutationResolver) CreateWorkout(ctx context.Context, input model.NewWor
 	created, err := r.WorkoutServer.CreateWorkout(input.Title, uname)
 
 	if err != nil {
-		log.Panic("GraphQL Error: ", err.Error())
-		return &model.Workout{}, errors.New("Internal Error!")
+		return &model.Workout{}, err
 	}
 
 	return &model.Workout{
@@ -66,18 +63,11 @@ func (r *mutationResolver) CreateWorkout(ctx context.Context, input model.NewWor
 	}, nil
 }
 
-func (r *mutationResolver) UpdateWorkout(ctx context.Context, input model.WorkoutUpdate) (*model.Workout, error) {
+func (r *mutationResolver) UpdateWorkout(ctx context.Context, input model.WorkoutUpdate) (bool, error) {
 	uname := auth.ForContext(ctx)
 
 	if uname == "" {
-		return &model.Workout{}, errors.New("Access Denied!")
-	}
-
-	id, err := format.ConvertToBase64(input.ID)
-	if err != nil {
-		log.Panic("GraphQL Error: ", err.Error())
-		return &model.Workout{}, errors.New("Internal Error!")
-
+		return false, errors.New("Access Denied!")
 	}
 
 	updates := entity.BaseWorkout{
@@ -85,71 +75,61 @@ func (r *mutationResolver) UpdateWorkout(ctx context.Context, input model.Workou
 		Username: uname,
 	}
 
-	err2 := r.WorkoutServer.UpdateWorkout(id, updates, uname)
-	if err2 != nil {
-		log.Panic("GraphQL Error: ", err2.Error())
-		return &model.Workout{}, errors.New("Internal Error!")
+	success, err := r.WorkoutServer.UpdateWorkout(input.ID, updates, uname)
+	if err != nil {
+		return false, err
 
 	}
 
-	got, err3 := r.WorkoutServer.GetWorkout(id, uname)
-	if err3 != nil {
-		log.Panic("GraphQL Error: ", err3.Error())
-		return &model.Workout{}, errors.New("Internal Error!")
-
-	}
-
-	return &model.Workout{
-		ID:        strconv.FormatInt(got.ID, 10),
-		Title:     got.Title,
-		CreatedAt: got.CreatedAt,
-		UpdatedAt: got.UpdatedAt,
-	}, nil
+	return success, nil
 }
 
-func (r *mutationResolver) DeleteWorkout(ctx context.Context, id string) (*model.Workout, error) {
+func (r *mutationResolver) DeleteWorkout(ctx context.Context, id string) (bool, error) {
 	uname := auth.ForContext(ctx)
 
 	if uname == "" {
-		return &model.Workout{}, errors.New("Access Denied!")
+		return false, errors.New("Access Denied!")
 	}
 
-	intID, err := format.ConvertToBase64(id)
+	success, err := r.WorkoutServer.DeleteWorkout(id, uname)
 	if err != nil {
-		log.Panic("GraphQL Error: ", err.Error())
-		return &model.Workout{}, errors.New("Internal Error!")
+		return false, err
 
 	}
 
-	got, err2 := r.WorkoutServer.GetWorkout(intID, uname)
-	if err2 != nil {
-		log.Panic("GraphQL Error: ", err2.Error())
-		return &model.Workout{}, errors.New("Internal Error!")
-
-	}
-
-	err3 := r.WorkoutServer.DeleteWorkout(intID, uname)
-	if err3 != nil {
-		log.Panic("GraphQL Error: ", err3.Error())
-		return &model.Workout{}, errors.New("Internal Error!")
-
-	}
-
-	return &model.Workout{
-		ID:        strconv.FormatInt(got.ID, 10),
-		Title:     got.Title,
-		CreatedAt: got.CreatedAt,
-		UpdatedAt: got.UpdatedAt,
-	}, nil
-
+	return success, nil
 }
 
 func (r *queryResolver) Users(ctx context.Context) ([]*model.User, error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *queryResolver) Workouts(ctx context.Context) ([]*model.Workout, error) {
-	panic(fmt.Errorf("not implemented"))
+func (r *queryResolver) Workouts(ctx context.Context, username string) ([]*model.Workout, error) {
+	var modelWorkouts []*model.Workout
+
+	uname := auth.ForContext(ctx)
+
+	if uname == "" {
+		return modelWorkouts, errors.New("Access Denied!")
+	}
+
+	got, err := r.WorkoutServer.GetWorkouts(uname)
+	if err != nil {
+		return modelWorkouts, err
+	}
+
+	for _, v := range got {
+		mWorkout := &model.Workout{
+			ID:        strconv.FormatInt(v.ID, 10),
+			Title:     v.Title,
+			CreatedAt: v.CreatedAt,
+			UpdatedAt: v.UpdatedAt}
+
+		modelWorkouts = append(modelWorkouts, mWorkout)
+	}
+
+	return modelWorkouts, nil
+
 }
 
 func (r *queryResolver) Workout(ctx context.Context, id string) (*model.Workout, error) {
@@ -159,17 +139,9 @@ func (r *queryResolver) Workout(ctx context.Context, id string) (*model.Workout,
 		return &model.Workout{}, errors.New("Access Denied!")
 	}
 
-	intID, err := format.ConvertToBase64(id)
+	got, err := r.WorkoutServer.GetWorkout(id, uname)
 	if err != nil {
-		log.Panic("GraphQL Error: ", err.Error())
-		return &model.Workout{}, errors.New("Internal Error!")
-
-	}
-
-	got, err2 := r.WorkoutServer.GetWorkout(intID, uname)
-	if err2 != nil {
-		log.Panic("GraphQL Error: ", err2.Error())
-		return &model.Workout{}, errors.New("Internal Error!")
+		return &model.Workout{}, err
 
 	}
 
