@@ -238,3 +238,82 @@ workout:createWorkout(input: {title: "Chest Day 2"}) {
 
 	})
 }
+
+func TestExerciseQueries(t *testing.T) {
+	srv := handler.NewDefaultServer(generated.NewExecutableSchema(graph.NewResolver()))
+	authSrv := auth.Middleware()(srv)
+	c := client.New(authSrv)
+	var token string
+
+	var resp struct {
+		Register struct{ Token string }
+	}
+
+	// First create a new user to get a valid token.
+	c.MustPost(`mutation {
+register:register(input: {username: "hero", email: "hero@gmail.com", password: "nero", confirm: "nero"}) {
+				    token
+			}
+			
+		}`, &resp)
+	assert.NotEmpty(t, resp.Register.Token)
+
+	token = resp.Register.Token
+
+	var resp2 struct {
+		Workout struct {
+			Title string
+		}
+	}
+
+	// Second create a workout.
+	c.MustPost(`mutation {
+	workout:createWorkout(input: {title: "Chest Day 2"}) {
+					 title
+			}
+	}`, &resp2, client.AddHeader("Authorization", token))
+	assert.NotEmpty(t, resp2.Workout)
+	assert.Equal(t, "Chest Day 2", resp2.Workout.Title)
+
+	// Add Exercise To Workout Query Tests.
+	t.Run("Add Exercise To Workout: When not unauthenticated", func(t *testing.T) {
+		var resp3 struct{}
+
+		err := c.Post(`mutation {
+			exercise: addExerciseToWorkout(input: {wid: 0, name: "Leg Day"}) {
+				    id
+					name
+				    wid
+			}
+			
+		}`, &resp3)
+		assert.NotEmpty(t, err)
+		assert.EqualError(t, err, `[{"message":"Access Denied!","path":["exercise"]}]`)
+	})
+
+	t.Run("Add Exercise To Workout: When authenticated", func(t *testing.T) {
+		var resp3 struct {
+			Exercise struct {
+				Id   string
+				Name string
+				Wid  string
+			}
+		}
+
+		c.MustPost(`mutation {
+			exercise: addExerciseToWorkout(input: {wid: 0, name: "Leg Day"}) {
+				    id
+					name
+				    wid
+			}
+			
+		}`, &resp3, client.AddHeader("Authorization", token))
+
+		assert.NotNil(t, resp3.Exercise)
+		assert.Equal(t, "0", resp3.Exercise.Id)
+		assert.Equal(t, "0", resp3.Exercise.Wid)
+		assert.Equal(t, "Leg Day", resp3.Exercise.Name)
+
+	})
+
+}
