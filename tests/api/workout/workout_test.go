@@ -37,6 +37,8 @@ func TestCreateWorkoutWhenValidToken(t *testing.T) {
 	assert.Equal(t, "Chest Day", created.Title)
 }
 
+// Util funcs.
+
 func skipTest(t *testing.T) {
 	t.Skip("Implement AuthorizedReadAccess first!.")
 }
