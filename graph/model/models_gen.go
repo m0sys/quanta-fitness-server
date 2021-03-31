@@ -10,6 +10,24 @@ type Auth struct {
 	Token string `json:"token"`
 }
 
+type Eset struct {
+	ID               string      `json:"id"`
+	Eid              string      `json:"eid"`
+	User             *PublicUser `json:"user"`
+	ActualRepCount   int         `json:"actualRepCount"`
+	Duration         float64     `json:"duration"`
+	RestTimeDuration float64     `json:"restTimeDuration"`
+	CreatedAt        time.Time   `json:"createdAt"`
+	UpdatedAt        time.Time   `json:"updatedAt"`
+}
+
+type EsetUpdate struct {
+	ID               string  `json:"id"`
+	ActualRepCount   int     `json:"actualRepCount"`
+	Duration         float64 `json:"duration"`
+	RestTimeDuration float64 `json:"restTimeDuration"`
+}
+
 type Exercise struct {
 	ID        string      `json:"id"`
 	Name      string      `json:"name"`
@@ -36,6 +54,13 @@ type Login struct {
 	Username *string `json:"username"`
 	Email    *string `json:"email"`
 	Password string  `json:"password"`
+}
+
+type NewEset struct {
+	Eid              string  `json:"eid"`
+	ActualRepCount   int     `json:"actualRepCount"`
+	Duration         float64 `json:"duration"`
+	RestTimeDuration float64 `json:"restTimeDuration"`
 }
 
 type NewExercise struct {
