@@ -438,3 +438,216 @@ updated: updateExercise(input: {id: 0, name: "Flat Bench Press", weight: 192.0, 
 	})
 
 }
+
+func TestEsetQueries(t *testing.T) {
+	srv := handler.NewDefaultServer(generated.NewExecutableSchema(graph.NewResolver()))
+	authSrv := auth.Middleware()(srv)
+	c := client.New(authSrv)
+	var token string
+
+	var resp struct {
+		Register struct{ Token string }
+	}
+
+	// First create a new user to get a valid token.
+	c.MustPost(`mutation {
+register:register(input: {username: "hero", email: "hero@gmail.com", password: "nero", confirm: "nero"}) {
+				    token
+			}
+			
+		}`, &resp)
+	assert.NotEmpty(t, resp.Register.Token)
+
+	token = resp.Register.Token
+
+	var resp2 struct {
+		Workout struct {
+			Title string
+		}
+	}
+
+	// Second create a workout.
+	c.MustPost(`mutation {
+	workout:createWorkout(input: {title: "Chest Day 2"}) {
+					 title
+			}
+	}`, &resp2, client.AddHeader("Authorization", token))
+	assert.NotEmpty(t, resp2.Workout)
+	assert.Equal(t, "Chest Day 2", resp2.Workout.Title)
+
+	// Third create an exercise.
+	var resp3 struct {
+		Exercise struct {
+			Id   string
+			Name string
+			Wid  string
+		}
+	}
+
+	c.MustPost(`mutation {
+			exercise: addExerciseToWorkout(input: {wid: 0, name: "Leg Day"}) {
+				    id
+					name
+				    wid
+			}
+	}`, &resp3, client.AddHeader("Authorization", token))
+	assert.NotNil(t, resp3.Exercise)
+	assert.Equal(t, "0", resp3.Exercise.Id)
+	assert.Equal(t, "0", resp3.Exercise.Wid)
+	assert.Equal(t, "Leg Day", resp3.Exercise.Name)
+
+	// Add Eset To Exercise Query Tests.
+	t.Run("Add Eset To Exercise: When not unauthenticated", func(t *testing.T) {
+		var resp4 struct{}
+
+		err := c.Post(`mutation {
+			added:addEsetToExercise(input: {eid: 0, actualRepCount: 7, duration: 120.0, restTimeDuration: 120.0}) {
+		    id
+			eid
+		    actualRepCount
+			}
+		}`, &resp4)
+		assert.NotEmpty(t, err)
+		assert.EqualError(t, err, `[{"message":"Access Denied!","path":["added"]}]`)
+	})
+
+	t.Run("Add Eset To Exercise: When authenticated", func(t *testing.T) {
+		var resp4 struct {
+			Added struct {
+				Id             string
+				Eid            string
+				ActualRepCount int
+			}
+		}
+
+		c.MustPost(`mutation {
+			added:addEsetToExercise(input: {eid: 0, actualRepCount: 7, duration: 120.0, restTimeDuration: 120.0}) {
+		    id
+			eid
+		    actualRepCount
+			}
+		}`, &resp4, client.AddHeader("Authorization", token))
+
+		assert.NotNil(t, resp4.Added)
+		assert.Equal(t, "0", resp4.Added.Id)
+		assert.Equal(t, "0", resp4.Added.Eid)
+		assert.Equal(t, 7, resp4.Added.ActualRepCount)
+
+	})
+
+	// Update Eset Query Tests.
+	t.Run("Update Eset: When not unauthenticated", func(t *testing.T) {
+		var resp4 struct{}
+
+		err := c.Post(`mutation {
+			updated: updateEset(input: {id: 0, actualRepCount: 10, duration: 121.0, restTimeDuration: 125.0})
+		}`, &resp4)
+		assert.NotEmpty(t, err)
+		assert.EqualError(t, err, `[{"message":"Access Denied!","path":["updated"]}]`)
+	})
+
+	t.Run("Update Eset: When authenticated", func(t *testing.T) {
+		var resp4 struct {
+			Updated bool
+		}
+
+		c.MustPost(`mutation {
+			updated: updateEset(input: {id: 0, actualRepCount: 10, duration: 121.0, restTimeDuration: 125.0})
+		}`, &resp4, client.AddHeader("Authorization", token))
+
+		assert.True(t, resp4.Updated)
+	})
+
+	// Get Eset Query Tests.
+	t.Run("Get Eset: When not unauthenticated", func(t *testing.T) {
+		var resp4 struct{}
+
+		err := c.Post(`{eset(id: 0) {
+			  id
+			  eid
+			  actualRepCount
+		}}`, &resp4)
+		assert.NotEmpty(t, err)
+		assert.EqualError(t, err, `[{"message":"Access Denied!","path":["eset"]}]`)
+	})
+
+	t.Run("Get Eset: When authenticated", func(t *testing.T) {
+		var resp4 struct {
+			Eset struct {
+				Id             string
+				Eid            string
+				ActualRepCount int
+			}
+		}
+
+		c.MustPost(`{eset(id: 0) {
+			  id
+			  eid
+			  actualRepCount
+		}}`, &resp4, client.AddHeader("Authorization", token))
+
+		assert.NotNil(t, resp4.Eset)
+		assert.Equal(t, "0", resp4.Eset.Id)
+		assert.Equal(t, "0", resp4.Eset.Eid)
+		assert.Equal(t, 10, resp4.Eset.ActualRepCount)
+	})
+
+	// Get Eset For Exercise Query Tests.
+	t.Run("Get Eset For Exercise: When not unauthenticated", func(t *testing.T) {
+		var resp4 struct{}
+
+		err := c.Post(`{esets(eid: 0) {
+			  id
+			  eid
+			  actualRepCount
+		}}`, &resp4)
+		assert.NotEmpty(t, err)
+		assert.EqualError(t, err, `[{"message":"Access Denied!","path":["esets"]}]`)
+	})
+
+	t.Run("Get Eset For Exercise: When authenticated", func(t *testing.T) {
+		var resp4 struct {
+			Esets []struct {
+				Id             string
+				Eid            string
+				ActualRepCount int
+			}
+		}
+
+		c.MustPost(`{esets(eid: 0) {
+			  id
+			  eid
+			  actualRepCount
+		}}`, &resp4, client.AddHeader("Authorization", token))
+
+		assert.NotEmpty(t, resp4.Esets)
+		assert.Equal(t, 1, len(resp4.Esets))
+		assert.Equal(t, "0", resp4.Esets[0].Id)
+		assert.Equal(t, "0", resp4.Esets[0].Eid)
+		assert.Equal(t, 10, resp4.Esets[0].ActualRepCount)
+	})
+
+	// Delete Eset Query Tests.
+	t.Run("Delete Eset: When not unauthenticated", func(t *testing.T) {
+		var resp4 struct{}
+
+		err := c.Post(`mutation {
+				deleted:deleteEset(id: 0)
+		}`, &resp4)
+		assert.NotEmpty(t, err)
+		assert.EqualError(t, err, `[{"message":"Access Denied!","path":["deleted"]}]`)
+	})
+
+	t.Run("Delete Eset: When authenticated", func(t *testing.T) {
+		var resp4 struct {
+			Deleted bool
+		}
+
+		c.MustPost(`mutation {
+				deleted:deleteEset(id: 0)
+		}`, &resp4, client.AddHeader("Authorization", token))
+
+		assert.True(t, resp4.Deleted)
+	})
+
+}

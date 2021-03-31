@@ -123,7 +123,7 @@ func (r *mutationResolver) AddExerciseToWorkout(ctx context.Context, input model
 	}, nil
 }
 
-func (r *mutationResolver) UpdateExercise(ctx context.Context, input *model.ExerciseUpdate) (bool, error) {
+func (r *mutationResolver) UpdateExercise(ctx context.Context, input model.ExerciseUpdate) (bool, error) {
 	uname := auth.ForContext(ctx)
 
 	if uname == "" {
@@ -156,6 +156,66 @@ func (r *mutationResolver) DeleteExercise(ctx context.Context, id string) (bool,
 	}
 
 	success, err := r.ExerciseServer.DeleteExercise(id, uname)
+	if err != nil {
+		return false, err
+
+	}
+
+	return success, nil
+}
+
+func (r *mutationResolver) AddEsetToExercise(ctx context.Context, input model.NewEset) (*model.Eset, error) {
+	uname := auth.ForContext(ctx)
+
+	if uname == "" {
+		return &model.Eset{}, errors.New("Access Denied!")
+	}
+
+	created, err := r.EsetServer.AddEsetToExercise(uname, input.Eid, input.ActualRepCount, float32(input.Duration), float32(input.RestTimeDuration))
+
+	if err != nil {
+		return &model.Eset{}, err
+	}
+	return &model.Eset{
+		ID:               strconv.FormatInt(created.ID, 10),
+		Eid:              strconv.FormatInt(created.EID, 10),
+		ActualRepCount:   created.SMetric.ActualRepCount,
+		Duration:         float64(created.SMetric.Duration),
+		RestTimeDuration: float64(created.SMetric.RestTimeDuration),
+	}, nil
+}
+
+func (r *mutationResolver) UpdateEset(ctx context.Context, input model.EsetUpdate) (bool, error) {
+	uname := auth.ForContext(ctx)
+
+	if uname == "" {
+		return false, errors.New("Access Denied!")
+	}
+
+	updates := entity.EsetUpdate{
+		SMetric: entity.SMetric{
+			ActualRepCount:   input.ActualRepCount,
+			RestTimeDuration: float32(input.RestTimeDuration),
+			Duration:         float32(input.Duration),
+		},
+	}
+
+	success, err := r.EsetServer.UpdateEset(input.ID, uname, updates)
+	if err != nil {
+		return false, err
+	}
+
+	return success, nil
+}
+
+func (r *mutationResolver) DeleteEset(ctx context.Context, id string) (bool, error) {
+	uname := auth.ForContext(ctx)
+
+	if uname == "" {
+		return false, errors.New("Access Denied!")
+	}
+
+	success, err := r.EsetServer.DeleteEset(id, uname)
 	if err != nil {
 		return false, err
 
@@ -272,6 +332,61 @@ func (r *queryResolver) Exercises(ctx context.Context, wid string) ([]*model.Exe
 	}
 
 	return modelExercises, nil
+}
+
+func (r *queryResolver) Eset(ctx context.Context, id string) (*model.Eset, error) {
+	uname := auth.ForContext(ctx)
+
+	if uname == "" {
+		return &model.Eset{}, errors.New("Access Denied!")
+	}
+
+	got, err := r.EsetServer.GetEset(id, uname)
+	if err != nil {
+		return &model.Eset{}, err
+
+	}
+
+	return &model.Eset{
+		ID:               strconv.FormatInt(got.ID, 10),
+		Eid:              strconv.FormatInt(got.EID, 10),
+		ActualRepCount:   got.SMetric.ActualRepCount,
+		RestTimeDuration: float64(got.BaseEset.SMetric.RestTimeDuration),
+		Duration:         float64(got.BaseEset.SMetric.Duration),
+		CreatedAt:        got.CreatedAt,
+		UpdatedAt:        got.UpdatedAt,
+	}, nil
+}
+
+func (r *queryResolver) Esets(ctx context.Context, eid string) ([]*model.Eset, error) {
+	var modelEsets []*model.Eset
+
+	uname := auth.ForContext(ctx)
+
+	if uname == "" {
+		return modelEsets, errors.New("Access Denied!")
+	}
+
+	got, err := r.EsetServer.GetEsetsForExercise(eid, uname)
+	if err != nil {
+		return modelEsets, err
+	}
+
+	for _, v := range got {
+		mEset := &model.Eset{
+			ID:               strconv.FormatInt(v.ID, 10),
+			Eid:              strconv.FormatInt(v.EID, 10),
+			ActualRepCount:   v.BaseEset.SMetric.ActualRepCount,
+			RestTimeDuration: float64(v.BaseEset.SMetric.RestTimeDuration),
+			Duration:         float64(v.BaseEset.SMetric.Duration),
+			CreatedAt:        v.CreatedAt,
+			UpdatedAt:        v.UpdatedAt,
+		}
+
+		modelEsets = append(modelEsets, mEset)
+	}
+
+	return modelEsets, nil
 }
 
 // Mutation returns generated.MutationResolver implementation.

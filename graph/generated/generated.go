@@ -48,6 +48,17 @@ type ComplexityRoot struct {
 		Token func(childComplexity int) int
 	}
 
+	Eset struct {
+		ActualRepCount   func(childComplexity int) int
+		CreatedAt        func(childComplexity int) int
+		Duration         func(childComplexity int) int
+		Eid              func(childComplexity int) int
+		ID               func(childComplexity int) int
+		RestTimeDuration func(childComplexity int) int
+		UpdatedAt        func(childComplexity int) int
+		User             func(childComplexity int) int
+	}
+
 	Exercise struct {
 		CreatedAt func(childComplexity int) int
 		ID        func(childComplexity int) int
@@ -62,13 +73,16 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
+		AddEsetToExercise    func(childComplexity int, input model.NewEset) int
 		AddExerciseToWorkout func(childComplexity int, input model.NewExercise) int
 		CreateWorkout        func(childComplexity int, input model.NewWorkout) int
+		DeleteEset           func(childComplexity int, id string) int
 		DeleteExercise       func(childComplexity int, id string) int
 		DeleteWorkout        func(childComplexity int, id string) int
 		Login                func(childComplexity int, input model.Login) int
 		Register             func(childComplexity int, input model.NewUser) int
-		UpdateExercise       func(childComplexity int, input *model.ExerciseUpdate) int
+		UpdateEset           func(childComplexity int, input model.EsetUpdate) int
+		UpdateExercise       func(childComplexity int, input model.ExerciseUpdate) int
 		UpdateWorkout        func(childComplexity int, input model.WorkoutUpdate) int
 	}
 
@@ -80,6 +94,8 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
+		Eset      func(childComplexity int, id string) int
+		Esets     func(childComplexity int, eid string) int
 		Exercise  func(childComplexity int, id string) int
 		Exercises func(childComplexity int, wid string) int
 		Users     func(childComplexity int) int
@@ -103,8 +119,11 @@ type MutationResolver interface {
 	UpdateWorkout(ctx context.Context, input model.WorkoutUpdate) (bool, error)
 	DeleteWorkout(ctx context.Context, id string) (bool, error)
 	AddExerciseToWorkout(ctx context.Context, input model.NewExercise) (*model.Exercise, error)
-	UpdateExercise(ctx context.Context, input *model.ExerciseUpdate) (bool, error)
+	UpdateExercise(ctx context.Context, input model.ExerciseUpdate) (bool, error)
 	DeleteExercise(ctx context.Context, id string) (bool, error)
+	AddEsetToExercise(ctx context.Context, input model.NewEset) (*model.Eset, error)
+	UpdateEset(ctx context.Context, input model.EsetUpdate) (bool, error)
+	DeleteEset(ctx context.Context, id string) (bool, error)
 }
 type QueryResolver interface {
 	Users(ctx context.Context) ([]*model.PublicUser, error)
@@ -112,6 +131,8 @@ type QueryResolver interface {
 	Workout(ctx context.Context, id string) (*model.Workout, error)
 	Exercise(ctx context.Context, id string) (*model.Exercise, error)
 	Exercises(ctx context.Context, wid string) ([]*model.Exercise, error)
+	Eset(ctx context.Context, id string) (*model.Eset, error)
+	Esets(ctx context.Context, eid string) ([]*model.Eset, error)
 }
 
 type executableSchema struct {
@@ -135,6 +156,62 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Auth.Token(childComplexity), true
+
+	case "Eset.actualRepCount":
+		if e.complexity.Eset.ActualRepCount == nil {
+			break
+		}
+
+		return e.complexity.Eset.ActualRepCount(childComplexity), true
+
+	case "Eset.createdAt":
+		if e.complexity.Eset.CreatedAt == nil {
+			break
+		}
+
+		return e.complexity.Eset.CreatedAt(childComplexity), true
+
+	case "Eset.duration":
+		if e.complexity.Eset.Duration == nil {
+			break
+		}
+
+		return e.complexity.Eset.Duration(childComplexity), true
+
+	case "Eset.eid":
+		if e.complexity.Eset.Eid == nil {
+			break
+		}
+
+		return e.complexity.Eset.Eid(childComplexity), true
+
+	case "Eset.id":
+		if e.complexity.Eset.ID == nil {
+			break
+		}
+
+		return e.complexity.Eset.ID(childComplexity), true
+
+	case "Eset.restTimeDuration":
+		if e.complexity.Eset.RestTimeDuration == nil {
+			break
+		}
+
+		return e.complexity.Eset.RestTimeDuration(childComplexity), true
+
+	case "Eset.updatedAt":
+		if e.complexity.Eset.UpdatedAt == nil {
+			break
+		}
+
+		return e.complexity.Eset.UpdatedAt(childComplexity), true
+
+	case "Eset.user":
+		if e.complexity.Eset.User == nil {
+			break
+		}
+
+		return e.complexity.Eset.User(childComplexity), true
 
 	case "Exercise.createdAt":
 		if e.complexity.Exercise.CreatedAt == nil {
@@ -206,6 +283,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Exercise.Wid(childComplexity), true
 
+	case "Mutation.addEsetToExercise":
+		if e.complexity.Mutation.AddEsetToExercise == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_addEsetToExercise_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.AddEsetToExercise(childComplexity, args["input"].(model.NewEset)), true
+
 	case "Mutation.addExerciseToWorkout":
 		if e.complexity.Mutation.AddExerciseToWorkout == nil {
 			break
@@ -229,6 +318,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.CreateWorkout(childComplexity, args["input"].(model.NewWorkout)), true
+
+	case "Mutation.deleteEset":
+		if e.complexity.Mutation.DeleteEset == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_deleteEset_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.DeleteEset(childComplexity, args["id"].(string)), true
 
 	case "Mutation.deleteExercise":
 		if e.complexity.Mutation.DeleteExercise == nil {
@@ -278,6 +379,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.Register(childComplexity, args["input"].(model.NewUser)), true
 
+	case "Mutation.updateEset":
+		if e.complexity.Mutation.UpdateEset == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateEset_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateEset(childComplexity, args["input"].(model.EsetUpdate)), true
+
 	case "Mutation.updateExercise":
 		if e.complexity.Mutation.UpdateExercise == nil {
 			break
@@ -288,7 +401,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.UpdateExercise(childComplexity, args["input"].(*model.ExerciseUpdate)), true
+		return e.complexity.Mutation.UpdateExercise(childComplexity, args["input"].(model.ExerciseUpdate)), true
 
 	case "Mutation.updateWorkout":
 		if e.complexity.Mutation.UpdateWorkout == nil {
@@ -329,6 +442,30 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.PublicUser.Weight(childComplexity), true
+
+	case "Query.eset":
+		if e.complexity.Query.Eset == nil {
+			break
+		}
+
+		args, err := ec.field_Query_eset_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.Eset(childComplexity, args["id"].(string)), true
+
+	case "Query.esets":
+		if e.complexity.Query.Esets == nil {
+			break
+		}
+
+		args, err := ec.field_Query_esets_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.Esets(childComplexity, args["eid"].(string)), true
 
 	case "Query.exercise":
 		if e.complexity.Query.Exercise == nil {
@@ -507,6 +644,17 @@ type Exercise {
     updatedAt: Time!
 }
 
+type Eset {
+    id: ID!
+    eid: ID!
+    user: PublicUser!
+    actualRepCount: Int!
+    duration: Float!
+    restTimeDuration: Float!
+    createdAt: Time!
+    updatedAt: Time!
+}
+
 type PublicUser {
     username: String!
     weight: Float!
@@ -551,6 +699,20 @@ input ExerciseUpdate {
     numSets: Int!
 }
 
+input NewEset {
+    eid: ID!
+    actualRepCount: Int!
+    duration: Float!
+    restTimeDuration: Float!
+}
+
+input EsetUpdate {
+    id: ID!
+    actualRepCount: Int!
+    duration: Float!
+    restTimeDuration: Float!
+}
+
 type Auth {
     token: String!
 }
@@ -561,6 +723,8 @@ type Query {
   workout(id: ID!): Workout
   exercise(id: ID!): Exercise
   exercises(wid: ID!): [Exercise!]!
+  eset(id: ID!): Eset
+  esets(eid: ID!): [Eset!]!
 }
 
 type Mutation {
@@ -570,8 +734,11 @@ type Mutation {
   updateWorkout(input: WorkoutUpdate!): Boolean!
   deleteWorkout(id: ID!): Boolean! 
   addExerciseToWorkout(input: NewExercise!): Exercise!
-  updateExercise(input: ExerciseUpdate): Boolean!
+  updateExercise(input: ExerciseUpdate!): Boolean!
   deleteExercise(id: ID!): Boolean!
+  addEsetToExercise(input: NewEset!): Eset!
+  updateEset(input: EsetUpdate!): Boolean!
+  deleteEset(id: ID!): Boolean!
 }
 `, BuiltIn: false},
 }
@@ -580,6 +747,21 @@ var parsedSchema = gqlparser.MustLoadSchema(sources...)
 // endregion ************************** generated!.gotpl **************************
 
 // region    ***************************** args.gotpl *****************************
+
+func (ec *executionContext) field_Mutation_addEsetToExercise_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.NewEset
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalNNewEset2githubᚗcomᚋmhd53ᚋquantaᚑfitnessᚑserverᚋgraphᚋmodelᚐNewEset(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
 
 func (ec *executionContext) field_Mutation_addExerciseToWorkout_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
@@ -608,6 +790,21 @@ func (ec *executionContext) field_Mutation_createWorkout_args(ctx context.Contex
 		}
 	}
 	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_deleteEset_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalNID2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
 	return args, nil
 }
 
@@ -671,13 +868,28 @@ func (ec *executionContext) field_Mutation_register_args(ctx context.Context, ra
 	return args, nil
 }
 
+func (ec *executionContext) field_Mutation_updateEset_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.EsetUpdate
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalNEsetUpdate2githubᚗcomᚋmhd53ᚋquantaᚑfitnessᚑserverᚋgraphᚋmodelᚐEsetUpdate(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Mutation_updateExercise_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 *model.ExerciseUpdate
+	var arg0 model.ExerciseUpdate
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalOExerciseUpdate2ᚖgithubᚗcomᚋmhd53ᚋquantaᚑfitnessᚑserverᚋgraphᚋmodelᚐExerciseUpdate(ctx, tmp)
+		arg0, err = ec.unmarshalNExerciseUpdate2githubᚗcomᚋmhd53ᚋquantaᚑfitnessᚑserverᚋgraphᚋmodelᚐExerciseUpdate(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -713,6 +925,36 @@ func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs
 		}
 	}
 	args["name"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_eset_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalNID2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_esets_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["eid"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("eid"))
+		arg0, err = ec.unmarshalNID2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["eid"] = arg0
 	return args, nil
 }
 
@@ -847,6 +1089,286 @@ func (ec *executionContext) _Auth_token(ctx context.Context, field graphql.Colle
 	res := resTmp.(string)
 	fc.Result = res
 	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Eset_id(ctx context.Context, field graphql.CollectedField, obj *model.Eset) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Eset",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Eset_eid(ctx context.Context, field graphql.CollectedField, obj *model.Eset) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Eset",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Eid, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Eset_user(ctx context.Context, field graphql.CollectedField, obj *model.Eset) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Eset",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.User, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.PublicUser)
+	fc.Result = res
+	return ec.marshalNPublicUser2ᚖgithubᚗcomᚋmhd53ᚋquantaᚑfitnessᚑserverᚋgraphᚋmodelᚐPublicUser(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Eset_actualRepCount(ctx context.Context, field graphql.CollectedField, obj *model.Eset) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Eset",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ActualRepCount, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Eset_duration(ctx context.Context, field graphql.CollectedField, obj *model.Eset) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Eset",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Duration, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(float64)
+	fc.Result = res
+	return ec.marshalNFloat2float64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Eset_restTimeDuration(ctx context.Context, field graphql.CollectedField, obj *model.Eset) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Eset",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.RestTimeDuration, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(float64)
+	fc.Result = res
+	return ec.marshalNFloat2float64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Eset_createdAt(ctx context.Context, field graphql.CollectedField, obj *model.Eset) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Eset",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CreatedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(time.Time)
+	fc.Result = res
+	return ec.marshalNTime2timeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Eset_updatedAt(ctx context.Context, field graphql.CollectedField, obj *model.Eset) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Eset",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.UpdatedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(time.Time)
+	fc.Result = res
+	return ec.marshalNTime2timeᚐTime(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Exercise_id(ctx context.Context, field graphql.CollectedField, obj *model.Exercise) (ret graphql.Marshaler) {
@@ -1476,7 +1998,7 @@ func (ec *executionContext) _Mutation_updateExercise(ctx context.Context, field 
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().UpdateExercise(rctx, args["input"].(*model.ExerciseUpdate))
+		return ec.resolvers.Mutation().UpdateExercise(rctx, args["input"].(model.ExerciseUpdate))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1519,6 +2041,132 @@ func (ec *executionContext) _Mutation_deleteExercise(ctx context.Context, field 
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Mutation().DeleteExercise(rctx, args["id"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_addEsetToExercise(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_addEsetToExercise_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().AddEsetToExercise(rctx, args["input"].(model.NewEset))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.Eset)
+	fc.Result = res
+	return ec.marshalNEset2ᚖgithubᚗcomᚋmhd53ᚋquantaᚑfitnessᚑserverᚋgraphᚋmodelᚐEset(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_updateEset(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_updateEset_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UpdateEset(rctx, args["input"].(model.EsetUpdate))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_deleteEset(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_deleteEset_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().DeleteEset(rctx, args["id"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1870,6 +2518,87 @@ func (ec *executionContext) _Query_exercises(ctx context.Context, field graphql.
 	res := resTmp.([]*model.Exercise)
 	fc.Result = res
 	return ec.marshalNExercise2ᚕᚖgithubᚗcomᚋmhd53ᚋquantaᚑfitnessᚑserverᚋgraphᚋmodelᚐExerciseᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_eset(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_eset_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().Eset(rctx, args["id"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.Eset)
+	fc.Result = res
+	return ec.marshalOEset2ᚖgithubᚗcomᚋmhd53ᚋquantaᚑfitnessᚑserverᚋgraphᚋmodelᚐEset(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_esets(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_esets_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().Esets(rctx, args["eid"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Eset)
+	fc.Result = res
+	return ec.marshalNEset2ᚕᚖgithubᚗcomᚋmhd53ᚋquantaᚑfitnessᚑserverᚋgraphᚋmodelᚐEsetᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -3205,6 +3934,50 @@ func (ec *executionContext) ___Type_ofType(ctx context.Context, field graphql.Co
 
 // region    **************************** input.gotpl *****************************
 
+func (ec *executionContext) unmarshalInputEsetUpdate(ctx context.Context, obj interface{}) (model.EsetUpdate, error) {
+	var it model.EsetUpdate
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "id":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+			it.ID, err = ec.unmarshalNID2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "actualRepCount":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("actualRepCount"))
+			it.ActualRepCount, err = ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "duration":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("duration"))
+			it.Duration, err = ec.unmarshalNFloat2float64(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "restTimeDuration":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("restTimeDuration"))
+			it.RestTimeDuration, err = ec.unmarshalNFloat2float64(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputExerciseUpdate(ctx context.Context, obj interface{}) (model.ExerciseUpdate, error) {
 	var it model.ExerciseUpdate
 	var asMap = obj.(map[string]interface{})
@@ -3292,6 +4065,50 @@ func (ec *executionContext) unmarshalInputLogin(ctx context.Context, obj interfa
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("password"))
 			it.Password, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputNewEset(ctx context.Context, obj interface{}) (model.NewEset, error) {
+	var it model.NewEset
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "eid":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("eid"))
+			it.Eid, err = ec.unmarshalNID2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "actualRepCount":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("actualRepCount"))
+			it.ActualRepCount, err = ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "duration":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("duration"))
+			it.Duration, err = ec.unmarshalNFloat2float64(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "restTimeDuration":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("restTimeDuration"))
+			it.RestTimeDuration, err = ec.unmarshalNFloat2float64(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -3456,6 +4273,68 @@ func (ec *executionContext) _Auth(ctx context.Context, sel ast.SelectionSet, obj
 	return out
 }
 
+var esetImplementors = []string{"Eset"}
+
+func (ec *executionContext) _Eset(ctx context.Context, sel ast.SelectionSet, obj *model.Eset) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, esetImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Eset")
+		case "id":
+			out.Values[i] = ec._Eset_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "eid":
+			out.Values[i] = ec._Eset_eid(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "user":
+			out.Values[i] = ec._Eset_user(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "actualRepCount":
+			out.Values[i] = ec._Eset_actualRepCount(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "duration":
+			out.Values[i] = ec._Eset_duration(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "restTimeDuration":
+			out.Values[i] = ec._Eset_restTimeDuration(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "createdAt":
+			out.Values[i] = ec._Eset_createdAt(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "updatedAt":
+			out.Values[i] = ec._Eset_updatedAt(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var exerciseImplementors = []string{"Exercise"}
 
 func (ec *executionContext) _Exercise(ctx context.Context, sel ast.SelectionSet, obj *model.Exercise) graphql.Marshaler {
@@ -3580,6 +4459,21 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			}
 		case "deleteExercise":
 			out.Values[i] = ec._Mutation_deleteExercise(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "addEsetToExercise":
+			out.Values[i] = ec._Mutation_addEsetToExercise(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "updateEset":
+			out.Values[i] = ec._Mutation_updateEset(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "deleteEset":
+			out.Values[i] = ec._Mutation_deleteEset(ctx, field)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -3710,6 +4604,31 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_exercises(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
+		case "eset":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_eset(ctx, field)
+				return res
+			})
+		case "esets":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_esets(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&invalids, 1)
 				}
@@ -4051,6 +4970,62 @@ func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.Se
 	return res
 }
 
+func (ec *executionContext) marshalNEset2githubᚗcomᚋmhd53ᚋquantaᚑfitnessᚑserverᚋgraphᚋmodelᚐEset(ctx context.Context, sel ast.SelectionSet, v model.Eset) graphql.Marshaler {
+	return ec._Eset(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNEset2ᚕᚖgithubᚗcomᚋmhd53ᚋquantaᚑfitnessᚑserverᚋgraphᚋmodelᚐEsetᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Eset) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNEset2ᚖgithubᚗcomᚋmhd53ᚋquantaᚑfitnessᚑserverᚋgraphᚋmodelᚐEset(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+	return ret
+}
+
+func (ec *executionContext) marshalNEset2ᚖgithubᚗcomᚋmhd53ᚋquantaᚑfitnessᚑserverᚋgraphᚋmodelᚐEset(ctx context.Context, sel ast.SelectionSet, v *model.Eset) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._Eset(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNEsetUpdate2githubᚗcomᚋmhd53ᚋquantaᚑfitnessᚑserverᚋgraphᚋmodelᚐEsetUpdate(ctx context.Context, v interface{}) (model.EsetUpdate, error) {
+	res, err := ec.unmarshalInputEsetUpdate(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) marshalNExercise2githubᚗcomᚋmhd53ᚋquantaᚑfitnessᚑserverᚋgraphᚋmodelᚐExercise(ctx context.Context, sel ast.SelectionSet, v model.Exercise) graphql.Marshaler {
 	return ec._Exercise(ctx, sel, &v)
 }
@@ -4102,6 +5077,11 @@ func (ec *executionContext) marshalNExercise2ᚖgithubᚗcomᚋmhd53ᚋquantaᚑ
 	return ec._Exercise(ctx, sel, v)
 }
 
+func (ec *executionContext) unmarshalNExerciseUpdate2githubᚗcomᚋmhd53ᚋquantaᚑfitnessᚑserverᚋgraphᚋmodelᚐExerciseUpdate(ctx context.Context, v interface{}) (model.ExerciseUpdate, error) {
+	res, err := ec.unmarshalInputExerciseUpdate(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) unmarshalNFloat2float64(ctx context.Context, v interface{}) (float64, error) {
 	res, err := graphql.UnmarshalFloat(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -4149,6 +5129,11 @@ func (ec *executionContext) marshalNInt2int(ctx context.Context, sel ast.Selecti
 
 func (ec *executionContext) unmarshalNLogin2githubᚗcomᚋmhd53ᚋquantaᚑfitnessᚑserverᚋgraphᚋmodelᚐLogin(ctx context.Context, v interface{}) (model.Login, error) {
 	res, err := ec.unmarshalInputLogin(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNNewEset2githubᚗcomᚋmhd53ᚋquantaᚑfitnessᚑserverᚋgraphᚋmodelᚐNewEset(ctx context.Context, v interface{}) (model.NewEset, error) {
+	res, err := ec.unmarshalInputNewEset(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
@@ -4553,19 +5538,18 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 	return graphql.MarshalBoolean(*v)
 }
 
+func (ec *executionContext) marshalOEset2ᚖgithubᚗcomᚋmhd53ᚋquantaᚑfitnessᚑserverᚋgraphᚋmodelᚐEset(ctx context.Context, sel ast.SelectionSet, v *model.Eset) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._Eset(ctx, sel, v)
+}
+
 func (ec *executionContext) marshalOExercise2ᚖgithubᚗcomᚋmhd53ᚋquantaᚑfitnessᚑserverᚋgraphᚋmodelᚐExercise(ctx context.Context, sel ast.SelectionSet, v *model.Exercise) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return ec._Exercise(ctx, sel, v)
-}
-
-func (ec *executionContext) unmarshalOExerciseUpdate2ᚖgithubᚗcomᚋmhd53ᚋquantaᚑfitnessᚑserverᚋgraphᚋmodelᚐExerciseUpdate(ctx context.Context, v interface{}) (*model.ExerciseUpdate, error) {
-	if v == nil {
-		return nil, nil
-	}
-	res, err := ec.unmarshalInputExerciseUpdate(ctx, v)
-	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalOString2string(ctx context.Context, v interface{}) (string, error) {
