@@ -16,10 +16,7 @@ import (
 )
 
 var (
-	service    serv.EsetService
-	notImplErr = errors.New("Not Implemented!")
-	// deniedErr = errors.New("Access Denied!")
-	internalErr = errors.New("Internal Error!")
+	service serv.EsetService
 )
 
 type server struct{}
@@ -45,7 +42,8 @@ func (*server) AddEsetToExercise(uname, eid string, actualRC int, dur, restDur f
 	intID, err := format.ConvertToBase64(eid)
 	if err != nil {
 		log.Panic("API Error: ", err.Error())
-		return entity.Eset{}, internalErr
+		return entity.Eset{}, errors.New("Internal Error!")
+
 	}
 
 	return service.AddEsetToExercise(uname, intID, actualRC, dur, restDur)
@@ -55,13 +53,13 @@ func (*server) UpdateEset(id, uname string, updates entity.EsetUpdate) (bool, er
 	intID, err := format.ConvertToBase64(id)
 	if err != nil {
 		log.Panic("API Error: ", err.Error())
-		return false, internalErr
+		return false, errors.New("Internal Error!")
 	}
 
 	err2 := service.UpdateEset(intID, uname, updates)
 	if err2 != nil {
 		log.Panic("API Error: ", err2.Error())
-		return false, internalErr
+		return false, errors.New("Internal Error!")
 	}
 
 	return true, nil
@@ -72,13 +70,13 @@ func (*server) DeleteEset(id, uname string) (bool, error) {
 	intID, err := format.ConvertToBase64(id)
 	if err != nil {
 		log.Panic("API Error: ", err.Error())
-		return false, internalErr
+		return false, errors.New("Internal Error!")
 	}
 
 	err2 := service.DeleteEset(intID, uname)
 	if err2 != nil {
 		log.Panic("API Error: ", err2.Error())
-		return false, internalErr
+		return false, errors.New("Internal Error!")
 	}
 
 	return true, nil
@@ -89,13 +87,13 @@ func (*server) GetEset(id, uname string) (entity.Eset, error) {
 	intID, err := format.ConvertToBase64(id)
 	if err != nil {
 		log.Panic("API Error: ", err.Error())
-		return entity.Eset{}, internalErr
+		return entity.Eset{}, errors.New("Internal Error!")
 	}
 
 	got, err2 := service.GetEset(intID, uname)
 	if err2 != nil {
 		log.Panic("API Error: ", err2.Error())
-		return entity.Eset{}, internalErr
+		return entity.Eset{}, errors.New("Internal Error!")
 	}
 	return got, nil
 
@@ -107,13 +105,13 @@ func (*server) GetEsetsForExercise(eid, uname string) ([]entity.Eset, error) {
 	intID, err := format.ConvertToBase64(eid)
 	if err != nil {
 		log.Panic("API Error: ", err.Error())
-		return esets, internalErr
+		return esets, errors.New("Internal Error!")
 	}
 
 	esets, err2 := service.GetEsetsForExercise(intID, uname)
 	if err2 != nil {
 		log.Panic("API Error: ", err2.Error())
-		return esets, internalErr
+		return esets, errors.New("Internal Error!")
 	}
 
 	return esets, nil
