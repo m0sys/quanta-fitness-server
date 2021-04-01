@@ -2,6 +2,7 @@ package exercise
 
 import (
 	"errors"
+	"fmt"
 	"log"
 
 	store "github.com/mhd53/quanta-fitness-server/internal/datastore/exercisestore"
@@ -41,7 +42,7 @@ func (*service) AddExerciseToWorkout(name, uname string, wid int64) (entity.Exer
 	ok, err := auth.AuthorizeWorkoutAccess(uname, wid)
 
 	if err != nil {
-		log.Fatal(err)
+		logErr(err)
 		return entity.Exercise{}, internalErr
 	}
 	if !ok {
@@ -61,7 +62,7 @@ func (*service) AddExerciseToWorkout(name, uname string, wid int64) (entity.Exer
 	})
 
 	if err3 != nil {
-		return entity.Exercise{}, internalErr
+		return entity.Exercise{}, formatErr(err3)
 	}
 
 	return created, nil
@@ -71,7 +72,7 @@ func (*service) UpdateExercise(eid int64, uname string, updates entity.ExerciseU
 	ok, err := auth.AuthorizeExerciseAccess(uname, eid)
 
 	if err != nil {
-		log.Fatal(err)
+		logErr(err)
 		return internalErr
 	}
 
@@ -88,7 +89,7 @@ func (*service) UpdateExercise(eid int64, uname string, updates entity.ExerciseU
 	err3 := ses.Update(eid, updates)
 
 	if err3 != nil {
-		return err3
+		return formatErr(err3)
 	}
 
 	return nil
@@ -98,6 +99,7 @@ func (*service) DeleteExercise(eid int64, uname string) error {
 	authorized, err := auth.AuthorizeExerciseAccess(uname, eid)
 
 	if err != nil {
+		logErr(err)
 		return internalErr
 	}
 
@@ -108,7 +110,7 @@ func (*service) DeleteExercise(eid int64, uname string) error {
 	err2 := ses.Delete(eid)
 
 	if err2 != nil {
-		return internalErr
+		return formatErr(err2)
 	}
 
 	return nil
@@ -118,6 +120,7 @@ func (*service) GetExercise(eid int64, uname string) (entity.Exercise, error) {
 	authorized, err := auth.AuthorizeExerciseAccess(uname, eid)
 
 	if err != nil {
+		logErr(err)
 		return entity.Exercise{}, internalErr
 	}
 
@@ -128,7 +131,7 @@ func (*service) GetExercise(eid int64, uname string) (entity.Exercise, error) {
 	got, _, err2 := ses.FindExerciseById(eid)
 
 	if err2 != nil {
-		return entity.Exercise{}, internalErr
+		return entity.Exercise{}, formatErr(err2)
 	}
 
 	return got, nil
@@ -141,6 +144,7 @@ func (*service) GetExercisesForWorkout(wid int64, uname string) ([]entity.Exerci
 	authorized, err := auth.AuthorizeWorkoutAccess(uname, wid)
 
 	if err != nil {
+		logErr(err)
 		return exercises, internalErr
 	}
 
@@ -151,7 +155,7 @@ func (*service) GetExercisesForWorkout(wid int64, uname string) ([]entity.Exerci
 	exercises, err2 := ses.FindAllExercisesByWID(wid)
 
 	if err2 != nil {
-		return exercises, internalErr
+		return exercises, formatErr(err2)
 	}
 
 	return exercises, nil
@@ -164,6 +168,7 @@ func (*service) GetExercisesForUser(uname string) ([]entity.Exercise, error) {
 	authorized, err := auth.AuthorizeReadAccess(uname)
 
 	if err != nil {
+		logErr(err)
 		return exercises, internalErr
 	}
 
@@ -172,4 +177,12 @@ func (*service) GetExercisesForUser(uname string) ([]entity.Exercise, error) {
 	}
 
 	return exercises, nil
+}
+
+func logErr(err error) {
+	log.Printf("%s: %s", "exercise_service", err.Error())
+}
+
+func formatErr(err error) error {
+	return fmt.Errorf("%s: couldn't access db: %w", "exercise_service", err)
 }

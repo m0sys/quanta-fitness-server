@@ -1,8 +1,7 @@
 package eset
 
 import (
-	"errors"
-	"log"
+	"fmt"
 
 	ess "github.com/mhd53/quanta-fitness-server/internal/datastore/esetstore"
 	us "github.com/mhd53/quanta-fitness-server/internal/datastore/userstore"
@@ -63,9 +62,7 @@ func (*authorizer) AuthorizeEsetAccess(uname string, esid int64) (bool, error) {
 func checkUserOwnsEset(uname string, esid int64) (bool, error) {
 	esetDS, found, err := aess.FindEsetById(esid)
 	if err != nil {
-		log.Fatal(err)
-		return false, errors.New("Internal error! Please try again later.")
-
+		return false, fmt.Errorf("%s: couldn't access db: %w", "eset_auth", err)
 	}
 
 	if !found {

@@ -1,8 +1,7 @@
 package workout
 
 import (
-	"errors"
-	"log"
+	"fmt"
 
 	ustore "github.com/mhd53/quanta-fitness-server/internal/datastore/userstore"
 	wstore "github.com/mhd53/quanta-fitness-server/internal/datastore/workoutstore"
@@ -39,8 +38,7 @@ func (*server) UpdateWorkout(wid string, workout entity.BaseWorkout, uname strin
 
 	intID, err := format.ConvertToBase64(wid)
 	if err != nil {
-		log.Panic("API Error: ", err.Error())
-		return false, errors.New("Interna Error!")
+		return false, formatErr(err)
 
 	}
 
@@ -55,8 +53,7 @@ func (*server) UpdateWorkout(wid string, workout entity.BaseWorkout, uname strin
 func (*server) DeleteWorkout(wid string, uname string) (bool, error) {
 	intID, err := format.ConvertToBase64(wid)
 	if err != nil {
-		log.Panic("API Error: ", err.Error())
-		return false, errors.New("Interna Error!")
+		return false, formatErr(err)
 
 	}
 
@@ -71,8 +68,7 @@ func (*server) DeleteWorkout(wid string, uname string) (bool, error) {
 func (*server) GetWorkout(wid string, uname string) (entity.Workout, error) {
 	intID, err := format.ConvertToBase64(wid)
 	if err != nil {
-		log.Panic("API Error: ", err.Error())
-		return entity.Workout{}, errors.New("Interna Error!")
+		return entity.Workout{}, formatErr(err)
 
 	}
 
@@ -81,4 +77,8 @@ func (*server) GetWorkout(wid string, uname string) (entity.Workout, error) {
 
 func (*server) GetWorkouts(uname string) ([]entity.Workout, error) {
 	return service.GetWorkoutsForUser(uname)
+}
+
+func formatErr(err error) error {
+	return fmt.Errorf("%s: couldn't format id: %w", "API Workout", err)
 }

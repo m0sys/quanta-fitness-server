@@ -2,8 +2,8 @@ package auth
 
 import (
 	"errors"
+	"fmt"
 	"github.com/go-playground/validator/v10"
-	"log"
 
 	"github.com/mhd53/quanta-fitness-server/internal/datastore/userstore"
 	"github.com/mhd53/quanta-fitness-server/pkg/crypto"
@@ -32,11 +32,9 @@ func (*authValidator) ValidateRegisteration(uname, email, pwd, confirm string) e
 		return errors.New("Password must equal Confirm!")
 	}
 
-	_, found, err1 := valStore.FindUserByUsername(uname)
-
-	if err1 != nil {
-		log.Fatal(err1)
-		return errors.New("Internal Error!")
+	_, found, err := valStore.FindUserByUsername(uname)
+	if err != nil {
+		return fmt.Errorf("couldn't access db: %w", err)
 	}
 
 	if found {
@@ -45,14 +43,12 @@ func (*authValidator) ValidateRegisteration(uname, email, pwd, confirm string) e
 
 	err2 := validateEmail(email)
 	if err2 != nil {
-		log.Print(err2)
-		return errors.New("Invalid email!")
+		return err2
 	}
 
 	_, found2, err3 := valStore.FindUserByEmail(email)
 	if err3 != nil {
-		log.Fatal(err3)
-		return errors.New("Internal Error!")
+		return fmt.Errorf("couldn't access db: %w", err3)
 	}
 
 	if found2 {
@@ -71,11 +67,9 @@ func validateEmail(email string) error {
 }
 
 func (*authValidator) ValidateLoginWithUname(uname, pwd string) error {
-	user, found, err1 := valStore.FindUserByUsername(uname)
-
-	if err1 != nil {
-		log.Fatal(err1)
-		return errors.New("Internal Error!")
+	user, found, err := valStore.FindUserByUsername(uname)
+	if err != nil {
+		return fmt.Errorf("couldn't access db: %w", err)
 	}
 
 	if !found {
@@ -93,15 +87,12 @@ func (*authValidator) ValidateLoginWithUname(uname, pwd string) error {
 func (*authValidator) ValidateLoginWithEmail(email, pwd string) error {
 	err := validateEmail(email)
 	if err != nil {
-		log.Print(err)
-		return errors.New("Invalid email!")
+		return err
 	}
 
-	user, found, err1 := valStore.FindUserByEmail(email)
-
-	if err1 != nil {
-		log.Fatal(err1)
-		return errors.New("Internal Error!")
+	user, found, err := valStore.FindUserByEmail(email)
+	if err != nil {
+		return fmt.Errorf("couldn't access db: %w", err)
 	}
 
 	if !found {
