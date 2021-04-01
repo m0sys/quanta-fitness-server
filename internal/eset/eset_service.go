@@ -2,6 +2,7 @@ package eset
 
 import (
 	"errors"
+	"fmt"
 	"log"
 
 	store "github.com/mhd53/quanta-fitness-server/internal/datastore/esetstore"
@@ -40,7 +41,7 @@ func (*service) AddEsetToExercise(uname string, eid int64, actualRC int, dur, re
 	authorized, err := auth.AuthorizeExerciseAccess(uname, eid)
 
 	if err != nil {
-		log.Panic(err)
+		logErr(err)
 		return entity.Eset{}, internalErr
 	}
 
@@ -64,8 +65,7 @@ func (*service) AddEsetToExercise(uname string, eid int64, actualRC int, dur, re
 		},
 	})
 	if err3 != nil {
-		log.Panic(err3)
-		return entity.Eset{}, internalErr
+		return entity.Eset{}, formatErr(err3)
 	}
 
 	return added, nil
@@ -76,7 +76,7 @@ func (*service) UpdateEset(esid int64, uname string, updates entity.EsetUpdate) 
 	authorized, err := auth.AuthorizeEsetAccess(uname, esid)
 
 	if err != nil {
-		log.Panic(err)
+		logErr(err)
 		return internalErr
 	}
 
@@ -91,8 +91,7 @@ func (*service) UpdateEset(esid int64, uname string, updates entity.EsetUpdate) 
 
 	err3 := sess.Update(esid, updates)
 	if err3 != nil {
-		log.Panic(err3)
-		return internalErr
+		return formatErr(err3)
 	}
 
 	return nil
@@ -102,7 +101,7 @@ func (*service) DeleteEset(esid int64, uname string) error {
 	authorized, err := auth.AuthorizeEsetAccess(uname, esid)
 
 	if err != nil {
-		log.Panic(err)
+		logErr(err)
 		return internalErr
 	}
 
@@ -113,8 +112,7 @@ func (*service) DeleteEset(esid int64, uname string) error {
 	err2 := sess.Delete(esid)
 
 	if err2 != nil {
-		log.Panic(err2)
-		return internalErr
+		return formatErr(err2)
 	}
 
 	return nil
@@ -124,7 +122,7 @@ func (*service) GetEset(esid int64, uname string) (entity.Eset, error) {
 	authorized, err := auth.AuthorizeEsetAccess(uname, esid)
 
 	if err != nil {
-		log.Panic(err)
+		logErr(err)
 		return entity.Eset{}, internalErr
 	}
 
@@ -135,7 +133,7 @@ func (*service) GetEset(esid int64, uname string) (entity.Eset, error) {
 	got, _, err2 := sess.FindEsetById(esid)
 
 	if err2 != nil {
-		return entity.Eset{}, internalErr
+		return entity.Eset{}, formatErr(err2)
 	}
 
 	return got, nil
@@ -148,8 +146,7 @@ func (*service) GetEsetsForExercise(eid int64, uname string) ([]entity.Eset, err
 	authorized, err := auth.AuthorizeExerciseAccess(uname, eid)
 
 	if err != nil {
-		log.Panic(err)
-		return esets, internalErr
+		return esets, err
 	}
 
 	if !authorized {
@@ -159,9 +156,16 @@ func (*service) GetEsetsForExercise(eid int64, uname string) ([]entity.Eset, err
 	esets, err2 := sess.FindAllEsetByEID(eid)
 
 	if err2 != nil {
-		log.Panic(err2)
-		return esets, internalErr
+		return esets, formatErr(err2)
 	}
 
 	return esets, nil
+}
+
+func logErr(err error) {
+	log.Printf("%s: %s", "eset_service", err.Error())
+}
+
+func formatErr(err error) error {
+	return fmt.Errorf("%s: couldn't access db: %w", "eset_service", err)
 }

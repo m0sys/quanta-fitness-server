@@ -55,7 +55,7 @@ func TestValidateRegisterationWithInvalidEmail(t *testing.T) {
 	err := testValidator.ValidateRegisteration(MOCK_USERNAME, notEmail, MOCK_PWD, MOCK_PWD)
 
 	assert.NotNil(t, err)
-	assert.Equal(t, "Invalid email!", err.Error())
+	assert.Equal(t, "Invalid email address!", err.Error())
 }
 
 func TestValidateRegisterationSuccess(t *testing.T) {
@@ -142,7 +142,7 @@ func TestValidateLoginWithEmailWhenInvalidEmail(t *testing.T) {
 	err := testValidator.ValidateLoginWithEmail("notanemail.com", MOCK_PWD)
 
 	assert.NotNil(t, err)
-	assert.Equal(t, "Invalid email!", err.Error())
+	assert.Equal(t, "Invalid email address!", err.Error())
 }
 
 func TestValidateLoginWithEmailSuccess(t *testing.T) {

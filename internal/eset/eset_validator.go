@@ -18,7 +18,17 @@ func NewEsetValidator() EsetValidator {
 }
 
 func (*validator) ValidateAddEsetToExercise(actualRC int, dur, restDur float32) error {
-	err := validateActualRC(actualRC)
+	return validateFields(actualRC, dur, restDur)
+}
+
+func (*validator) ValidateUpdateEset(updates entity.EsetUpdate) error {
+	return validateFields(updates.SMetric.ActualRepCount, updates.SMetric.Duration, updates.SMetric.RestTimeDuration)
+}
+
+// Helper funcs.
+
+func validateFields(arc int, dur, restDur float32) error {
+	err := validateActualRC(arc)
 
 	if err != nil {
 		return err
@@ -37,32 +47,7 @@ func (*validator) ValidateAddEsetToExercise(actualRC int, dur, restDur float32) 
 	}
 
 	return nil
-
 }
-
-func (*validator) ValidateUpdateEset(updates entity.EsetUpdate) error {
-	err := validateActualRC(updates.SMetric.ActualRepCount)
-
-	if err != nil {
-		return err
-	}
-
-	err2 := validateDur(updates.SMetric.Duration)
-
-	if err2 != nil {
-		return err2
-	}
-
-	err3 := validateRestDur(updates.SMetric.RestTimeDuration)
-
-	if err3 != nil {
-		return err3
-	}
-
-	return nil
-}
-
-// Helper funcs.
 
 func validateActualRC(actualRC int) error {
 	if isNegativeInt(actualRC) {

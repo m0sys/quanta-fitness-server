@@ -14,30 +14,20 @@ type WorkoutValidator interface {
 
 type workoutValidator struct{}
 
-var (
-	validate = validator.New()
-)
-
 func NewWorkoutValidator() WorkoutValidator {
 	return &workoutValidator{}
 }
 
 func (*workoutValidator) ValidateCreateWorkout(title string) error {
 	return validateTitle(title)
-
 }
 
 func validateTitle(title string) error {
-	err := checkTitleLength(title)
-	if err != nil {
-		return err
-	}
-
-	return nil
-
+	return checkTitleLength(title)
 }
 
 func checkTitleLength(title string) error {
+	validate := validator.New()
 	if validate.Var(title, "required,max=75") != nil {
 		return errors.New("Title must be less than 76 characters!")
 	}

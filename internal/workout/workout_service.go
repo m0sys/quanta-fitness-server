@@ -2,9 +2,10 @@ package workout
 
 import (
 	"errors"
+	"fmt"
 	"log"
 
-	"github.com/mhd53/quanta-fitness-server/internal/datastore/workoutstore"
+	ws "github.com/mhd53/quanta-fitness-server/internal/datastore/workoutstore"
 	"github.com/mhd53/quanta-fitness-server/internal/entity"
 )
 
@@ -20,7 +21,7 @@ type WorkoutService interface {
 type service struct{}
 
 var (
-	ws          workoutstore.WorkoutStore
+	sws         ws.WorkoutStore
 	auth        WorkoutAuth
 	val         WorkoutValidator
 	deniedErr   = errors.New("Access Denied!")
@@ -28,10 +29,10 @@ var (
 )
 
 func NewWorkoutService(
-	workoutstore workoutstore.WorkoutStore,
+	workoutstore ws.WorkoutStore,
 	authorizer WorkoutAuth,
 	validator WorkoutValidator) WorkoutService {
-	ws = workoutstore
+	sws = workoutstore
 	auth = authorizer
 	val = validator
 	return &service{}
@@ -41,7 +42,7 @@ func (*service) CreateWorkout(title string, uname string) (entity.Workout, error
 	authorized, err := auth.AuthorizeCreateWorkout(uname)
 
 	if err != nil {
-		log.Panic(err)
+		logErr(err)
 		return entity.Workout{}, internalErr
 	}
 
@@ -59,11 +60,10 @@ func (*service) CreateWorkout(title string, uname string) (entity.Workout, error
 		Title:    title,
 		Username: uname,
 	}
-	workoutDS, err3 := ws.Save(workout)
+	workoutDS, err3 := sws.Save(workout)
 
 	if err3 != nil {
-		log.Fatal(err3)
-		return entity.Workout{}, internalErr
+		return entity.Workout{}, formatErr(err3)
 	}
 
 	return workoutDS, nil
@@ -86,11 +86,10 @@ func (*service) UpdateWorkout(wid int64, workout entity.BaseWorkout, uname strin
 		return err2
 	}
 
-	err3 := ws.Update(wid, workout)
+	err3 := sws.Update(wid, workout)
 
 	if err3 != nil {
-		log.Panic(err3)
-		return internalErr
+		return formatErr(err3)
 	}
 
 	return nil
@@ -107,10 +106,10 @@ func (*service) DeleteWorkout(wid int64, uname string) error {
 		return deniedErr
 	}
 
-	err2 := ws.DeleteWorkout(wid)
+	err2 := sws.DeleteWorkout(wid)
 
 	if err2 != nil {
-		return internalErr
+		return formatErr(err2)
 	}
 
 	return nil
@@ -120,18 +119,18 @@ func (*service) DeleteWorkout(wid int64, uname string) error {
 func (*service) GetWorkout(wid int64, uname string) (entity.Workout, error) {
 	authorized, err := auth.AuthorizeAccessWorkout(uname, wid)
 	if err != nil {
-		return entity.Workout{}, err
+		logErr(err)
+		return entity.Workout{}, internalErr
 	}
 
 	if !authorized {
 		return entity.Workout{}, deniedErr
 	}
 
-	got, _, err2 := ws.FindWorkoutById(wid)
+	got, _, err2 := sws.FindWorkoutById(wid)
 
 	if err2 != nil {
-		log.Panic(err2)
-		return entity.Workout{}, internalErr
+		return entity.Workout{}, formatErr(err2)
 	}
 
 	return got, nil
@@ -142,17 +141,18 @@ func (*service) GetWorkoutsForUser(uname string) ([]entity.Workout, error) {
 
 	authorized, err := auth.AuthorizeCreateWorkout(uname)
 	if err != nil {
-		return workouts, err
+		logErr(err)
+		return workouts, internalErr
 	}
 
 	if !authorized {
 		return workouts, deniedErr
 	}
 
-	workouts, err2 := ws.FindAllWorkoutsByUname(uname)
+	workouts, err2 := sws.FindAllWorkoutsByUname(uname)
 
 	if err2 != nil {
-		return workouts, internalErr
+		return workouts, formatErr(err2)
 	}
 
 	return workouts, nil
@@ -161,4 +161,12 @@ func (*service) GetWorkoutsForUser(uname string) ([]entity.Workout, error) {
 func (*service) GetWorkoutExercises(wid int64, uname string) ([]entity.Exercise, error) {
 	var exercises []entity.Exercise
 	return exercises, nil
+}
+
+func logErr(err error) {
+	log.Printf("%s: %s", "workout_service", err.Error())
+}
+
+func formatErr(err error) error {
+	return fmt.Errorf("%s: couldn't access db: %w", "workout_service", err)
 }

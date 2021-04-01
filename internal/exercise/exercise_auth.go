@@ -1,8 +1,7 @@
 package exercise
 
 import (
-	"errors"
-	"log"
+	"fmt"
 
 	es "github.com/mhd53/quanta-fitness-server/internal/datastore/exercisestore"
 	us "github.com/mhd53/quanta-fitness-server/internal/datastore/userstore"
@@ -68,8 +67,7 @@ func (*authorizer) AuthorizeExerciseAccess(uname string, eid int64) (bool, error
 func checkUserOwnsExercise(uname string, eid int64) (bool, error) {
 	exerciseDS, found, err := aes.FindExerciseById(eid)
 	if err != nil {
-		log.Fatal(err)
-		return false, errors.New("Internal error! Please try again later.")
+		return false, fmt.Errorf("%s: couldn't access db: %w", "exercise_auth", err)
 
 	}
 

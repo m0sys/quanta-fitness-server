@@ -146,7 +146,7 @@ func TestLoginWithEmailWhenInvalidEmail(t *testing.T) {
 	userDS, err := testService.LoginWithEmail("notanemail", "bobin")
 
 	assert.NotNil(t, err)
-	assert.Equal(t, "Invalid email!", err.Error())
+	assert.Equal(t, "Invalid email address!", err.Error())
 	assert.Empty(t, userDS)
 }
 

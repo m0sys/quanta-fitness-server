@@ -1,8 +1,7 @@
 package exercise
 
 import (
-	"errors"
-	"log"
+	"fmt"
 
 	estore "github.com/mhd53/quanta-fitness-server/internal/datastore/exercisestore"
 	ustore "github.com/mhd53/quanta-fitness-server/internal/datastore/userstore"
@@ -39,8 +38,7 @@ func (*server) AddExerciseToWorkout(name, uname, wid string) (entity.Exercise, e
 
 	intID, err := format.ConvertToBase64(wid)
 	if err != nil {
-		log.Panic("API Error: ", err.Error())
-		return entity.Exercise{}, errors.New("Interna Error!")
+		return entity.Exercise{}, formatErr(err)
 
 	}
 
@@ -51,16 +49,13 @@ func (*server) UpdateExercise(id, uname string, updates entity.ExerciseUpdate) (
 
 	intID, err := format.ConvertToBase64(id)
 	if err != nil {
-		log.Panic("API Error: ", err.Error())
-		return false, errors.New("Interna Error!")
-
+		return false, formatErr(err)
 	}
 
 	err2 := service.UpdateExercise(intID, uname, updates)
 
 	if err2 != nil {
-		log.Panic("API Error: ", err2.Error())
-		return false, errors.New("Interna Error!")
+		return false, err2
 	}
 
 	return true, nil
@@ -70,16 +65,14 @@ func (*server) GetExercise(id, uname string) (entity.Exercise, error) {
 
 	intID, err := format.ConvertToBase64(id)
 	if err != nil {
-		log.Panic("API Error: ", err.Error())
-		return entity.Exercise{}, errors.New("Interna Error!")
+		return entity.Exercise{}, formatErr(err)
 
 	}
 
 	got, err2 := service.GetExercise(intID, uname)
 
 	if err2 != nil {
-		log.Panic("API Error: ", err2.Error())
-		return entity.Exercise{}, errors.New("Interna Error!")
+		return entity.Exercise{}, err2
 	}
 
 	return got, nil
@@ -90,15 +83,13 @@ func (*server) GetExercisesForWorkout(wid, uname string) ([]entity.Exercise, err
 
 	intID, err := format.ConvertToBase64(wid)
 	if err != nil {
-		log.Panic("API Error: ", err.Error())
-		return []entity.Exercise{}, errors.New("Interna Error!")
+		return []entity.Exercise{}, formatErr(err)
 
 	}
 
 	got, err2 := service.GetExercisesForWorkout(intID, uname)
 	if err2 != nil {
-		log.Panic("API Error: ", err2.Error())
-		return []entity.Exercise{}, errors.New("Interna Error!")
+		return []entity.Exercise{}, err2
 	}
 
 	return got, nil
@@ -109,17 +100,19 @@ func (*server) DeleteExercise(id, uname string) (bool, error) {
 
 	intID, err := format.ConvertToBase64(id)
 	if err != nil {
-		log.Panic("API Error: ", err.Error())
-		return false, errors.New("Interna Error!")
+		return false, formatErr(err)
 
 	}
 
 	err2 := service.DeleteExercise(intID, uname)
 	if err2 != nil {
-		log.Panic("API Error: ", err2.Error())
-		return false, errors.New("Interna Error!")
+		return false, err2
 	}
 
 	return true, nil
 
+}
+
+func formatErr(err error) error {
+	return fmt.Errorf("%s: couldn't format id: %w", "API Exercise", err)
 }

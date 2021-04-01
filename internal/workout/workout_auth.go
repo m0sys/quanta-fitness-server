@@ -1,11 +1,10 @@
 package workout
 
 import (
-	"errors"
-	"log"
+	"fmt"
 
-	"github.com/mhd53/quanta-fitness-server/internal/datastore/userstore"
-	"github.com/mhd53/quanta-fitness-server/internal/datastore/workoutstore"
+	us "github.com/mhd53/quanta-fitness-server/internal/datastore/userstore"
+	ws "github.com/mhd53/quanta-fitness-server/internal/datastore/workoutstore"
 	"github.com/mhd53/quanta-fitness-server/internal/util"
 )
 
@@ -14,45 +13,37 @@ type WorkoutAuth interface {
 	AuthorizeAccessWorkout(uname string, wid int64) (bool, error)
 }
 
-type authorizer struct{}
-
-var (
-	aws workoutstore.WorkoutStore
-	aus userstore.UserStore
-)
-
-func NewWorkoutAuthorizer(workoutstore workoutstore.WorkoutStore,
-	userstore userstore.UserStore) WorkoutAuth {
-	aws = workoutstore
-	aus = userstore
-	return &authorizer{}
+type authorizer struct {
+	ws ws.WorkoutStore
+	us us.UserStore
 }
 
-func (*authorizer) AuthorizeCreateWorkout(uname string) (bool, error) {
-	return util.CheckUserExists(aus, uname)
+func NewWorkoutAuthorizer(workoutstore ws.WorkoutStore,
+	userstore us.UserStore) WorkoutAuth {
+	return &authorizer{
+		ws: workoutstore,
+		us: userstore,
+	}
 }
 
-func (*authorizer) AuthorizeAccessWorkout(uname string, wid int64) (bool, error) {
-	ok, err := util.CheckUserExists(aus, uname)
+func (auth *authorizer) AuthorizeCreateWorkout(uname string) (bool, error) {
+	return util.CheckUserExists(auth.us, uname)
+}
 
-	if err != nil {
+func (auth *authorizer) AuthorizeAccessWorkout(uname string, wid int64) (bool, error) {
+	ok, err := util.CheckUserExists(auth.us, uname)
+
+	if err != nil || !ok {
 		return ok, err
 	}
 
-	if !ok {
-		return false, nil
-	}
-
-	return checkUserOwnsWorkout(uname, wid)
-
+	return checkUserOwnsWorkout(auth.ws, uname, wid)
 }
 
-func checkUserOwnsWorkout(uname string, wid int64) (bool, error) {
-	workoutDS, found, err := aws.FindWorkoutById(wid)
+func checkUserOwnsWorkout(ws ws.WorkoutStore, uname string, wid int64) (bool, error) {
+	workoutDS, found, err := ws.FindWorkoutById(wid)
 	if err != nil {
-		log.Fatal(err)
-		return false, errors.New("Internal error! Please try again later.")
-
+		return false, fmt.Errorf("%s: couldn't access db: %w", "workout_auth", err)
 	}
 
 	if !found {

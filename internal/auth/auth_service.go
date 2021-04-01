@@ -1,8 +1,7 @@
 package auth
 
 import (
-	"errors"
-	"log"
+	"fmt"
 
 	"github.com/mhd53/quanta-fitness-server/internal/datastore/userstore"
 	"github.com/mhd53/quanta-fitness-server/internal/entity"
@@ -34,15 +33,12 @@ func (*service) Register(uname, email, pwd, confirm string) (entity.User, error)
 	err := val.ValidateRegisteration(uname, email, pwd, confirm)
 
 	if err != nil {
-		log.Print(err)
 		return entity.User{}, err
 	}
 
 	hashedPwd, err3 := crypto.HashPwd(pwd)
-
 	if err3 != nil {
-		log.Fatal(err3)
-		return entity.User{}, errors.New("Failed to register user! Please try again later.")
+		return entity.User{}, formatErr(err3)
 	}
 
 	user := entity.BaseUser{
@@ -51,42 +47,32 @@ func (*service) Register(uname, email, pwd, confirm string) (entity.User, error)
 		Password: hashedPwd,
 	}
 
-	userDS, err4 := ds.Save(user)
-	if err4 != nil {
-		log.Fatal(err4)
-		return entity.User{}, errors.New("Failed to register user! Please try again later.")
+	userDS, err3 := ds.Save(user)
+	if err3 != nil {
+		return entity.User{}, formatErr(err3)
 	}
 
 	return userDS, nil
 }
 
 func (*service) LoginWithUname(uname, pwd string) (entity.User, error) {
-	err := val.ValidateLoginWithUname(uname, pwd)
-
-	if err != nil {
-		return entity.User{}, err
-	}
-
-	userDS, _, err2 := ds.FindUserByUsername(uname)
-	if err2 != nil {
-		log.Fatal(err2)
-		return entity.User{}, errors.New("Failed to login! Please try again later.")
-	}
-
-	return userDS, nil
+	return login(uname, pwd, val.ValidateLoginWithUname, ds.FindUserByUsername)
 }
 
 func (*service) LoginWithEmail(email, pwd string) (entity.User, error) {
-	err := val.ValidateLoginWithEmail(email, pwd)
+	return login(email, pwd, val.ValidateLoginWithEmail, ds.FindUserByEmail)
+}
+
+func login(cred, pwd string, validator func(cred, pwd string) error, fetcher func(cred string) (entity.User, bool, error)) (entity.User, error) {
+	err := validator(cred, pwd)
 
 	if err != nil {
 		return entity.User{}, err
 	}
 
-	userDS, _, err2 := ds.FindUserByEmail(email)
+	userDS, _, err2 := fetcher(cred)
 	if err2 != nil {
-		log.Fatal(err2)
-		return entity.User{}, errors.New("Failed to register user! Please try again later.")
+		return entity.User{}, formatErr(err2)
 	}
 
 	return userDS, nil
@@ -94,4 +80,8 @@ func (*service) LoginWithEmail(email, pwd string) (entity.User, error) {
 
 func (*service) Logout(string) error {
 	return nil
+}
+
+func formatErr(err error) error {
+	return fmt.Errorf("%s: couldn't access db: %w", "auth_service", err)
 }
