@@ -10,7 +10,7 @@ import (
 
 type WorkoutAuth interface {
 	AuthorizeCreateWorkout(uname string) (bool, error)
-	AuthorizeAccessWorkout(uname string, wid int64) (bool, error)
+	AuthorizeAccessWorkout(uname, wid string) (bool, error)
 }
 
 type authorizer struct {
@@ -30,7 +30,7 @@ func (auth *authorizer) AuthorizeCreateWorkout(uname string) (bool, error) {
 	return util.CheckUserExists(auth.us, uname)
 }
 
-func (auth *authorizer) AuthorizeAccessWorkout(uname string, wid int64) (bool, error) {
+func (auth *authorizer) AuthorizeAccessWorkout(uname, wid string) (bool, error) {
 	ok, err := util.CheckUserExists(auth.us, uname)
 
 	if err != nil || !ok {
@@ -40,7 +40,7 @@ func (auth *authorizer) AuthorizeAccessWorkout(uname string, wid int64) (bool, e
 	return checkUserOwnsWorkout(auth.ws, uname, wid)
 }
 
-func checkUserOwnsWorkout(ws ws.WorkoutStore, uname string, wid int64) (bool, error) {
+func checkUserOwnsWorkout(ws ws.WorkoutStore, uname, wid string) (bool, error) {
 	workoutDS, found, err := ws.FindWorkoutById(wid)
 	if err != nil {
 		return false, fmt.Errorf("%s: couldn't access db: %w", "workout_auth", err)

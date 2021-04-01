@@ -9,7 +9,7 @@ import (
 
 type BaseEset struct {
 	Username string `json:"username"`
-	EID      int64  `json:"eid"`
+	EID      string `json:"eid"`
 	SMetric
 }
 
@@ -25,7 +25,7 @@ type EsetUpdate struct {
 
 type Eset struct {
 	BaseEset
-	ID        int64     `json:"id"`
+	ID        string    `json:"id"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 }

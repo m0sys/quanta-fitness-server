@@ -18,7 +18,7 @@ func NewMockUserStore() UserStore {
 func (s *store) Save(newUser entity.BaseUser) (entity.User, error) {
 	created := entity.User{
 		BaseUser:  newUser,
-		ID:        s.lastID,
+		ID:        string(s.lastID),
 		Weight:    0,
 		Height:    0,
 		Gender:    "N/A",

@@ -11,8 +11,8 @@ import (
 
 type ExerciseAuth interface {
 	AuthorizeReadAccess(uname string) (bool, error)
-	AuthorizeWorkoutAccess(uname string, wid int64) (bool, error)
-	AuthorizeExerciseAccess(uname string, eid int64) (bool, error)
+	AuthorizeWorkoutAccess(uname, wid string) (bool, error)
+	AuthorizeExerciseAccess(uname, eid string) (bool, error)
 }
 
 type authorizer struct{}
@@ -37,11 +37,11 @@ func (*authorizer) AuthorizeReadAccess(uname string) (bool, error) {
 
 }
 
-func (*authorizer) AuthorizeWorkoutAccess(uname string, wid int64) (bool, error) {
+func (*authorizer) AuthorizeWorkoutAccess(uname, wid string) (bool, error) {
 	return wauth.AuthorizeAccessWorkout(uname, wid)
 }
 
-func (*authorizer) AuthorizeExerciseAccess(uname string, eid int64) (bool, error) {
+func (*authorizer) AuthorizeExerciseAccess(uname, eid string) (bool, error) {
 	ok, err := util.CheckUserExists(aus, uname)
 	if err != nil {
 		return false, err
@@ -64,7 +64,7 @@ func (*authorizer) AuthorizeExerciseAccess(uname string, eid int64) (bool, error
 	return true, nil
 }
 
-func checkUserOwnsExercise(uname string, eid int64) (bool, error) {
+func checkUserOwnsExercise(uname, eid string) (bool, error) {
 	exerciseDS, found, err := aes.FindExerciseById(eid)
 	if err != nil {
 		return false, fmt.Errorf("%s: couldn't access db: %w", "exercise_auth", err)

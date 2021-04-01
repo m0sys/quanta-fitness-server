@@ -10,8 +10,8 @@ import (
 )
 
 type EsetAuth interface {
-	AuthorizeExerciseAccess(uname string, eid int64) (bool, error)
-	AuthorizeEsetAccess(uname string, esid int64) (bool, error)
+	AuthorizeExerciseAccess(uname string, eid string) (bool, error)
+	AuthorizeEsetAccess(uname string, esid string) (bool, error)
 }
 
 type authorizer struct{}
@@ -31,11 +31,11 @@ func NewEsetAuthorizer(store ess.EsetStore,
 	return &authorizer{}
 }
 
-func (*authorizer) AuthorizeExerciseAccess(uname string, eid int64) (bool, error) {
+func (*authorizer) AuthorizeExerciseAccess(uname string, eid string) (bool, error) {
 	return eauth.AuthorizeExerciseAccess(uname, eid)
 }
 
-func (*authorizer) AuthorizeEsetAccess(uname string, esid int64) (bool, error) {
+func (*authorizer) AuthorizeEsetAccess(uname string, esid string) (bool, error) {
 	ok, err := util.CheckUserExists(aus, uname)
 
 	if err != nil {
@@ -59,7 +59,7 @@ func (*authorizer) AuthorizeEsetAccess(uname string, esid int64) (bool, error) {
 	return true, nil
 }
 
-func checkUserOwnsEset(uname string, esid int64) (bool, error) {
+func checkUserOwnsEset(uname string, esid string) (bool, error) {
 	esetDS, found, err := aess.FindEsetById(esid)
 	if err != nil {
 		return false, fmt.Errorf("%s: couldn't access db: %w", "eset_auth", err)

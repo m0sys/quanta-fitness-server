@@ -13,7 +13,7 @@ const (
 func CreateMockValidBaseExercise() entity.BaseExercise {
 	return entity.BaseExercise{
 		Name:     MOCK_VALID_NAME,
-		WID:      0,
+		WID:      "0",
 		Username: ats.MOCK_USERNAME,
 	}
 }
@@ -21,7 +21,7 @@ func CreateMockValidBaseExercise() entity.BaseExercise {
 func CreateMockInvalidBaseExercise() entity.BaseExercise {
 	return entity.BaseExercise{
 		Name:     MOCK_INVALID_NAME,
-		WID:      0,
+		WID:      "0",
 		Username: ats.MOCK_USERNAME,
 	}
 }

@@ -2,6 +2,8 @@ package workoutstore
 
 import (
 	"errors"
+	"log"
+	"strconv"
 	"time"
 
 	"github.com/mhd53/quanta-fitness-server/internal/entity"
@@ -19,7 +21,7 @@ func NewMockWorkoutStore() WorkoutStore {
 func (s *store) Save(workout entity.BaseWorkout) (entity.Workout, error) {
 	created := entity.Workout{
 		BaseWorkout: workout,
-		ID:          s.lastID,
+		ID:          string(s.lastID),
 		CreatedAt:   time.Now(),
 		UpdatedAt:   time.Now(),
 	}
@@ -30,8 +32,8 @@ func (s *store) Save(workout entity.BaseWorkout) (entity.Workout, error) {
 	return created, nil
 }
 
-func (s *store) Update(wid int64, updates entity.BaseWorkout) error {
-	prev := s.workouts[wid]
+func (s *store) Update(wid string, updates entity.BaseWorkout) error {
+	prev := s.workouts[parseInt64(wid)]
 	updated := entity.Workout{
 		BaseWorkout: updates,
 		ID:          prev.ID,
@@ -39,13 +41,13 @@ func (s *store) Update(wid int64, updates entity.BaseWorkout) error {
 		UpdatedAt:   time.Now(),
 	}
 
-	s.workouts[wid] = updated
+	s.workouts[parseInt64(wid)] = updated
 
 	return nil
 }
 
-func (s *store) FindWorkoutById(wid int64) (entity.Workout, bool, error) {
-	found := s.workouts[wid]
+func (s *store) FindWorkoutById(wid string) (entity.Workout, bool, error) {
+	found := s.workouts[parseInt64(wid)]
 
 	if isEmpty(found) {
 		return entity.Workout{}, false, nil
@@ -58,13 +60,13 @@ func isEmpty(found entity.Workout) bool {
 	return found == (entity.Workout{})
 }
 
-func (s *store) DeleteWorkout(wid int64) error {
-	found := s.workouts[wid]
+func (s *store) DeleteWorkout(wid string) error {
+	found := s.workouts[parseInt64(wid)]
 	if isEmpty(found) {
 		return errors.New("Not Found!")
 	}
 
-	delete(s.workouts, wid)
+	delete(s.workouts, parseInt64(wid))
 	return nil
 
 }
@@ -80,4 +82,12 @@ func (s *store) FindAllWorkoutsByUname(uname string) ([]entity.Workout, error) {
 	}
 
 	return entries, nil
+}
+
+func parseInt64(s string) int64 {
+	val, err := strconv.ParseInt(s, 10, 64)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return val
 }

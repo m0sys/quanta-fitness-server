@@ -6,7 +6,7 @@ import (
 
 type BaseExercise struct {
 	Name     string `json:"name"`
-	WID      int64  `json:"wid"`
+	WID      string `json:"wid"`
 	Username string `json:"username"`
 }
 
@@ -20,7 +20,7 @@ type Metrics struct {
 
 type Exercise struct {
 	BaseExercise
-	ID        int64     `json:"id"`
+	ID        string    `json:"id"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 	Metrics

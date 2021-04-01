@@ -10,11 +10,11 @@ import (
 )
 
 type ExerciseService interface {
-	AddExerciseToWorkout(name, uname string, wid int64) (entity.Exercise, error)
-	UpdateExercise(eid int64, uname string, updates entity.ExerciseUpdate) error
-	DeleteExercise(eid int64, uname string) error
-	GetExercise(eid int64, uname string) (entity.Exercise, error)
-	GetExercisesForWorkout(wid int64, uname string) ([]entity.Exercise, error)
+	AddExerciseToWorkout(name, uname, wid string) (entity.Exercise, error)
+	UpdateExercise(eid, uname string, updates entity.ExerciseUpdate) error
+	DeleteExercise(eid, uname string) error
+	GetExercise(eid, uname string) (entity.Exercise, error)
+	GetExercisesForWorkout(wid, uname string) ([]entity.Exercise, error)
 	GetExercisesForUser(uname string) ([]entity.Exercise, error)
 }
 
@@ -38,7 +38,7 @@ func NewExerciseService(
 	return &service{}
 }
 
-func (*service) AddExerciseToWorkout(name, uname string, wid int64) (entity.Exercise, error) {
+func (*service) AddExerciseToWorkout(name, uname, wid string) (entity.Exercise, error) {
 	ok, err := auth.AuthorizeWorkoutAccess(uname, wid)
 
 	if err != nil {
@@ -68,7 +68,7 @@ func (*service) AddExerciseToWorkout(name, uname string, wid int64) (entity.Exer
 	return created, nil
 }
 
-func (*service) UpdateExercise(eid int64, uname string, updates entity.ExerciseUpdate) error {
+func (*service) UpdateExercise(eid, uname string, updates entity.ExerciseUpdate) error {
 	ok, err := auth.AuthorizeExerciseAccess(uname, eid)
 
 	if err != nil {
@@ -95,7 +95,7 @@ func (*service) UpdateExercise(eid int64, uname string, updates entity.ExerciseU
 	return nil
 }
 
-func (*service) DeleteExercise(eid int64, uname string) error {
+func (*service) DeleteExercise(eid, uname string) error {
 	authorized, err := auth.AuthorizeExerciseAccess(uname, eid)
 
 	if err != nil {
@@ -116,7 +116,7 @@ func (*service) DeleteExercise(eid int64, uname string) error {
 	return nil
 }
 
-func (*service) GetExercise(eid int64, uname string) (entity.Exercise, error) {
+func (*service) GetExercise(eid, uname string) (entity.Exercise, error) {
 	authorized, err := auth.AuthorizeExerciseAccess(uname, eid)
 
 	if err != nil {
@@ -138,7 +138,7 @@ func (*service) GetExercise(eid int64, uname string) (entity.Exercise, error) {
 
 }
 
-func (*service) GetExercisesForWorkout(wid int64, uname string) ([]entity.Exercise, error) {
+func (*service) GetExercisesForWorkout(wid, uname string) ([]entity.Exercise, error) {
 	var exercises []entity.Exercise
 
 	authorized, err := auth.AuthorizeWorkoutAccess(uname, wid)

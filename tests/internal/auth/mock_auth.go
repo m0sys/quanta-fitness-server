@@ -19,7 +19,7 @@ func CreateValidMockUser(id int64) entity.User {
 	hashedPwd, _ := crypto.HashPwd(MOCK_PWD)
 
 	user := entity.User{
-		ID: id,
+		ID: string(id),
 		BaseUser: entity.BaseUser{
 			Username: MOCK_USERNAME,
 			Email:    MOCK_EMAIL,

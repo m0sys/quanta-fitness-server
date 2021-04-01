@@ -20,7 +20,7 @@ func CreateValidMockWorkout(id int64) entity.Workout {
 			Title:    MOCK_TITLE,
 			Username: MOCK_UNAME,
 		},
-		ID:        id,
+		ID:        string(id),
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
 	}

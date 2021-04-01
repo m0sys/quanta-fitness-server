@@ -6,8 +6,8 @@ import (
 
 type WorkoutStore interface {
 	Save(workout entity.BaseWorkout) (entity.Workout, error)
-	Update(wid int64, updates entity.BaseWorkout) error
-	FindWorkoutById(wid int64) (entity.Workout, bool, error)
-	DeleteWorkout(wid int64) error
+	Update(wid string, updates entity.BaseWorkout) error
+	FindWorkoutById(wid string) (entity.Workout, bool, error)
+	DeleteWorkout(wid string) error
 	FindAllWorkoutsByUname(uname string) ([]entity.Workout, error)
 }

@@ -11,11 +11,11 @@ import (
 
 type WorkoutService interface {
 	CreateWorkout(title string, uname string) (entity.Workout, error)
-	UpdateWorkout(wid int64, workout entity.BaseWorkout, uname string) error
-	DeleteWorkout(wid int64, uname string) error
-	GetWorkout(wid int64, uname string) (entity.Workout, error)
+	UpdateWorkout(wid string, workout entity.BaseWorkout, uname string) error
+	DeleteWorkout(wid, uname string) error
+	GetWorkout(wid, uname string) (entity.Workout, error)
 	GetWorkoutsForUser(uname string) ([]entity.Workout, error)
-	GetWorkoutExercises(wid int64, uname string) ([]entity.Exercise, error)
+	GetWorkoutExercises(wid, uname string) ([]entity.Exercise, error)
 }
 
 type service struct{}
@@ -69,7 +69,7 @@ func (*service) CreateWorkout(title string, uname string) (entity.Workout, error
 	return workoutDS, nil
 }
 
-func (*service) UpdateWorkout(wid int64, workout entity.BaseWorkout, uname string) error {
+func (*service) UpdateWorkout(wid string, workout entity.BaseWorkout, uname string) error {
 	authorized, err := auth.AuthorizeAccessWorkout(uname, wid)
 
 	if err != nil {
@@ -96,7 +96,7 @@ func (*service) UpdateWorkout(wid int64, workout entity.BaseWorkout, uname strin
 
 }
 
-func (*service) DeleteWorkout(wid int64, uname string) error {
+func (*service) DeleteWorkout(wid, uname string) error {
 	authorized, err := auth.AuthorizeAccessWorkout(uname, wid)
 	if err != nil {
 		return err
@@ -116,7 +116,7 @@ func (*service) DeleteWorkout(wid int64, uname string) error {
 
 }
 
-func (*service) GetWorkout(wid int64, uname string) (entity.Workout, error) {
+func (*service) GetWorkout(wid, uname string) (entity.Workout, error) {
 	authorized, err := auth.AuthorizeAccessWorkout(uname, wid)
 	if err != nil {
 		logErr(err)
@@ -158,7 +158,7 @@ func (*service) GetWorkoutsForUser(uname string) ([]entity.Workout, error) {
 	return workouts, nil
 }
 
-func (*service) GetWorkoutExercises(wid int64, uname string) ([]entity.Exercise, error) {
+func (*service) GetWorkoutExercises(wid, uname string) ([]entity.Exercise, error) {
 	var exercises []entity.Exercise
 	return exercises, nil
 }

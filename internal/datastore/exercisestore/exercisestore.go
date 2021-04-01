@@ -6,9 +6,9 @@ import (
 
 type ExerciseStore interface {
 	Save(exercise entity.BaseExercise) (entity.Exercise, error)
-	Update(eid int64, updates entity.ExerciseUpdate) error
-	Delete(eid int64) error
-	FindExerciseById(eid int64) (entity.Exercise, bool, error)
-	FindAllExercisesByWID(wid int64) ([]entity.Exercise, error)
+	Update(eid string, updates entity.ExerciseUpdate) error
+	Delete(eid string) error
+	FindExerciseById(eid string) (entity.Exercise, bool, error)
+	FindAllExercisesByWID(wid string) ([]entity.Exercise, error)
 	FindAllExercisesByUname(uname string) ([]entity.Exercise, error)
 }

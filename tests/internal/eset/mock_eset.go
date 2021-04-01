@@ -7,7 +7,7 @@ import (
 func CreateValidBaseRobinSet() entity.BaseEset {
 	return entity.BaseEset{
 		Username: "robin",
-		EID:      0,
+		EID:      "0",
 		SMetric: entity.SMetric{
 			ActualRepCount:   6,
 			Duration:         183.0,
@@ -19,7 +19,7 @@ func CreateValidBaseRobinSet() entity.BaseEset {
 func CreateValidBaseBobinSet() entity.BaseEset {
 	return entity.BaseEset{
 		Username: "bobin",
-		EID:      0,
+		EID:      "0",
 		SMetric: entity.SMetric{
 			ActualRepCount:   6,
 			Duration:         183.0,

@@ -12,7 +12,7 @@ type BaseUser struct {
 
 type User struct {
 	BaseUser
-	ID        int64     `json:"id"`
+	ID        string    `json:"id"`
 	Weight    float32   `json:"weight"`
 	Height    float32   `json:"height"`
 	Gender    string    `json:"gender"`

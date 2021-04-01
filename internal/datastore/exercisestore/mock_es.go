@@ -2,6 +2,8 @@ package exercisestore
 
 import (
 	"errors"
+	"log"
+	"strconv"
 	"time"
 
 	"github.com/mhd53/quanta-fitness-server/internal/entity"
@@ -19,7 +21,7 @@ func NewMockExerciseStore() ExerciseStore {
 func (s *store) Save(exercise entity.BaseExercise) (entity.Exercise, error) {
 	created := entity.Exercise{
 		BaseExercise: exercise,
-		ID:           s.lastID,
+		ID:           string(s.lastID),
 		CreatedAt:    time.Now(),
 		UpdatedAt:    time.Now(),
 		Metrics: entity.Metrics{
@@ -35,8 +37,8 @@ func (s *store) Save(exercise entity.BaseExercise) (entity.Exercise, error) {
 	return created, nil
 }
 
-func (s *store) Update(eid int64, updates entity.ExerciseUpdate) error {
-	prev := s.exercises[eid]
+func (s *store) Update(eid string, updates entity.ExerciseUpdate) error {
+	prev := s.exercises[parseInt64(eid)]
 	updated := entity.Exercise{
 		BaseExercise: entity.BaseExercise{
 			Name:     updates.Name,
@@ -48,17 +50,17 @@ func (s *store) Update(eid int64, updates entity.ExerciseUpdate) error {
 		Metrics:   updates.Metrics,
 	}
 
-	s.exercises[eid] = updated
+	s.exercises[parseInt64(eid)] = updated
 	return nil
 }
 
-func (s *store) Delete(eid int64) error {
-	found := s.exercises[eid]
+func (s *store) Delete(eid string) error {
+	found := s.exercises[parseInt64(eid)]
 	if isEmpty(found) {
 		return errors.New("Not Found!")
 	}
 
-	delete(s.exercises, eid)
+	delete(s.exercises, parseInt64(eid))
 	return nil
 }
 
@@ -66,8 +68,8 @@ func isEmpty(found entity.Exercise) bool {
 	return found == (entity.Exercise{})
 }
 
-func (s *store) FindExerciseById(eid int64) (entity.Exercise, bool, error) {
-	found := s.exercises[eid]
+func (s *store) FindExerciseById(eid string) (entity.Exercise, bool, error) {
+	found := s.exercises[parseInt64(eid)]
 
 	if isEmpty(found) {
 		return entity.Exercise{}, false, nil
@@ -76,7 +78,7 @@ func (s *store) FindExerciseById(eid int64) (entity.Exercise, bool, error) {
 	return found, true, nil
 }
 
-func (s *store) FindAllExercisesByWID(wid int64) ([]entity.Exercise, error) {
+func (s *store) FindAllExercisesByWID(wid string) ([]entity.Exercise, error) {
 	var entries []entity.Exercise
 
 	for k := range s.exercises {
@@ -101,4 +103,12 @@ func (s *store) FindAllExercisesByUname(uname string) ([]entity.Exercise, error)
 	}
 
 	return entries, nil
+}
+
+func parseInt64(s string) int64 {
+	val, err := strconv.ParseInt(s, 10, 64)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return val
 }

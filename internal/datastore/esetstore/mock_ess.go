@@ -1,6 +1,8 @@
 package esetstore
 
 import (
+	"log"
+	"strconv"
 	"time"
 
 	"github.com/mhd53/quanta-fitness-server/internal/entity"
@@ -18,7 +20,7 @@ func NewMockEsetStore() EsetStore {
 func (s *store) Save(eset entity.BaseEset) (entity.Eset, error) {
 	created := entity.Eset{
 		BaseEset:  eset,
-		ID:        s.lastID,
+		ID:        string(s.lastID),
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
 	}
@@ -30,8 +32,8 @@ func (s *store) Save(eset entity.BaseEset) (entity.Eset, error) {
 }
 
 // Precondition: `esid` is a valid (i.e. exists).
-func (s *store) Update(esid int64, updates entity.EsetUpdate) error {
-	prev := s.esets[esid]
+func (s *store) Update(esid string, updates entity.EsetUpdate) error {
+	prev := s.esets[parseInt64(esid)]
 	updated := entity.Eset{
 		BaseEset: entity.BaseEset{
 			SMetric:  updates.SMetric,
@@ -43,18 +45,18 @@ func (s *store) Update(esid int64, updates entity.EsetUpdate) error {
 		UpdatedAt: time.Now(),
 	}
 
-	s.esets[esid] = updated
+	s.esets[parseInt64(esid)] = updated
 	return nil
 }
 
 // Precondition: `esid` is a valid (i.e. exists).
-func (s *store) Delete(esid int64) error {
-	delete(s.esets, esid)
+func (s *store) Delete(esid string) error {
+	delete(s.esets, parseInt64(esid))
 	return nil
 }
 
-func (s *store) FindEsetById(esid int64) (entity.Eset, bool, error) {
-	found := s.esets[esid]
+func (s *store) FindEsetById(esid string) (entity.Eset, bool, error) {
+	found := s.esets[parseInt64(esid)]
 	if isEmpty(found) {
 		return entity.Eset{}, false, nil
 	}
@@ -66,7 +68,7 @@ func isEmpty(found entity.Eset) bool {
 	return found == (entity.Eset{})
 }
 
-func (s *store) FindAllEsetByEID(eid int64) ([]entity.Eset, error) {
+func (s *store) FindAllEsetByEID(eid string) ([]entity.Eset, error) {
 	var entries []entity.Eset
 
 	for k := range s.esets {
@@ -76,4 +78,12 @@ func (s *store) FindAllEsetByEID(eid int64) ([]entity.Eset, error) {
 		}
 	}
 	return entries, nil
+}
+
+func parseInt64(s string) int64 {
+	val, err := strconv.ParseInt(s, 10, 64)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return val
 }

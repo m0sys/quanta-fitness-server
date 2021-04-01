@@ -10,11 +10,11 @@ import (
 )
 
 type EsetService interface {
-	AddEsetToExercise(uname string, eid int64, actualRC int, dur, restDur float32) (entity.Eset, error)
-	UpdateEset(esid int64, uname string, updates entity.EsetUpdate) error
-	DeleteEset(esid int64, uname string) error
-	GetEset(esid int64, uname string) (entity.Eset, error)
-	GetEsetsForExercise(eid int64, uname string) ([]entity.Eset, error)
+	AddEsetToExercise(uname string, eid string, actualRC int, dur, restDur float32) (entity.Eset, error)
+	UpdateEset(esid string, uname string, updates entity.EsetUpdate) error
+	DeleteEset(esid string, uname string) error
+	GetEset(esid string, uname string) (entity.Eset, error)
+	GetEsetsForExercise(eid string, uname string) ([]entity.Eset, error)
 }
 
 var (
@@ -37,7 +37,7 @@ func NewEsetService(
 	return &service{}
 }
 
-func (*service) AddEsetToExercise(uname string, eid int64, actualRC int, dur, restDur float32) (entity.Eset, error) {
+func (*service) AddEsetToExercise(uname string, eid string, actualRC int, dur, restDur float32) (entity.Eset, error) {
 	authorized, err := auth.AuthorizeExerciseAccess(uname, eid)
 
 	if err != nil {
@@ -72,7 +72,7 @@ func (*service) AddEsetToExercise(uname string, eid int64, actualRC int, dur, re
 
 }
 
-func (*service) UpdateEset(esid int64, uname string, updates entity.EsetUpdate) error {
+func (*service) UpdateEset(esid string, uname string, updates entity.EsetUpdate) error {
 	authorized, err := auth.AuthorizeEsetAccess(uname, esid)
 
 	if err != nil {
@@ -97,7 +97,7 @@ func (*service) UpdateEset(esid int64, uname string, updates entity.EsetUpdate) 
 	return nil
 }
 
-func (*service) DeleteEset(esid int64, uname string) error {
+func (*service) DeleteEset(esid string, uname string) error {
 	authorized, err := auth.AuthorizeEsetAccess(uname, esid)
 
 	if err != nil {
@@ -118,7 +118,7 @@ func (*service) DeleteEset(esid int64, uname string) error {
 	return nil
 }
 
-func (*service) GetEset(esid int64, uname string) (entity.Eset, error) {
+func (*service) GetEset(esid string, uname string) (entity.Eset, error) {
 	authorized, err := auth.AuthorizeEsetAccess(uname, esid)
 
 	if err != nil {
@@ -140,7 +140,7 @@ func (*service) GetEset(esid int64, uname string) (entity.Eset, error) {
 
 }
 
-func (*service) GetEsetsForExercise(eid int64, uname string) ([]entity.Eset, error) {
+func (*service) GetEsetsForExercise(eid string, uname string) ([]entity.Eset, error) {
 	var esets []entity.Eset
 
 	authorized, err := auth.AuthorizeExerciseAccess(uname, eid)

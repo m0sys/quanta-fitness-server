@@ -11,7 +11,7 @@ type BaseWorkout struct {
 
 type Workout struct {
 	BaseWorkout
-	ID        int64     `json:"id"`
+	ID        string    `json:"id"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 }
