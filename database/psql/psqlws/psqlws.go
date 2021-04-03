@@ -55,17 +55,69 @@ func (*store) Save(workout entity.BaseWorkout) (entity.Workout, error) {
 	if err != nil {
 		log.Printf("Error %s: couldn't insert new workout into db!", err)
 		return entity.Workout{}, err
+
 	}
 
 	return dbWorkout, nil
 }
 
 func (*store) Update(wid int64, updates entity.BaseWorkout) error {
+	db, err := psql.ConnectDB()
+	if err != nil {
+		log.Printf("Error %s: failed to connect to db!", err)
+		return err
+	}
+	defer db.Close()
+
+	query := `
+	UPDATE workouts
+	SET title = $2
+	WHERE id = $1;
+	`
+
+	res, err := db.Exec(query, wid, updates.Title)
+	if err != nil {
+		log.Printf("Error %s: couldn't update workout from db!", err)
+		return err
+	}
+
+	count, err := res.RowsAffected()
+	if err != nil {
+		log.Printf("Error %s: couldn't get rows affected", err)
+		return err
+	}
+
+	if count != 1 {
+		return errors.New("The number of affected rows is not 1!")
+	}
+
 	return nil
 }
 
 func (*store) FindWorkoutById(wid int64) (entity.Workout, bool, error) {
-	return entity.Workout{}, false, nil
+	db, err := psql.ConnectDB()
+	if err != nil {
+		log.Printf("Error %s: failed to connect to db!", err)
+		return entity.Workout{}, false, err
+	}
+	defer db.Close()
+
+	var dbWorkout entity.Workout
+
+	query := `
+	SELECT w.id, w.title, w.created_at, w.updated_at, u.username 
+	FROM workouts AS w
+ 	JOIN users AS u ON w.user_id = u.id
+	WHERE w.id = $1;
+	`
+
+	err = db.QueryRow(query, wid).Scan(&dbWorkout.ID, &dbWorkout.BaseWorkout.Title, &dbWorkout.CreatedAt, &dbWorkout.UpdatedAt, &dbWorkout.BaseWorkout.Username)
+	if err != nil {
+		log.Printf("Error %s: couldn't find workout db!", err)
+		return entity.Workout{}, false, err
+	}
+
+	return dbWorkout, true, nil
 }
 
 func (*store) DeleteWorkout(wid int64) error {
