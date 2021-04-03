@@ -24,6 +24,7 @@ func TestSave(t *testing.T) {
 		psqlDB.DeleteUser(newUser.ID)
 	})
 }
+
 func TestFindUserByUsername(t *testing.T) {
 	psqlDB := psqlus.NewPsqlUserStore()
 	user := entity.BaseUser{

@@ -24,11 +24,11 @@ func NewPsqlUserStore() us.UserStore {
 func (*store) Save(user entity.BaseUser) (entity.User, error) {
 	// Connect to db.
 	db, err := psql.ConnectDB()
-	defer db.Close()
 	if err != nil {
 		log.Printf("Error %s: failed to connect to db!", err)
 		return entity.User{}, err
 	}
+	defer db.Close()
 
 	query := `
 	INSERT INTO users(username, email, hashed_password)
@@ -48,11 +48,11 @@ func (*store) Save(user entity.BaseUser) (entity.User, error) {
 
 func (*store) FindUserByUsername(username string) (entity.User, bool, error) {
 	db, err := psql.ConnectDB()
-	defer db.Close()
 	if err != nil {
 		log.Printf("Error %s: failed to connect to db!", err)
 		return entity.User{}, false, err
 	}
+	defer db.Close()
 
 	query := `
 	SELECT * FROM users
@@ -72,11 +72,11 @@ func (*store) FindUserByUsername(username string) (entity.User, bool, error) {
 
 func (*store) FindUserByEmail(email string) (entity.User, bool, error) {
 	db, err := psql.ConnectDB()
-	defer db.Close()
 	if err != nil {
 		log.Printf("Error %s: failed to connect to db!", err)
 		return entity.User{}, false, err
 	}
+	defer db.Close()
 
 	query := `
 	SELECT * FROM users
@@ -97,11 +97,11 @@ func (*store) FindUserByEmail(email string) (entity.User, bool, error) {
 func (*store) DeleteUser(id int64) (bool, error) {
 	// Connect to db.
 	db, err := psql.ConnectDB()
-	defer db.Close()
 	if err != nil {
 		log.Printf("Error %s: failed to connect to db!", err)
-
+		return false, err
 	}
+	defer db.Close()
 
 	query := `
 	DELETE FROM users

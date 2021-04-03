@@ -19,6 +19,8 @@ var (
 	DbConn   *sql.DB
 )
 
+// FIXME: Figure out how to manage connections in a centralized fashion.
+
 func ConnectDB() (*sql.DB, error) {
 	// Load config file + set vars.
 	// TODO: Fix this abs path!
