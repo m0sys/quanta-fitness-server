@@ -20,8 +20,10 @@ func TestSave(t *testing.T) {
 	assert.Nil(t, err)
 	assert.NotEmpty(t, newUser)
 	assert.Equal(t, "robin", newUser.Username)
+
 	t.Cleanup(func() {
-		psqlDB.DeleteUser(newUser.ID)
+		_, err = psqlDB.DeleteUser(newUser.ID)
+		assert.Nil(t, err)
 	})
 }
 
@@ -42,8 +44,10 @@ func TestFindUserByUsername(t *testing.T) {
 	assert.Nil(t, err)
 	assert.True(t, found)
 	assert.Equal(t, "robin", got.Username)
+
 	t.Cleanup(func() {
-		psqlDB.DeleteUser(newUser.ID)
+		_, err = psqlDB.DeleteUser(newUser.ID)
+		assert.Nil(t, err)
 	})
 }
 
@@ -65,8 +69,10 @@ func TestFindUserByEmail(t *testing.T) {
 	assert.True(t, found)
 	assert.Equal(t, "robin", got.Username)
 	assert.Equal(t, "robin@gmail.com", got.Email)
+
 	t.Cleanup(func() {
-		psqlDB.DeleteUser(newUser.ID)
+		_, err = psqlDB.DeleteUser(newUser.ID)
+		assert.Nil(t, err)
 	})
 }
 
