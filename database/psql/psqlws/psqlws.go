@@ -154,5 +154,56 @@ func (*store) DeleteWorkout(wid int64) error {
 
 func (*store) FindAllWorkoutsByUname(uname string) ([]entity.Workout, error) {
 	var workouts []entity.Workout
+
+	db, err := psql.ConnectDB()
+	if err != nil {
+		log.Printf("Error %s: failed to connect to db!", err)
+		return workouts, err
+	}
+	defer db.Close()
+
+	var uid int64
+
+	query := `
+	SELECT id FROM users
+	WHERE username = $1
+	`
+
+	err = db.QueryRow(query, uname).Scan(&uid)
+	if err != nil {
+		log.Printf("Error %s: failed get user_id from users table!", err)
+		return workouts, err
+	}
+
+	query = `SELECT id, title, created_at, updated_at FROM workouts WHERE user_id = $1;`
+
+	rows, err := db.Query(query, uid)
+	if err != nil {
+		log.Printf("Error %s: couldn't get rows from workout table!", err)
+		return workouts, err
+
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var workout entity.Workout
+		workout.BaseWorkout.Username = uname
+
+		err = rows.Scan(&workout.ID, &workout.BaseWorkout.Title, &workout.CreatedAt, &workout.UpdatedAt)
+		if err != nil {
+			log.Printf("Error %s: couldn't scan row from workout table!", err)
+			return workouts, err
+
+		}
+
+		workouts = append(workouts, workout)
+	}
+
+	err = rows.Err()
+	if err != nil {
+		log.Printf("Error %s: while looping through workouts table!", err)
+		return workouts, err
+	}
+
 	return workouts, nil
 }

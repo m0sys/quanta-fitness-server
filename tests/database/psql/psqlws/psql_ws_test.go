@@ -90,6 +90,63 @@ func TestFindWorkoutById(t *testing.T) {
 	})
 }
 
+func TestDelete(t *testing.T) {
+	psqlUS, psqlWS, uid := setup(t)
+
+	workout := entity.BaseWorkout{
+		Username: "robin",
+		Title:    "Chest Day!",
+	}
+
+	newWorkout, err := psqlWS.Save(workout)
+
+	assert.Nil(t, err)
+	assert.NotEmpty(t, newWorkout)
+	assert.Equal(t, "robin", newWorkout.Username)
+	assert.Equal(t, "Chest Day!", newWorkout.Title)
+
+	err = psqlWS.DeleteWorkout(newWorkout.ID)
+	assert.Nil(t, err)
+
+	t.Cleanup(func() {
+		psqlUS.DeleteUser(uid)
+	})
+}
+
+func TestFindAllWorkoutsByUname(t *testing.T) {
+	psqlUS, psqlWS, uid := setup(t)
+
+	workout := entity.BaseWorkout{
+		Username: "robin",
+		Title:    "Chest Day!",
+	}
+
+	count := 3
+	for i := 0; i < count; i++ {
+		newWorkout, err := psqlWS.Save(workout)
+		assert.Nil(t, err)
+		assert.NotEmpty(t, newWorkout)
+		assert.Equal(t, "robin", newWorkout.Username)
+		assert.Equal(t, "Chest Day!", newWorkout.Title)
+
+	}
+
+	got, err := psqlWS.FindAllWorkoutsByUname("robin")
+	assert.Nil(t, err)
+	assert.NotEmpty(t, got)
+	assert.Equal(t, count, len(got))
+	assert.Equal(t, "Chest Day!", got[0].BaseWorkout.Title)
+	assert.Equal(t, "robin", got[0].BaseWorkout.Username)
+
+	t.Cleanup(func() {
+		psqlUS.DeleteUser(uid)
+		for i := 0; i < count; i++ {
+			err := psqlWS.DeleteWorkout(got[i].ID)
+			assert.Nil(t, err)
+		}
+	})
+}
+
 // Util funcs.
 
 func setup(t *testing.T) (us.UserStore, ws.WorkoutStore, int64) {
