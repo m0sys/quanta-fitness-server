@@ -1,6 +1,7 @@
 package userstore
 
 import (
+	"errors"
 	"time"
 
 	"github.com/mhd53/quanta-fitness-server/internal/entity"
@@ -56,6 +57,10 @@ func (s *store) FindUserByEmail(email string) (entity.User, bool, error) {
 	}
 
 	return found, true, nil
+}
+
+func (s *store) DeleteUser(id int64) (bool, error) {
+	return false, errors.New("Not Implemented!")
 }
 
 func isEmpty(found entity.User) bool {
