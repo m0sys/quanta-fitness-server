@@ -1,9 +1,10 @@
+// Exercise contains the Exercise entity.
+
 package workoutlog
 
 import (
 	"errors"
 	"math"
-	"time"
 
 	"github.com/mhd53/quanta-fitness-server/pkg/uuid"
 )
@@ -16,7 +17,7 @@ type Exercise struct {
 	Name       string
 	Weight     float64 // in kg
 	TargetRep  int
-	RestTime   time.Duration // in sec
+	RestTime   float64 // in sec
 	Sets       []Set
 	order      int
 }
@@ -24,10 +25,10 @@ type Exercise struct {
 // NewExercise create a new Exercise.
 func NewExercise(name string, weight, restTime float64, targetRep int, order int) (Exercise, error) {
 	if err := validateExerciseFields(name, weight, restTime, targetRep); err != nil {
-		return &Exercise{}, err
+		return Exercise{}, err
 	}
 
-	return &Exercise{
+	return Exercise{
 		ExerciseID: uuid.GenerateUUID(),
 		Weight:     roundToTwoDecimalPlaces(weight),
 		RestTime:   roundToTwoDecimalPlaces(restTime),
@@ -54,7 +55,7 @@ func (e *Exercise) RemoveSet(set Set) error {
 
 	for i, s := range e.Sets {
 		if s.SetID == set.SetID {
-			e.Sets = remove(e.Sets, i)
+			e.Sets = removeSet(e.Sets, i)
 			deleted = true
 		}
 	}
@@ -100,9 +101,9 @@ func validateExerciseFields(name string, weight, restTime float64, targetRep int
 	return nil
 }
 
-func validateName(title string) error {
-	if len(title) > 75 {
-		return errors.New("Title must be less than 76 characters")
+func validateName(name string) error {
+	if len(name) > 75 {
+		return errors.New("name must be less than 76 characters")
 	}
 
 	return nil
@@ -131,4 +132,8 @@ func validateTargetRep(targetRep int) error {
 
 func roundToTwoDecimalPlaces(num float64) float64 {
 	return math.Round(num*100) / 100
+}
+
+func removeSet(slice []Set, idx int) []Set {
+	return append(slice[:idx], slice[idx+1:]...)
 }

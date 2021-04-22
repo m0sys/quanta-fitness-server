@@ -1,4 +1,5 @@
-// Entity contains the Athlete entity.
+// Athlete contains the Athlete entity.
+
 package athlete
 
 import (
@@ -27,7 +28,7 @@ type weight struct {
 
 // NewAthlete create a new Athlete.
 func NewAthlete() Athlete {
-	return &Athlete{
+	return Athlete{
 		AthleteID: uuid.GenerateUUID(),
 	}
 }
@@ -74,7 +75,7 @@ func (a *Athlete) RemoveWorkoutLog(log wl.WorkoutLog) error {
 
 	for i, l := range a.WorkoutLogs {
 		if l.LogID == log.LogID {
-			a.WorkoutLogs = remove(a.WorkoutLogs, i)
+			a.WorkoutLogs = removeWorkoutLog(a.WorkoutLogs, i)
 			deleted = true
 		}
 	}
@@ -105,6 +106,6 @@ func roundToTwoDecimalPlaces(num float64) float64 {
 	return math.Round(num*100) / 100
 }
 
-func remove(slice []interface{}, idx int) []interface{} {
-	return append(slice[:s], slice[s+1:]...)
+func removeWorkoutLog(slice []wl.WorkoutLog, idx int) []wl.WorkoutLog {
+	return append(slice[:idx], slice[idx+1:]...)
 }

@@ -1,3 +1,5 @@
+// WorkoutLog contains the WorkoutLog entity.
+
 package workoutlog
 
 import (
@@ -20,10 +22,10 @@ type WorkoutLog struct {
 func NewWorkoutLog(title string) (WorkoutLog, error) {
 	err := validateTitle(title)
 	if err != nil {
-		return &WorkoutLog{}, err
+		return WorkoutLog{}, err
 	}
 
-	return &WorkoutLog{
+	return WorkoutLog{
 		LogID: uuid.GenerateUUID(),
 		Title: title,
 		Date:  time.Now(),
@@ -38,7 +40,7 @@ func (l *WorkoutLog) AddExercise(exercise Exercise) error {
 		}
 	}
 
-	l.Exercises = append(l.Exercises, Exercise)
+	l.Exercises = append(l.Exercises, exercise)
 	return nil
 }
 
@@ -48,7 +50,7 @@ func (l *WorkoutLog) RemoveExercise(exercise Exercise) error {
 
 	for i, e := range l.Exercises {
 		if e.ExerciseID == exercise.ExerciseID {
-			l.Exercises = remove(l.Exercises, i)
+			l.Exercises = removeExercise(l.Exercises, i)
 			deleted = true
 		}
 	}
@@ -80,8 +82,8 @@ func (l *WorkoutLog) OrderExercises() {
 
 // Helper funcs.
 
-func remove(slice []interface{}, idx int) []interface{} {
-	return append(slice[:s], slice[s+1:]...)
+func removeExercise(slice []Exercise, idx int) []Exercise {
+	return append(slice[:idx], slice[idx+1:]...)
 }
 
 func validateTitle(title string) error {

@@ -1,3 +1,5 @@
+// Set contains the Set entity.
+
 package workoutlog
 
 import (
@@ -15,13 +17,13 @@ type Set struct {
 // NewSet create a new Set.
 func NewSet(actualRepCount int) (Set, error) {
 	if err := validateActualRepCount(actualRepCount); err != nil {
-		return &Set{}, err
+		return Set{}, err
 	}
 
-	return &Set{
+	return Set{
 		SetID:          uuid.GenerateUUID(),
 		ActualRepCount: actualRepCount,
-	}
+	}, nil
 }
 
 // EditSet edit fields of Set.
