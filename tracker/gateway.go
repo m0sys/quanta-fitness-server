@@ -1,7 +1,12 @@
 // Facade for all persistant tracking of data for the FitnessTracker
 package tracker
 
-type FitnessGateway interface {
+import (
+	a "github.com/mhd53/quanta-fitness-server/athlete"
+	w "github.com/mhd53/quanta-fitness-server/workout"
+)
+
+type TrackerGateway interface {
 	WorkoutGateway
 	ExerciseGateway
 	SetGateway
@@ -9,7 +14,7 @@ type FitnessGateway interface {
 }
 
 type WorkoutGateway interface {
-	SaveWorkout()
+	SaveWorkout(w.Workout) error
 	GetWorkout()
 	DeleteWorkout()
 	UpdateWorkout()
@@ -30,6 +35,7 @@ type SetGateway interface {
 }
 
 type AthleteGateway interface {
+	FindAtheleteByUname(uname string) (a.Athlete, bool)
 	SaveAthlete()
 	GetAthlete()
 	DeleteAthlete()

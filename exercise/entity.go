@@ -1,10 +1,14 @@
 // Entity contains the Exercise entity.
 package exercise
 
-import "time"
+import (
+	"time"
+
+	"github.com/mhd53/quanta-fitness-server/internal/id"
+)
 
 type Exercise struct {
-	ID        int64
+	ID        id.ID
 	WID       int64
 	Name      string
 	RestTime  float64

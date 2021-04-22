@@ -1,14 +1,17 @@
 // Entity contains the Workout entity.
 package workout
 
-import "time"
+import (
+	"time"
+
+	"github.com/mhd53/quanta-fitness-server/internal/id"
+)
 
 type Workout struct {
-	ID        int64
-	AID       int64
-	Title     string
-	Date      time.Time
-	Exercises []Exercise
-	State     string // 'incomplete', 'inprogress', 'done'
-	Duration  time.Duration
+	ID       id.ID
+	AID      id.ID
+	Title    string
+	Date     time.Time
+	State    string // 'incomplete', 'inprogress', 'done'
+	Duration time.Duration
 }
