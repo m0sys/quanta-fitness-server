@@ -17,11 +17,11 @@ import (
 type Athlete struct {
 	AthleteID     string
 	Height        float64 // in meters
-	WeightHistory []weight
+	WeightHistory []WeightRecord
 	WorkoutLogs   []wl.WorkoutLog
 }
 
-type weight struct {
+type WeightRecord struct {
 	Amount float64 // in kg
 	Date   time.Time
 }
@@ -48,7 +48,7 @@ func (a *Athlete) UpdateWeight(weight float64) error {
 		return err
 	}
 
-	newWeight := Weight{
+	newWeight := WeightRecord{
 		Amount: weight,
 		Date:   time.Now(),
 	}

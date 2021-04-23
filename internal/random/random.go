@@ -50,3 +50,8 @@ func RestTime() float64 {
 func RepCount() int {
 	return Int(5, 15)
 }
+
+// Height generate a random height in m.
+func Height() float64 {
+	return Float(1.0, 2.0)
+}
