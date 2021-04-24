@@ -11,6 +11,7 @@ import (
 type repo struct {
 	wlogs     map[string]inRepoWorkoutLog
 	exercises map[string]inRepoExercise
+	sets      map[string]inRepoSet
 }
 
 // NewTrackerRepo create new in memory Tracker Repository.
@@ -18,6 +19,7 @@ func NewTrackerRepo() tckr.Repository {
 	return &repo{
 		wlogs:     make(map[string]inRepoWorkoutLog),
 		exercises: make(map[string]inRepoExercise),
+		sets:      make(map[string]inRepoSet),
 	}
 }
 
@@ -113,6 +115,25 @@ func (r *repo) AddExerciseToWorkoutLog(wlog wl.WorkoutLog, exercise wl.Exercise)
 	}, nil
 }
 
+func (r *repo) AddSetToExercise(exercise wl.Exercise, set wl.Set) (tckr.SetRes, error) {
+	createTime := time.Now()
+	rSet := inRepoSet{
+		SetID:          set.SetID,
+		ExerciseID:     exercise.ExerciseID,
+		ActualRepCount: set.ActualRepCount,
+		CreatedAt:      createTime,
+		UpdatedAt:      createTime,
+	}
+	r.sets[set.SetID] = rSet
+
+	return tckr.SetRes{
+		SetID:          rSet.SetID,
+		ActualRepCount: rSet.ActualRepCount,
+		CreatedAt:      rSet.CreatedAt,
+		UpdatedAt:      rSet.UpdatedAt,
+	}, nil
+}
+
 type inRepoWorkoutLog struct {
 	LogID     string
 	AthleteID string
@@ -131,4 +152,12 @@ type inRepoExercise struct {
 	RestTime   float64
 	CreatedAt  time.Time
 	UpdatedAt  time.Time
+}
+
+type inRepoSet struct {
+	SetID          string
+	ExerciseID     string
+	ActualRepCount int
+	CreatedAt      time.Time
+	UpdatedAt      time.Time
 }

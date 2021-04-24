@@ -8,3 +8,10 @@ type AddExerciseToWorkoutLogReq struct {
 	TargetRep int
 	RestTime  float64
 }
+
+// AddSetToExerciseReq request model for the AddSetToExercise use case.
+type AddSetToExerciseReq struct {
+	LogID          string
+	ExerciseID     string
+	ActualRepCount int
+}

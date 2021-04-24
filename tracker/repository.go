@@ -15,5 +15,6 @@ type workoutLogRepo interface {
 	FindWorkoutLogByID(id string) (WorkoutLogRes, bool, error)
 	FindAllExercisesForWorkoutLog(wlog wl.WorkoutLog) ([]ExerciseRes, error)
 	AddExerciseToWorkoutLog(wlog wl.WorkoutLog, exercise wl.Exercise) (ExerciseRes, error)
+	AddSetToExercise(exercise wl.Exercise, set wl.Set) (SetRes, error)
 	// FindAllWorkoutLogsForAthlete(ath athlete.Athlete) ([]WorkoutLogRes, error)
 }
