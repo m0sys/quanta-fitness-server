@@ -514,3 +514,128 @@ func TestEditExercise(t *testing.T) {
 		require.Equal(t, newName, updated.Name)
 	})
 }
+
+func TestEditSet(t *testing.T) {
+	t.Run("When WorkoutLog not created first", func(t *testing.T) {
+		testTracker, _ := setup()
+		newRep := random.RepCount()
+
+		req := tracker.EditSetReq{
+			SetID:          "1234",
+			ExerciseID:     "1234",
+			ActualRepCount: newRep,
+		}
+
+		updated, err := testTracker.EditSet(req)
+		require.Error(t, err)
+		require.Empty(t, updated)
+		require.Equal(t, "no WorkoutLog is assigned to Tracker", err.Error())
+	})
+
+	t.Run("When Exercise not found", func(t *testing.T) {
+		testTracker, _ := setup()
+		title := random.String(64)
+		newRep := random.RepCount()
+
+		res, err := testTracker.CreateWorkoutLog(title)
+		require.NoError(t, err)
+		require.NotEmpty(t, res)
+
+		req := tracker.EditSetReq{
+			SetID:          "1234",
+			ExerciseID:     "1234",
+			ActualRepCount: newRep,
+		}
+
+		updated, err := testTracker.EditSet(req)
+		require.Error(t, err)
+		require.Empty(t, updated)
+		require.Equal(t, "Exercise not found", err.Error())
+	})
+
+	t.Run("When Set not found", func(t *testing.T) {
+		testTracker, _ := setup()
+		title := random.String(64)
+		name := random.String(64)
+		weight := random.Weight()
+		targetRep := random.RepCount()
+		restTime := random.RestTime()
+		newRep := random.RepCount()
+
+		res, err := testTracker.CreateWorkoutLog(title)
+		require.NoError(t, err)
+		require.NotEmpty(t, res)
+
+		req := tracker.AddExerciseToWorkoutLogReq{
+			LogID:     res.LogID,
+			Name:      name,
+			Weight:    weight,
+			TargetRep: targetRep,
+			RestTime:  restTime,
+		}
+
+		res2, err := testTracker.AddExerciseToWorkoutLog(req)
+		require.NoError(t, err)
+		require.NotEmpty(t, res2)
+
+		req2 := tracker.EditSetReq{
+			SetID:          "1234",
+			ExerciseID:     res2.ExerciseID,
+			ActualRepCount: newRep,
+		}
+
+		updated, err := testTracker.EditSet(req2)
+		require.Error(t, err)
+		require.Empty(t, updated)
+		require.Equal(t, "Set not found", err.Error())
+	})
+
+	t.Run("When success", func(t *testing.T) {
+		testTracker, _ := setup()
+		title := random.String(64)
+		name := random.String(64)
+		weight := random.Weight()
+		targetRep := random.RepCount()
+		restTime := random.RestTime()
+		rep := random.RepCount()
+		newRep := random.RepCount()
+
+		res, err := testTracker.CreateWorkoutLog(title)
+		require.NoError(t, err)
+		require.NotEmpty(t, res)
+
+		req := tracker.AddExerciseToWorkoutLogReq{
+			LogID:     res.LogID,
+			Name:      name,
+			Weight:    weight,
+			TargetRep: targetRep,
+			RestTime:  restTime,
+		}
+
+		res2, err := testTracker.AddExerciseToWorkoutLog(req)
+		require.NoError(t, err)
+		require.NotEmpty(t, res2)
+
+		req2 := tracker.AddSetToExerciseReq{
+			LogID:          res.LogID,
+			ExerciseID:     res2.ExerciseID,
+			ActualRepCount: rep,
+		}
+
+		res3, err := testTracker.AddSetToExercise(req2)
+		require.NoError(t, err)
+		require.NotEmpty(t, res3)
+
+		req3 := tracker.EditSetReq{
+			SetID:          res3.SetID,
+			ExerciseID:     res2.ExerciseID,
+			ActualRepCount: newRep,
+		}
+
+		updated, err := testTracker.EditSet(req3)
+		require.NoError(t, err)
+		require.NotEmpty(t, updated)
+		require.Equal(t, res3.SetID, updated.SetID)
+		require.Equal(t, newRep, updated.ActualRepCount)
+	})
+}
