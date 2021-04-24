@@ -104,3 +104,104 @@ func TestAddExerciseToWorkoutLog(t *testing.T) {
 		// require.Equal(t, 4, len(testTracker.))
 	})
 }
+
+func TestAddSetToExercise(t *testing.T) {
+	t.Run("When WorkoutLog not created first", func(t *testing.T) {
+		testTracker, _ := setup()
+		rep := random.RepCount()
+
+		req := tracker.AddSetToExerciseReq{
+			LogID:          "1234",
+			ExerciseID:     "1234",
+			ActualRepCount: rep,
+		}
+
+		res2, err := testTracker.AddSetToExercise(req)
+		require.Error(t, err)
+		require.Empty(t, res2)
+		require.Equal(t, "no WorkoutLog is assigned to Tracker", err.Error())
+	})
+
+	t.Run("When LogID mismatch", func(t *testing.T) {
+		testTracker, _ := setup()
+		title := random.String(64)
+		rep := random.RepCount()
+
+		res, err := testTracker.CreateWorkoutLog(title)
+		require.NoError(t, err)
+		require.NotEmpty(t, res)
+
+		req := tracker.AddSetToExerciseReq{
+			LogID:          "1234",
+			ExerciseID:     "1234",
+			ActualRepCount: rep,
+		}
+
+		res2, err := testTracker.AddSetToExercise(req)
+		require.Error(t, err)
+		require.Empty(t, res2)
+		require.Equal(t, "WorkoutLog does not match requested LogID", err.Error())
+
+	})
+
+	t.Run("When Exercise not found", func(t *testing.T) {
+		testTracker, _ := setup()
+		title := random.String(64)
+		rep := random.RepCount()
+
+		res, err := testTracker.CreateWorkoutLog(title)
+		require.NoError(t, err)
+		require.NotEmpty(t, res)
+
+		req := tracker.AddSetToExerciseReq{
+			LogID:          res.LogID,
+			ExerciseID:     "1234",
+			ActualRepCount: rep,
+		}
+
+		res2, err := testTracker.AddSetToExercise(req)
+		require.Error(t, err)
+		require.Empty(t, res2)
+		require.Equal(t, "Exercise not found", err.Error())
+
+	})
+
+	t.Run("When success", func(t *testing.T) {
+		testTracker, _ := setup()
+		title := random.String(64)
+		rep := random.RepCount()
+		name := random.String(64)
+		weight := random.Weight()
+		targetRep := random.RepCount()
+		restTime := random.RestTime()
+
+		res, err := testTracker.CreateWorkoutLog(title)
+		require.NoError(t, err)
+		require.NotEmpty(t, res)
+
+		req := tracker.AddExerciseToWorkoutLogReq{
+			LogID:     res.LogID,
+			Name:      name,
+			Weight:    weight,
+			TargetRep: targetRep,
+			RestTime:  restTime,
+		}
+
+		res2, err := testTracker.AddExerciseToWorkoutLog(req)
+		require.NoError(t, err)
+		require.NotEmpty(t, res2)
+
+		req2 := tracker.AddSetToExerciseReq{
+			LogID:          res.LogID,
+			ExerciseID:     res2.ExerciseID,
+			ActualRepCount: rep,
+		}
+
+		res3, err := testTracker.AddSetToExercise(req2)
+		require.NoError(t, err)
+		require.NotEmpty(t, res3)
+		require.Equal(t, rep, res3.ActualRepCount)
+
+	})
+
+}
