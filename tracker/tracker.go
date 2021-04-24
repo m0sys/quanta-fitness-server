@@ -19,6 +19,8 @@ type WorkoutTracker interface {
 	RemoveExerciseFromWorkoutLog(exerciseID string) error
 	RemoveSetFromExercise(setID string, exerciseID string) error
 	EditWorkoutLog(req EditWorkoutLogReq) (WorkoutLogRes, error)
+	EditExercise(req EditExerciseReq) (ExerciseRes, error)
+	EditSet(req EditSetReq) (SetRes, error)
 }
 
 // FIXME: Get rid of that pointer for ath.
@@ -231,4 +233,45 @@ func (t *tracker) EditWorkoutLog(req EditWorkoutLogReq) (WorkoutLogRes, error) {
 	}
 
 	return res, nil
+}
+
+func (t *tracker) EditExercise(req EditExerciseReq) (ExerciseRes, error) {
+	if t.wlog == nil {
+		return ExerciseRes{}, errNilWorkoutLog
+	}
+
+	found := false
+	var foundIdx int
+	var exercise wl.Exercise
+	for i, e := range t.wlog.Exercises {
+		if e.ExerciseID == req.ExerciseID {
+			found = true
+			foundIdx = i
+			exercise = e
+		}
+	}
+
+	if !found {
+		return ExerciseRes{}, errExerciseNotFound
+	}
+
+	err := exercise.EditExercise(req.Name, req.Weight, req.RestTime, req.TargetRep)
+	if err != nil {
+		return ExerciseRes{}, err
+	}
+
+	t.wlog.Exercises[foundIdx] = exercise
+
+	res, err := t.repo.UpdateExercise(req)
+	if err != nil {
+		log.Printf("%s: couldn't update Exercise from repo: %s", "tracker", err.Error())
+		return ExerciseRes{}, errInternal
+
+	}
+
+	return res, nil
+}
+
+func (t *tracker) EditSet(req EditSetReq) (SetRes, error) {
+	return SetRes{}, nil
 }

@@ -24,3 +24,18 @@ type EditWorkoutLogReq struct {
 	Title string
 	Date  time.Time
 }
+
+// EditExerciseReq request model for the EditExercise use case.
+type EditExerciseReq struct {
+	ExerciseID string
+	Name       string
+	Weight     float64
+	TargetRep  int
+	RestTime   float64
+}
+
+// EditSetReq request model for the EditSet use case.
+type EditSetReq struct {
+	SetID          string
+	ActualRepCount int
+}

@@ -166,6 +166,53 @@ func (r *repo) UpdateWorkoutLog(req tckr.EditWorkoutLogReq) (tckr.WorkoutLogRes,
 		UpdatedAt: rWlog.UpdatedAt,
 	}, nil
 }
+func (r *repo) UpdateExercise(req tckr.EditExerciseReq) (tckr.ExerciseRes, error) {
+	updateTime := time.Now()
+	prev := r.exercises[req.ExerciseID]
+	rExercise := inRepoExercise{
+		ExerciseID: prev.ExerciseID,
+		LogID:      prev.LogID,
+		Name:       req.Name,
+		Weight:     req.Weight,
+		TargetRep:  req.TargetRep,
+		RestTime:   req.RestTime,
+		CreatedAt:  prev.CreatedAt,
+		UpdatedAt:  updateTime,
+	}
+
+	r.exercises[req.ExerciseID] = rExercise
+
+	return tckr.ExerciseRes{
+		ExerciseID: rExercise.ExerciseID,
+		Name:       rExercise.Name,
+		Weight:     rExercise.Weight,
+		TargetRep:  rExercise.TargetRep,
+		RestTime:   rExercise.RestTime,
+		CreatedAt:  rExercise.CreatedAt,
+		UpdatedAt:  rExercise.UpdatedAt,
+	}, nil
+}
+
+func (r *repo) UpdateSet(req tckr.EditSetReq) (tckr.SetRes, error) {
+	updateTime := time.Now()
+	prev := r.sets[req.SetID]
+	rSet := inRepoSet{
+		SetID:          prev.SetID,
+		ExerciseID:     prev.ExerciseID,
+		ActualRepCount: req.ActualRepCount,
+		CreatedAt:      prev.CreatedAt,
+		UpdatedAt:      updateTime,
+	}
+
+	r.sets[req.SetID] = rSet
+
+	return tckr.SetRes{
+		SetID:          rSet.SetID,
+		ActualRepCount: rSet.ActualRepCount,
+		CreatedAt:      rSet.CreatedAt,
+		UpdatedAt:      rSet.UpdatedAt,
+	}, nil
+}
 
 type inRepoWorkoutLog struct {
 	LogID     string
