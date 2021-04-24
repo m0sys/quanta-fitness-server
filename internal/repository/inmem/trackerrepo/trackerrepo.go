@@ -144,6 +144,29 @@ func (r *repo) DeleteSet(id string) error {
 	return nil
 }
 
+func (r *repo) UpdateWorkoutLog(req tckr.EditWorkoutLogReq) (tckr.WorkoutLogRes, error) {
+	updateTime := time.Now()
+	prev := r.wlogs[req.LogID]
+	rWlog := inRepoWorkoutLog{
+		LogID:     prev.LogID,
+		AthleteID: prev.AthleteID,
+		Title:     req.Title,
+		Date:      req.Date,
+		CreatedAt: prev.CreatedAt,
+		UpdatedAt: updateTime,
+	}
+
+	r.wlogs[req.LogID] = rWlog
+
+	return tckr.WorkoutLogRes{
+		LogID:     rWlog.LogID,
+		Title:     rWlog.Title,
+		Date:      rWlog.Date,
+		CreatedAt: rWlog.CreatedAt,
+		UpdatedAt: rWlog.UpdatedAt,
+	}, nil
+}
+
 type inRepoWorkoutLog struct {
 	LogID     string
 	AthleteID string

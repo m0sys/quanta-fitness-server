@@ -18,6 +18,7 @@ type WorkoutTracker interface {
 	SetWorkoutLog(id string) error
 	RemoveExerciseFromWorkoutLog(exerciseID string) error
 	RemoveSetFromExercise(setID string, exerciseID string) error
+	EditWorkoutLog(req EditWorkoutLogReq) (WorkoutLogRes, error)
 }
 
 // FIXME: Get rid of that pointer for ath.
@@ -208,4 +209,26 @@ func (t *tracker) RemoveSetFromExercise(setID string, exerciseID string) error {
 	}
 
 	return nil
+}
+
+func (t *tracker) EditWorkoutLog(req EditWorkoutLogReq) (WorkoutLogRes, error) {
+	if t.wlog == nil {
+		return WorkoutLogRes{}, errNilWorkoutLog
+	}
+	if t.wlog.LogID != req.LogID {
+		return WorkoutLogRes{}, errLogIDMismatch
+	}
+
+	err := t.wlog.EditWorkoutLog(req.Title, req.Date)
+	if err != nil {
+		return WorkoutLogRes{}, err
+	}
+
+	res, err := t.repo.UpdateWorkoutLog(req)
+	if err != nil {
+		log.Printf("%s: couldn't update WorkoutLog from repo: %s", "tracker", err.Error())
+		return WorkoutLogRes{}, errInternal
+	}
+
+	return res, nil
 }

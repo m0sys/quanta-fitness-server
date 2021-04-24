@@ -18,5 +18,6 @@ type workoutLogRepo interface {
 	AddSetToExercise(exercise wl.Exercise, set wl.Set) (SetRes, error)
 	DeleteExercise(id string) error
 	DeleteSet(id string) error
+	UpdateWorkoutLog(req EditWorkoutLogReq) (WorkoutLogRes, error)
 	// FindAllWorkoutLogsForAthlete(ath athlete.Athlete) ([]WorkoutLogRes, error)
 }
