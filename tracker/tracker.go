@@ -3,6 +3,7 @@
 package tracker
 
 import (
+	"errors"
 	"log"
 
 	"github.com/mhd53/quanta-fitness-server/athlete"
@@ -16,6 +17,7 @@ type WorkoutTracker interface {
 	AddSetToExercise(req AddSetToExerciseReq) (SetRes, error)
 	SetWorkoutLog(id string) error
 	RemoveExerciseFromWorkoutLog(exerciseID string) error
+	RemoveSetFromExercise(setID string, exerciseID string) error
 }
 
 // FIXME: Get rid of that pointer for ath.
@@ -97,10 +99,12 @@ func (t *tracker) AddSetToExercise(req AddSetToExerciseReq) (SetRes, error) {
 	}
 
 	found := false
+	var foundIdx int
 	var exercise wl.Exercise
-	for _, e := range t.wlog.Exercises {
+	for i, e := range t.wlog.Exercises {
 		if e.ExerciseID == req.ExerciseID {
 			found = true
+			foundIdx = i
 			exercise = e
 		}
 	}
@@ -113,11 +117,12 @@ func (t *tracker) AddSetToExercise(req AddSetToExerciseReq) (SetRes, error) {
 	if err != nil {
 		return SetRes{}, err
 	}
-
 	err = exercise.AddSet(newSet)
 	if err != nil {
 		log.Fatal("couldn't add newly created Set to Exercise")
 	}
+
+	t.wlog.Exercises[foundIdx] = exercise
 
 	setRes, err := t.repo.AddSetToExercise(exercise, newSet)
 	if err != nil {
@@ -154,6 +159,51 @@ func (t *tracker) RemoveExerciseFromWorkoutLog(exerciseID string) error {
 	err = t.repo.DeleteExercise(exerciseID)
 	if err != nil {
 		log.Printf("%s: couldn't delete Exercise from repo: %s", "tracker", err.Error())
+		return errInternal
+	}
+
+	return nil
+}
+func (t *tracker) RemoveSetFromExercise(setID string, exerciseID string) error {
+	if t.wlog == nil {
+		return errNilWorkoutLog
+	}
+
+	found := false
+	var exercise wl.Exercise
+	for _, e := range t.wlog.Exercises {
+		if e.ExerciseID == exerciseID {
+			found = true
+			exercise = e
+		}
+	}
+
+	if !found {
+		return errExerciseNotFound
+	}
+
+	found = false
+	var set wl.Set
+	for _, s := range exercise.Sets {
+		if s.SetID == setID {
+			found = true
+			set = s
+		}
+	}
+
+	if !found {
+		return errors.New("Set not found")
+	}
+
+	err := exercise.RemoveSet(set)
+	if err != nil {
+		return err
+	}
+
+	err = t.repo.DeleteSet(set.SetID)
+
+	if err != nil {
+		log.Printf("%s: couldn't delete Set from repo: %s", "tracker", err.Error())
 		return errInternal
 	}
 

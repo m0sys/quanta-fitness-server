@@ -89,6 +89,8 @@ func TestAddExerciseToWorkoutLog(t *testing.T) {
 		require.Equal(t, targetRep, res2.TargetRep)
 		// require.Equal(t, restTime, res2.RestTime) // round causing error
 
+		// TODO: Check for length.
+
 		res2, err = testTracker.AddExerciseToWorkoutLog(req)
 		require.NoError(t, err)
 		require.NotEmpty(t, res2)
@@ -202,6 +204,8 @@ func TestAddSetToExercise(t *testing.T) {
 		require.NotEmpty(t, res3)
 		require.Equal(t, rep, res3.ActualRepCount)
 
+		// TODO: Check for length.
+
 	})
 
 }
@@ -256,5 +260,99 @@ func TestRemoveExerciseFromWorkoutLog(t *testing.T) {
 		require.NoError(t, err)
 
 		// TODO: test that Exercise has been removed in repo.
+	})
+}
+
+func TestRemoveSetFromExercise(t *testing.T) {
+	t.Run("When WorkoutLog not created first", func(t *testing.T) {
+		testTracker, _ := setup()
+
+		err := testTracker.RemoveSetFromExercise("1234", "1234")
+		require.Error(t, err)
+		require.Equal(t, "no WorkoutLog is assigned to Tracker", err.Error())
+	})
+
+	t.Run("When Exercise not found", func(t *testing.T) {
+		testTracker, _ := setup()
+		title := random.String(64)
+
+		res, err := testTracker.CreateWorkoutLog(title)
+		require.NoError(t, err)
+		require.NotEmpty(t, res)
+
+		err = testTracker.RemoveSetFromExercise("1234", "1234")
+		require.Error(t, err)
+		require.Equal(t, "Exercise not found", err.Error())
+	})
+
+	t.Run("When Set not found", func(t *testing.T) {
+		testTracker, _ := setup()
+		title := random.String(64)
+		name := random.String(64)
+		weight := random.Weight()
+		targetRep := random.RepCount()
+		restTime := random.RestTime()
+
+		res, err := testTracker.CreateWorkoutLog(title)
+		require.NoError(t, err)
+		require.NotEmpty(t, res)
+
+		req := tracker.AddExerciseToWorkoutLogReq{
+			LogID:     res.LogID,
+			Name:      name,
+			Weight:    weight,
+			TargetRep: targetRep,
+			RestTime:  restTime,
+		}
+
+		res2, err := testTracker.AddExerciseToWorkoutLog(req)
+		require.NoError(t, err)
+		require.NotEmpty(t, res2)
+
+		err = testTracker.RemoveSetFromExercise("1234", res2.ExerciseID)
+		require.Error(t, err)
+		require.Equal(t, "Set not found", err.Error())
+
+	})
+
+	t.Run("When success", func(t *testing.T) {
+		testTracker, _ := setup()
+		title := random.String(64)
+		rep := random.RepCount()
+		name := random.String(64)
+		weight := random.Weight()
+		targetRep := random.RepCount()
+		restTime := random.RestTime()
+
+		res, err := testTracker.CreateWorkoutLog(title)
+		require.NoError(t, err)
+		require.NotEmpty(t, res)
+
+		req := tracker.AddExerciseToWorkoutLogReq{
+			LogID:     res.LogID,
+			Name:      name,
+			Weight:    weight,
+			TargetRep: targetRep,
+			RestTime:  restTime,
+		}
+
+		res2, err := testTracker.AddExerciseToWorkoutLog(req)
+		require.NoError(t, err)
+		require.NotEmpty(t, res2)
+
+		req2 := tracker.AddSetToExerciseReq{
+			LogID:          res.LogID,
+			ExerciseID:     res2.ExerciseID,
+			ActualRepCount: rep,
+		}
+
+		res3, err := testTracker.AddSetToExercise(req2)
+		require.NoError(t, err)
+		require.NotEmpty(t, res3)
+
+		err = testTracker.RemoveSetFromExercise(res3.SetID, res2.ExerciseID)
+		require.NoError(t, err)
+
+		// TODO: test that Set has been removed in repo.
 	})
 }

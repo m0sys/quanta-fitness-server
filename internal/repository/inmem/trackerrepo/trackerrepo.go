@@ -139,6 +139,11 @@ func (r *repo) DeleteExercise(id string) error {
 	return nil
 }
 
+func (r *repo) DeleteSet(id string) error {
+	delete(r.sets, id)
+	return nil
+}
+
 type inRepoWorkoutLog struct {
 	LogID     string
 	AthleteID string
