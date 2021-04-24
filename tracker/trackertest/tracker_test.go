@@ -205,3 +205,56 @@ func TestAddSetToExercise(t *testing.T) {
 	})
 
 }
+
+func TestRemoveExerciseFromWorkoutLog(t *testing.T) {
+	t.Run("When WorkoutLog not created first", func(t *testing.T) {
+		testTracker, _ := setup()
+
+		err := testTracker.RemoveExerciseFromWorkoutLog("1234")
+		require.Error(t, err)
+		require.Equal(t, "no WorkoutLog is assigned to Tracker", err.Error())
+	})
+
+	t.Run("When Exercise not found", func(t *testing.T) {
+		testTracker, _ := setup()
+		title := random.String(64)
+
+		res, err := testTracker.CreateWorkoutLog(title)
+		require.NoError(t, err)
+		require.NotEmpty(t, res)
+
+		err = testTracker.RemoveExerciseFromWorkoutLog("1234")
+		require.Error(t, err)
+		require.Equal(t, "Exercise not found", err.Error())
+	})
+
+	t.Run("When success", func(t *testing.T) {
+		testTracker, _ := setup()
+		title := random.String(64)
+		name := random.String(64)
+		weight := random.Weight()
+		targetRep := random.RepCount()
+		restTime := random.RestTime()
+
+		res, err := testTracker.CreateWorkoutLog(title)
+		require.NoError(t, err)
+		require.NotEmpty(t, res)
+
+		req := tracker.AddExerciseToWorkoutLogReq{
+			LogID:     res.LogID,
+			Name:      name,
+			Weight:    weight,
+			TargetRep: targetRep,
+			RestTime:  restTime,
+		}
+
+		res2, err := testTracker.AddExerciseToWorkoutLog(req)
+		require.NoError(t, err)
+		require.NotEmpty(t, res2)
+
+		err = testTracker.RemoveExerciseFromWorkoutLog(res2.ExerciseID)
+		require.NoError(t, err)
+
+		// TODO: test that Exercise has been removed in repo.
+	})
+}
