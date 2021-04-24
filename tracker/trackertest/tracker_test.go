@@ -9,6 +9,7 @@ import (
 )
 
 func TestCreateWorkoutLog(t *testing.T) {
+	testTracker, testAthlete := setup()
 	gen := random.String(64)
 
 	res, err := testTracker.CreateWorkoutLog(gen)
@@ -19,28 +20,87 @@ func TestCreateWorkoutLog(t *testing.T) {
 }
 
 func TestAddExerciseToWorkoutLog(t *testing.T) {
-	title := random.String(64)
-	name := random.String(64)
-	weight := random.Weight()
-	targetRep := random.RepCount()
-	restTime := random.RestTime()
+	t.Run("When WorkoutLog not first created", func(t *testing.T) {
+		testTracker, _ := setup()
+		name := random.String(64)
+		weight := random.Weight()
+		targetRep := random.RepCount()
+		restTime := random.RestTime()
 
-	res, err := testTracker.CreateWorkoutLog(title)
-	require.NoError(t, err)
-	require.NotEmpty(t, res)
+		req := tracker.AddExerciseToWorkoutLogReq{
+			LogID:     "1234",
+			Name:      name,
+			Weight:    weight,
+			TargetRep: targetRep,
+			RestTime:  restTime,
+		}
+		res2, err := testTracker.AddExerciseToWorkoutLog(req)
+		require.Error(t, err)
+		require.Empty(t, res2)
+		require.Equal(t, "no WorkoutLog is assigned to Tracker", err.Error())
+	})
 
-	req := tracker.AddExerciseToWorkoutLogReq{
-		LogID:     res.LogID,
-		Name:      name,
-		Weight:    weight,
-		TargetRep: targetRep,
-		RestTime:  restTime,
-	}
-	res2, err := testTracker.AddExerciseToWorkoutLog(req)
-	require.NoError(t, err)
-	require.NotEmpty(t, res2)
-	require.Equal(t, name, res2.Name)
-	// require.Equal(t, weight, res2.Weight) // round causing error
-	require.Equal(t, targetRep, res2.TargetRep)
-	// require.Equal(t, restTime, res2.RestTime) // round causing error
+	t.Run("When LogID mismatch", func(t *testing.T) {
+		testTracker, _ := setup()
+		title := random.String(64)
+		name := random.String(64)
+		weight := random.Weight()
+		targetRep := random.RepCount()
+		restTime := random.RestTime()
+
+		_, err := testTracker.CreateWorkoutLog(title)
+		req := tracker.AddExerciseToWorkoutLogReq{
+			LogID:     "1234",
+			Name:      name,
+			Weight:    weight,
+			TargetRep: targetRep,
+			RestTime:  restTime,
+		}
+		res2, err := testTracker.AddExerciseToWorkoutLog(req)
+		require.Error(t, err)
+		require.Empty(t, res2)
+		require.Equal(t, "WorkoutLog does not match requested LogID", err.Error())
+	})
+
+	t.Run("When success", func(t *testing.T) {
+		testTracker, _ := setup()
+		title := random.String(64)
+		name := random.String(64)
+		weight := random.Weight()
+		targetRep := random.RepCount()
+		restTime := random.RestTime()
+
+		res, err := testTracker.CreateWorkoutLog(title)
+		require.NoError(t, err)
+		require.NotEmpty(t, res)
+
+		req := tracker.AddExerciseToWorkoutLogReq{
+			LogID:     res.LogID,
+			Name:      name,
+			Weight:    weight,
+			TargetRep: targetRep,
+			RestTime:  restTime,
+		}
+		res2, err := testTracker.AddExerciseToWorkoutLog(req)
+		require.NoError(t, err)
+		require.NotEmpty(t, res2)
+		require.Equal(t, name, res2.Name)
+		// require.Equal(t, weight, res2.Weight) // round causing error
+		require.Equal(t, targetRep, res2.TargetRep)
+		// require.Equal(t, restTime, res2.RestTime) // round causing error
+
+		res2, err = testTracker.AddExerciseToWorkoutLog(req)
+		require.NoError(t, err)
+		require.NotEmpty(t, res2)
+
+		res2, err = testTracker.AddExerciseToWorkoutLog(req)
+		require.NoError(t, err)
+		require.NotEmpty(t, res2)
+
+		res2, err = testTracker.AddExerciseToWorkoutLog(req)
+		require.NoError(t, err)
+		require.NotEmpty(t, res2)
+
+		// require.Equal(t, 4, len(testTracker.))
+	})
 }
