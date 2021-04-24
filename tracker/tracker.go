@@ -3,7 +3,6 @@
 package tracker
 
 import (
-	"errors"
 	"log"
 
 	"github.com/mhd53/quanta-fitness-server/athlete"
@@ -16,7 +15,7 @@ type WorkoutTracker interface {
 	AddExerciseToWorkoutLog(req AddExerciseToWorkoutLogReq) (ExerciseRes, error)
 	AddSetToExercise(req AddSetToExerciseReq) (SetRes, error)
 	SetWorkoutLog(id string) error
-	RemoveExerciseFromWorkoutLog(req RemoveExerciseFromWorkoutLogReq) error
+	RemoveExerciseFromWorkoutLog(exerciseID string) error
 }
 
 // FIXME: Get rid of that pointer for ath.
@@ -90,6 +89,9 @@ func (t *tracker) AddSetToExercise(req AddSetToExerciseReq) (SetRes, error) {
 	if t.wlog == nil {
 		return SetRes{}, errNilWorkoutLog
 	}
+
+	// NOTE: maybe we don't need to check for LogID since we want to add to
+	//		 the WorkoutLog that is currently in wlog.
 	if t.wlog.LogID != req.LogID {
 		return SetRes{}, errLogIDMismatch
 	}
@@ -104,7 +106,7 @@ func (t *tracker) AddSetToExercise(req AddSetToExerciseReq) (SetRes, error) {
 	}
 
 	if !found {
-		return SetRes{}, errors.New("Exercise not found")
+		return SetRes{}, errExerciseNotFound
 	}
 
 	newSet, err := wl.NewSet(req.ActualRepCount)
@@ -126,6 +128,34 @@ func (t *tracker) AddSetToExercise(req AddSetToExerciseReq) (SetRes, error) {
 	return setRes, nil
 }
 
-func (t *tracker) RemoveExerciseFromWorkoutLog(req RemoveExerciseFromWorkoutLogReq) error {
+func (t *tracker) RemoveExerciseFromWorkoutLog(exerciseID string) error {
+	if t.wlog == nil {
+		return errNilWorkoutLog
+	}
+
+	found := false
+	var exercise wl.Exercise
+	for _, e := range t.wlog.Exercises {
+		if e.ExerciseID == exerciseID {
+			found = true
+			exercise = e
+		}
+	}
+
+	if !found {
+		return errExerciseNotFound
+	}
+
+	err := t.wlog.RemoveExercise(exercise)
+	if err != nil {
+		return err
+	}
+
+	err = t.repo.DeleteExercise(exerciseID)
+	if err != nil {
+		log.Printf("%s: couldn't delete Exercise from repo: %s", "tracker", err.Error())
+		return errInternal
+	}
+
 	return nil
 }

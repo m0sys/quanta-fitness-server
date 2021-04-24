@@ -134,6 +134,11 @@ func (r *repo) AddSetToExercise(exercise wl.Exercise, set wl.Set) (tckr.SetRes, 
 	}, nil
 }
 
+func (r *repo) DeleteExercise(id string) error {
+	delete(r.exercises, id)
+	return nil
+}
+
 type inRepoWorkoutLog struct {
 	LogID     string
 	AthleteID string
