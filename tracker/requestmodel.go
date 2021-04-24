@@ -37,5 +37,6 @@ type EditExerciseReq struct {
 // EditSetReq request model for the EditSet use case.
 type EditSetReq struct {
 	SetID          string
+	ExerciseID     string
 	ActualRepCount int
 }

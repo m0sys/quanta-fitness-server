@@ -273,5 +273,55 @@ func (t *tracker) EditExercise(req EditExerciseReq) (ExerciseRes, error) {
 }
 
 func (t *tracker) EditSet(req EditSetReq) (SetRes, error) {
-	return SetRes{}, nil
+	if t.wlog == nil {
+		return SetRes{}, errNilWorkoutLog
+	}
+
+	found := false
+	var foundIdxE int
+	var exercise wl.Exercise
+	for i, e := range t.wlog.Exercises {
+		if e.ExerciseID == req.ExerciseID {
+			found = true
+			foundIdxE = i
+			exercise = e
+		}
+	}
+
+	if !found {
+		return SetRes{}, errExerciseNotFound
+	}
+	log.Print(foundIdxE)
+
+	found = false
+	var foundIdxS int
+	var set wl.Set
+	for i, s := range exercise.Sets {
+		if s.SetID == req.SetID {
+			found = true
+			foundIdxS = i
+			set = s
+		}
+	}
+
+	if !found {
+		return SetRes{}, errors.New("Set not found")
+	}
+	log.Print(foundIdxS)
+
+	err := set.EditSet(req.ActualRepCount)
+	if err != nil {
+		return SetRes{}, err
+	}
+
+	exercise.Sets[foundIdxS] = set
+	t.wlog.Exercises[foundIdxE] = exercise
+
+	res, err := t.repo.UpdateSet(req)
+	if err != nil {
+		log.Printf("%s: couldn't update Set from repo: %s", "tracker", err.Error())
+		return SetRes{}, errInternal
+	}
+
+	return res, nil
 }
