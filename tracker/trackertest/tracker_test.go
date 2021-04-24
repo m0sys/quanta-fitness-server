@@ -2,6 +2,7 @@ package trackertest
 
 import (
 	"testing"
+	"time"
 
 	"github.com/mhd53/quanta-fitness-server/internal/random"
 	"github.com/mhd53/quanta-fitness-server/tracker"
@@ -354,5 +355,70 @@ func TestRemoveSetFromExercise(t *testing.T) {
 		require.NoError(t, err)
 
 		// TODO: test that Set has been removed in repo.
+	})
+}
+
+func TestEditWorkoutLog(t *testing.T) {
+	t.Run("When WorkoutLog not created first", func(t *testing.T) {
+		testTracker, _ := setup()
+		newTitle := random.String(64)
+		newDate := time.Now().AddDate(0, 0, 1)
+
+		req := tracker.EditWorkoutLogReq{
+			LogID: "1234",
+			Title: newTitle,
+			Date:  newDate,
+		}
+
+		updated, err := testTracker.EditWorkoutLog(req)
+		require.Error(t, err)
+		require.Empty(t, updated)
+		require.Equal(t, "no WorkoutLog is assigned to Tracker", err.Error())
+	})
+
+	t.Run("When LogID mismatch", func(t *testing.T) {
+		testTracker, _ := setup()
+		title := random.String(64)
+		newTitle := random.String(64)
+		newDate := time.Now().AddDate(0, 0, 1)
+
+		res, err := testTracker.CreateWorkoutLog(title)
+		require.NoError(t, err)
+		require.NotEmpty(t, res)
+
+		req := tracker.EditWorkoutLogReq{
+			LogID: "1234",
+			Title: newTitle,
+			Date:  newDate,
+		}
+
+		updated, err := testTracker.EditWorkoutLog(req)
+		require.Error(t, err)
+		require.Empty(t, updated)
+		require.Equal(t, "WorkoutLog does not match requested LogID", err.Error())
+	})
+
+	t.Run("When success", func(t *testing.T) {
+		testTracker, _ := setup()
+		title := random.String(64)
+		newTitle := random.String(64)
+		newDate := time.Now().AddDate(0, 0, 1)
+
+		res, err := testTracker.CreateWorkoutLog(title)
+		require.NoError(t, err)
+		require.NotEmpty(t, res)
+
+		req := tracker.EditWorkoutLogReq{
+			LogID: res.LogID,
+			Title: newTitle,
+			Date:  newDate,
+		}
+
+		updated, err := testTracker.EditWorkoutLog(req)
+		require.NoError(t, err)
+		require.NotEmpty(t, updated)
+		require.Equal(t, res.LogID, updated.LogID)
+		require.Equal(t, newTitle, updated.Title)
+		require.WithinDuration(t, newDate, updated.Date, time.Second)
 	})
 }
