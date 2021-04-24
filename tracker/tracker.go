@@ -16,6 +16,7 @@ type WorkoutTracker interface {
 	AddExerciseToWorkoutLog(req AddExerciseToWorkoutLogReq) (ExerciseRes, error)
 	AddSetToExercise(req AddSetToExerciseReq) (SetRes, error)
 	SetWorkoutLog(id string) error
+	RemoveExerciseFromWorkoutLog(req RemoveExerciseFromWorkoutLogReq) error
 }
 
 // FIXME: Get rid of that pointer for ath.
@@ -123,4 +124,8 @@ func (t *tracker) AddSetToExercise(req AddSetToExerciseReq) (SetRes, error) {
 	}
 
 	return setRes, nil
+}
+
+func (t *tracker) RemoveExerciseFromWorkoutLog(req RemoveExerciseFromWorkoutLogReq) error {
+	return nil
 }
