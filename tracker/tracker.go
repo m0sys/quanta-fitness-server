@@ -21,9 +21,13 @@ type WorkoutTracker interface {
 	EditWorkoutLog(req EditWorkoutLogReq) (WorkoutLogRes, error)
 	EditExercise(req EditExerciseReq) (ExerciseRes, error)
 	EditSet(req EditSetReq) (SetRes, error)
+	FetchAllWorkoutLogs() ([]WorkoutLogRes, error)
+	FetchAllExercisesForWorkoutLog() ([]ExerciseRes, error)
+	FetchAllSetsForExercise(exerciseID string) ([]SetRes, error)
 }
 
 // FIXME: Get rid of that pointer for ath.
+// Precondition: WorkoutTracker will only retrieve data pertaining `wlog` and `ath`.
 type tracker struct {
 	repo Repository
 	ath  *athlete.Athlete
@@ -324,4 +328,61 @@ func (t *tracker) EditSet(req EditSetReq) (SetRes, error) {
 	}
 
 	return res, nil
+}
+
+func (t *tracker) FetchAllWorkoutLogs() ([]WorkoutLogRes, error) {
+	var wlogsRes []WorkoutLogRes
+	wlogsRes, err := t.repo.FindAllWorkoutLogsForAthlete(*t.ath)
+	if err != nil {
+		log.Printf("%s: couldn't fetch all WorkoutLogs from repo: %s", "tracker", err.Error())
+		return wlogsRes, errInternal
+	}
+
+	return wlogsRes, nil
+}
+
+func (t *tracker) FetchAllExercisesForWorkoutLog() ([]ExerciseRes, error) {
+	var exercisesRes []ExerciseRes
+
+	if t.wlog == nil {
+		return exercisesRes, errNilWorkoutLog
+	}
+
+	exercisesRes, err := t.repo.FindAllExercisesForWorkoutLog(*t.wlog)
+	if err != nil {
+		log.Printf("%s: couldn't fetch all Exercises from repo: %s", "tracker", err.Error())
+		return exercisesRes, errInternal
+
+	}
+
+	return exercisesRes, nil
+}
+
+func (t *tracker) FetchAllSetsForExercise(exerciseID string) ([]SetRes, error) {
+	var setsRes []SetRes
+
+	if t.wlog == nil {
+		return setsRes, errNilWorkoutLog
+	}
+
+	found := false
+	var exercise wl.Exercise
+	for _, e := range t.wlog.Exercises {
+		if e.ExerciseID == exerciseID {
+			found = true
+			exercise = e
+		}
+	}
+
+	if !found {
+		return setsRes, errExerciseNotFound
+	}
+
+	setsRes, err := t.repo.FindAllSetsForExercise(exercise)
+	if err != nil {
+		log.Printf("%s: couldn't fetch all Sets from repo: %s", "tracker", err.Error())
+		return setsRes, errInternal
+	}
+
+	return setsRes, nil
 }

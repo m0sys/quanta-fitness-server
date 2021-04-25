@@ -44,52 +44,6 @@ func (r *repo) StoreWorkoutLog(wlog wl.WorkoutLog, ath athlete.Athlete) (tckr.Wo
 	}, nil
 }
 
-// FindWorkoutLogByID find WorkoutLog in memory Tracker Repository by LogID.
-func (r *repo) FindWorkoutLogByID(id string) (tckr.WorkoutLogRes, bool, error) {
-	var rWlog inRepoWorkoutLog
-	var found bool
-
-	for k, val := range r.wlogs {
-		if k == id {
-			rWlog = val
-			found = true
-		}
-	}
-
-	if !found {
-		return tckr.WorkoutLogRes{}, false, nil
-	}
-
-	return tckr.WorkoutLogRes{
-		LogID:     rWlog.LogID,
-		Title:     rWlog.Title,
-		Date:      rWlog.Date,
-		CreatedAt: rWlog.CreatedAt,
-		UpdatedAt: rWlog.UpdatedAt,
-	}, true, nil
-}
-
-func (r *repo) FindAllExercisesForWorkoutLog(wlog wl.WorkoutLog) ([]tckr.ExerciseRes, error) {
-	var exercises []tckr.ExerciseRes
-
-	for _, val := range r.exercises {
-		if val.LogID == wlog.LogID {
-			found := tckr.ExerciseRes{
-				ExerciseID: val.ExerciseID,
-				Name:       val.Name,
-				Weight:     val.Weight,
-				TargetRep:  val.TargetRep,
-				CreatedAt:  val.CreatedAt,
-				UpdatedAt:  val.UpdatedAt,
-			}
-			exercises = append(exercises, found)
-		}
-	}
-
-	return exercises, nil
-
-}
-
 func (r *repo) AddExerciseToWorkoutLog(wlog wl.WorkoutLog, exercise wl.Exercise) (tckr.ExerciseRes, error) {
 	createTime := time.Now()
 	rExercise := inRepoExercise{
@@ -212,6 +166,84 @@ func (r *repo) UpdateSet(req tckr.EditSetReq) (tckr.SetRes, error) {
 		CreatedAt:      rSet.CreatedAt,
 		UpdatedAt:      rSet.UpdatedAt,
 	}, nil
+}
+
+// FindWorkoutLogByID find WorkoutLog in memory Tracker Repository by LogID.
+func (r *repo) FindWorkoutLogByID(id string) (tckr.WorkoutLogRes, bool, error) {
+	var rWlog inRepoWorkoutLog
+	var found bool
+
+	for k, val := range r.wlogs {
+		if k == id {
+			rWlog = val
+			found = true
+		}
+	}
+
+	if !found {
+		return tckr.WorkoutLogRes{}, false, nil
+	}
+
+	return tckr.WorkoutLogRes{
+		LogID:     rWlog.LogID,
+		Title:     rWlog.Title,
+		Date:      rWlog.Date,
+		CreatedAt: rWlog.CreatedAt,
+		UpdatedAt: rWlog.UpdatedAt,
+	}, true, nil
+}
+func (r *repo) FindAllWorkoutLogsForAthlete(ath athlete.Athlete) ([]tckr.WorkoutLogRes, error) {
+	var wlogs []tckr.WorkoutLogRes
+
+	for _, val := range r.wlogs {
+		if val.AthleteID == ath.AthleteID {
+			found := tckr.WorkoutLogRes{
+				LogID:     val.LogID,
+				Title:     val.Title,
+				Date:      val.Date,
+				CreatedAt: val.CreatedAt,
+				UpdatedAt: val.UpdatedAt,
+			}
+			wlogs = append(wlogs, found)
+		}
+	}
+	return wlogs, nil
+}
+
+func (r *repo) FindAllExercisesForWorkoutLog(wlog wl.WorkoutLog) ([]tckr.ExerciseRes, error) {
+	var exercises []tckr.ExerciseRes
+
+	for _, val := range r.exercises {
+		if val.LogID == wlog.LogID {
+			found := tckr.ExerciseRes{
+				ExerciseID: val.ExerciseID,
+				Name:       val.Name,
+				Weight:     val.Weight,
+				TargetRep:  val.TargetRep,
+				CreatedAt:  val.CreatedAt,
+				UpdatedAt:  val.UpdatedAt,
+			}
+			exercises = append(exercises, found)
+		}
+	}
+
+	return exercises, nil
+}
+
+func (r *repo) FindAllSetsForExercise(exercise wl.Exercise) ([]tckr.SetRes, error) {
+	var sets []tckr.SetRes
+	for _, val := range r.sets {
+		if val.ExerciseID == exercise.ExerciseID {
+			found := tckr.SetRes{
+				SetID:          val.SetID,
+				ActualRepCount: val.ActualRepCount,
+				CreatedAt:      val.CreatedAt,
+				UpdatedAt:      val.UpdatedAt,
+			}
+			sets = append(sets, found)
+		}
+	}
+	return sets, nil
 }
 
 type inRepoWorkoutLog struct {

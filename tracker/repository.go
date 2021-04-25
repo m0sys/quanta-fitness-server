@@ -12,8 +12,6 @@ type Repository interface {
 
 type workoutLogRepo interface {
 	StoreWorkoutLog(wlog wl.WorkoutLog, ath athlete.Athlete) (WorkoutLogRes, error)
-	FindWorkoutLogByID(id string) (WorkoutLogRes, bool, error)
-	FindAllExercisesForWorkoutLog(wlog wl.WorkoutLog) ([]ExerciseRes, error)
 	AddExerciseToWorkoutLog(wlog wl.WorkoutLog, exercise wl.Exercise) (ExerciseRes, error)
 	AddSetToExercise(exercise wl.Exercise, set wl.Set) (SetRes, error)
 	DeleteExercise(id string) error
@@ -21,5 +19,8 @@ type workoutLogRepo interface {
 	UpdateWorkoutLog(req EditWorkoutLogReq) (WorkoutLogRes, error)
 	UpdateExercise(req EditExerciseReq) (ExerciseRes, error)
 	UpdateSet(req EditSetReq) (SetRes, error)
-	// FindAllWorkoutLogsForAthlete(ath athlete.Athlete) ([]WorkoutLogRes, error)
+	FindWorkoutLogByID(id string) (WorkoutLogRes, bool, error)
+	FindAllWorkoutLogsForAthlete(ath athlete.Athlete) ([]WorkoutLogRes, error)
+	FindAllExercisesForWorkoutLog(wlog wl.WorkoutLog) ([]ExerciseRes, error)
+	FindAllSetsForExercise(exercise wl.Exercise) ([]SetRes, error)
 }
