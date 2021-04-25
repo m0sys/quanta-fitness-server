@@ -89,22 +89,6 @@ func TestAddExerciseToWorkoutLog(t *testing.T) {
 		// require.Equal(t, weight, res2.Weight) // round causing error
 		require.Equal(t, targetRep, res2.TargetRep)
 		// require.Equal(t, restTime, res2.RestTime) // round causing error
-
-		// TODO: Check for length.
-
-		res2, err = testTracker.AddExerciseToWorkoutLog(req)
-		require.NoError(t, err)
-		require.NotEmpty(t, res2)
-
-		res2, err = testTracker.AddExerciseToWorkoutLog(req)
-		require.NoError(t, err)
-		require.NotEmpty(t, res2)
-
-		res2, err = testTracker.AddExerciseToWorkoutLog(req)
-		require.NoError(t, err)
-		require.NotEmpty(t, res2)
-
-		// require.Equal(t, 4, len(testTracker.))
 	})
 }
 
@@ -204,9 +188,6 @@ func TestAddSetToExercise(t *testing.T) {
 		require.NoError(t, err)
 		require.NotEmpty(t, res3)
 		require.Equal(t, rep, res3.ActualRepCount)
-
-		// TODO: Check for length.
-
 	})
 
 }
@@ -260,7 +241,9 @@ func TestRemoveExerciseFromWorkoutLog(t *testing.T) {
 		err = testTracker.RemoveExerciseFromWorkoutLog(res2.ExerciseID)
 		require.NoError(t, err)
 
-		// TODO: test that Exercise has been removed in repo.
+		res3, err := testTracker.FetchAllExercisesForWorkoutLog()
+		require.NoError(t, err)
+		require.Equal(t, 0, len(res3))
 	})
 }
 
@@ -354,7 +337,9 @@ func TestRemoveSetFromExercise(t *testing.T) {
 		err = testTracker.RemoveSetFromExercise(res3.SetID, res2.ExerciseID)
 		require.NoError(t, err)
 
-		// TODO: test that Set has been removed in repo.
+		res4, err := testTracker.FetchAllSetsForExercise(res2.ExerciseID)
+		require.NoError(t, err)
+		require.Equal(t, 0, len(res4))
 	})
 }
 
