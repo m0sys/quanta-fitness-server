@@ -29,17 +29,20 @@ func TestUpdateHeight(t *testing.T) {
 	require.Equal(t, 0, len(athlete.WeightHistory))
 
 	t.Run("When weight is negative", func(t *testing.T) {
-		err := athlete.UpdateWeight(-1)
+		res, err := athlete.UpdateWeight(-1)
 		require.Error(t, err)
+		require.Empty(t, res)
 		require.Equal(t, 0, len(athlete.WeightHistory))
 	})
 
 	t.Run("When success", func(t *testing.T) {
 		gen := random.Weight()
-		err := athlete.UpdateWeight(gen)
+		res, err := athlete.UpdateWeight(gen)
 		require.NoError(t, err)
+		require.NotEmpty(t, res)
 		require.Equal(t, 1, len(athlete.WeightHistory))
 		require.Equal(t, gen, athlete.WeightHistory[0].Amount)
+		require.Equal(t, gen, res.Amount)
 
 	})
 }

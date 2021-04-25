@@ -4,6 +4,7 @@ package athlete
 
 import (
 	"errors"
+	"math"
 	"time"
 
 	"github.com/mhd53/quanta-fitness-server/pkg/uuid"
@@ -20,6 +21,7 @@ type Athlete struct {
 	WorkoutLogs   []wl.WorkoutLog
 }
 
+// WeightRecord holds recording for Athlete's weight.
 type WeightRecord struct {
 	Amount float64 // in kg
 	Date   time.Time
@@ -42,18 +44,18 @@ func (a *Athlete) SetHeight(height float64) error {
 }
 
 // UpdateWeight update the weight of Athlete.
-func (a *Athlete) UpdateWeight(weight float64) error {
+func (a *Athlete) UpdateWeight(weight float64) (WeightRecord, error) {
 	if err := validateWeight(weight); err != nil {
-		return err
+		return WeightRecord{}, err
 	}
 
 	newWeight := WeightRecord{
-		Amount: weight,
+		Amount: roundToTwoDecimalPlaces(weight),
 		Date:   time.Now(),
 	}
 
 	a.WeightHistory = append(a.WeightHistory, newWeight)
-	return nil
+	return newWeight, nil
 }
 
 // AddWorkoutLog add WorkoutLog to Athlete.
@@ -99,6 +101,10 @@ func validateWeight(weight float64) error {
 		return errors.New("weight must be a positive number")
 	}
 	return nil
+}
+
+func roundToTwoDecimalPlaces(num float64) float64 {
+	return math.Round(num*100) / 100
 }
 
 func removeWorkoutLog(slice []wl.WorkoutLog, idx int) []wl.WorkoutLog {
