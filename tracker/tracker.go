@@ -67,11 +67,12 @@ func (t *tracker) SetWorkoutLog(id string) error {
 }
 
 func (t *tracker) AddExerciseToWorkoutLog(req AddExerciseToWorkoutLogReq) (ExerciseRes, error) {
-	if t.wlog == nil {
-		return ExerciseRes{}, errNilWorkoutLog
+	if err := checkWlogNil(t.wlog); err != nil {
+		return ExerciseRes{}, err
 	}
-	if t.wlog.LogID != req.LogID {
-		return ExerciseRes{}, errLogIDMismatch
+
+	if err := checkLogIDMismatch(t.wlog.LogID, req.LogID); err != nil {
+		return ExerciseRes{}, err
 	}
 
 	newExercise, err := wl.NewExercise(req.Name, req.Weight, req.RestTime, req.TargetRep, len(t.wlog.Exercises))
@@ -95,27 +96,15 @@ func (t *tracker) AddExerciseToWorkoutLog(req AddExerciseToWorkoutLogReq) (Exerc
 }
 
 func (t *tracker) AddSetToExercise(req AddSetToExerciseReq) (SetRes, error) {
-	if t.wlog == nil {
-		return SetRes{}, errNilWorkoutLog
+	if err := checkWlogNil(t.wlog); err != nil {
+		return SetRes{}, err
 	}
 
-	// NOTE: maybe we don't need to check for LogID since we want to add to
-	//		 the WorkoutLog that is currently in wlog.
-	if t.wlog.LogID != req.LogID {
-		return SetRes{}, errLogIDMismatch
+	if err := checkLogIDMismatch(t.wlog.LogID, req.LogID); err != nil {
+		return SetRes{}, err
 	}
 
-	found := false
-	var foundIdx int
-	var exercise wl.Exercise
-	for i, e := range t.wlog.Exercises {
-		if e.ExerciseID == req.ExerciseID {
-			found = true
-			foundIdx = i
-			exercise = e
-		}
-	}
-
+	found, foundIdx, exercise := findExercise(*t.wlog, req.ExerciseID)
 	if !found {
 		return SetRes{}, errExerciseNotFound
 	}
@@ -141,19 +130,11 @@ func (t *tracker) AddSetToExercise(req AddSetToExerciseReq) (SetRes, error) {
 }
 
 func (t *tracker) RemoveExerciseFromWorkoutLog(exerciseID string) error {
-	if t.wlog == nil {
-		return errNilWorkoutLog
+	if err := checkWlogNil(t.wlog); err != nil {
+		return err
 	}
 
-	found := false
-	var exercise wl.Exercise
-	for _, e := range t.wlog.Exercises {
-		if e.ExerciseID == exerciseID {
-			found = true
-			exercise = e
-		}
-	}
-
+	found, _, exercise := findExercise(*t.wlog, exerciseID)
 	if !found {
 		return errExerciseNotFound
 	}
@@ -171,33 +152,18 @@ func (t *tracker) RemoveExerciseFromWorkoutLog(exerciseID string) error {
 
 	return nil
 }
+
 func (t *tracker) RemoveSetFromExercise(setID string, exerciseID string) error {
-	if t.wlog == nil {
-		return errNilWorkoutLog
+	if err := checkWlogNil(t.wlog); err != nil {
+		return err
 	}
 
-	found := false
-	var exercise wl.Exercise
-	for _, e := range t.wlog.Exercises {
-		if e.ExerciseID == exerciseID {
-			found = true
-			exercise = e
-		}
-	}
-
+	found, _, exercise := findExercise(*t.wlog, exerciseID)
 	if !found {
 		return errExerciseNotFound
 	}
 
-	found = false
-	var set wl.Set
-	for _, s := range exercise.Sets {
-		if s.SetID == setID {
-			found = true
-			set = s
-		}
-	}
-
+	found, _, set := findSet(exercise, setID)
 	if !found {
 		return errors.New("Set not found")
 	}
@@ -218,11 +184,12 @@ func (t *tracker) RemoveSetFromExercise(setID string, exerciseID string) error {
 }
 
 func (t *tracker) EditWorkoutLog(req EditWorkoutLogReq) (WorkoutLogRes, error) {
-	if t.wlog == nil {
-		return WorkoutLogRes{}, errNilWorkoutLog
+	if err := checkWlogNil(t.wlog); err != nil {
+		return WorkoutLogRes{}, err
 	}
-	if t.wlog.LogID != req.LogID {
-		return WorkoutLogRes{}, errLogIDMismatch
+
+	if err := checkLogIDMismatch(t.wlog.LogID, req.LogID); err != nil {
+		return WorkoutLogRes{}, err
 	}
 
 	err := t.wlog.EditWorkoutLog(req.Title, req.Date)
@@ -240,21 +207,11 @@ func (t *tracker) EditWorkoutLog(req EditWorkoutLogReq) (WorkoutLogRes, error) {
 }
 
 func (t *tracker) EditExercise(req EditExerciseReq) (ExerciseRes, error) {
-	if t.wlog == nil {
-		return ExerciseRes{}, errNilWorkoutLog
+	if err := checkWlogNil(t.wlog); err != nil {
+		return ExerciseRes{}, err
 	}
 
-	found := false
-	var foundIdx int
-	var exercise wl.Exercise
-	for i, e := range t.wlog.Exercises {
-		if e.ExerciseID == req.ExerciseID {
-			found = true
-			foundIdx = i
-			exercise = e
-		}
-	}
-
+	found, foundIdx, exercise := findExercise(*t.wlog, req.ExerciseID)
 	if !found {
 		return ExerciseRes{}, errExerciseNotFound
 	}
@@ -277,41 +234,19 @@ func (t *tracker) EditExercise(req EditExerciseReq) (ExerciseRes, error) {
 }
 
 func (t *tracker) EditSet(req EditSetReq) (SetRes, error) {
-	if t.wlog == nil {
-		return SetRes{}, errNilWorkoutLog
+	if err := checkWlogNil(t.wlog); err != nil {
+		return SetRes{}, err
 	}
 
-	found := false
-	var foundIdxE int
-	var exercise wl.Exercise
-	for i, e := range t.wlog.Exercises {
-		if e.ExerciseID == req.ExerciseID {
-			found = true
-			foundIdxE = i
-			exercise = e
-		}
-	}
-
+	found, foundIdxE, exercise := findExercise(*t.wlog, req.ExerciseID)
 	if !found {
 		return SetRes{}, errExerciseNotFound
 	}
-	log.Print(foundIdxE)
 
-	found = false
-	var foundIdxS int
-	var set wl.Set
-	for i, s := range exercise.Sets {
-		if s.SetID == req.SetID {
-			found = true
-			foundIdxS = i
-			set = s
-		}
-	}
-
+	found, foundIdxS, set := findSet(exercise, req.SetID)
 	if !found {
 		return SetRes{}, errors.New("Set not found")
 	}
-	log.Print(foundIdxS)
 
 	err := set.EditSet(req.ActualRepCount)
 	if err != nil {
@@ -344,8 +279,8 @@ func (t *tracker) FetchAllWorkoutLogs() ([]WorkoutLogRes, error) {
 func (t *tracker) FetchAllExercisesForWorkoutLog() ([]ExerciseRes, error) {
 	var exercisesRes []ExerciseRes
 
-	if t.wlog == nil {
-		return exercisesRes, errNilWorkoutLog
+	if err := checkWlogNil(t.wlog); err != nil {
+		return exercisesRes, err
 	}
 
 	exercisesRes, err := t.repo.FindAllExercisesForWorkoutLog(*t.wlog)
@@ -361,19 +296,11 @@ func (t *tracker) FetchAllExercisesForWorkoutLog() ([]ExerciseRes, error) {
 func (t *tracker) FetchAllSetsForExercise(exerciseID string) ([]SetRes, error) {
 	var setsRes []SetRes
 
-	if t.wlog == nil {
-		return setsRes, errNilWorkoutLog
+	if err := checkWlogNil(t.wlog); err != nil {
+		return setsRes, err
 	}
 
-	found := false
-	var exercise wl.Exercise
-	for _, e := range t.wlog.Exercises {
-		if e.ExerciseID == exerciseID {
-			found = true
-			exercise = e
-		}
-	}
-
+	found, _, exercise := findExercise(*t.wlog, exerciseID)
 	if !found {
 		return setsRes, errExerciseNotFound
 	}
@@ -385,4 +312,50 @@ func (t *tracker) FetchAllSetsForExercise(exerciseID string) ([]SetRes, error) {
 	}
 
 	return setsRes, nil
+}
+
+// Helper funcs.
+
+func checkWlogNil(ptr *wl.WorkoutLog) error {
+	if ptr == nil {
+		return errNilWorkoutLog
+	}
+	return nil
+}
+
+func checkLogIDMismatch(a string, b string) error {
+	if a != b {
+		return errLogIDMismatch
+	}
+	return nil
+}
+
+func findExercise(wlog wl.WorkoutLog, eid string) (bool, int, wl.Exercise) {
+	found := false
+	var foundIdx int
+	var exercise wl.Exercise
+	for i, e := range wlog.Exercises {
+		if e.ExerciseID == eid {
+			found = true
+			foundIdx = i
+			exercise = e
+		}
+	}
+
+	return found, foundIdx, exercise
+}
+
+func findSet(exercise wl.Exercise, sid string) (bool, int, wl.Set) {
+	found := false
+	var foundIdx int
+	var set wl.Set
+	for i, s := range exercise.Sets {
+		if s.SetID == sid {
+			found = true
+			foundIdx = i
+			set = s
+		}
+	}
+
+	return found, foundIdx, set
 }
