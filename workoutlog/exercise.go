@@ -28,6 +28,9 @@ func NewExercise(name string, weight, restTime float64, targetRep int, order int
 		return Exercise{}, err
 	}
 
+	weight = roundToTwoDecimalPlaces(weight)
+	restTime = roundToTwoDecimalPlaces(restTime)
+
 	return Exercise{
 		ExerciseID: uuid.GenerateUUID(),
 		Name:       name,

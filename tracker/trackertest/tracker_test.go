@@ -50,6 +50,8 @@ func TestAddExerciseToWorkoutLog(t *testing.T) {
 		restTime := random.RestTime()
 
 		_, err := testTracker.CreateWorkoutLog(title)
+		require.NoError(t, err)
+
 		req := tracker.AddExerciseToWorkoutLogReq{
 			LogID:     "1234",
 			Name:      name,

@@ -4,7 +4,6 @@ package athlete
 
 import (
 	"errors"
-	"math"
 	"time"
 
 	"github.com/mhd53/quanta-fitness-server/pkg/uuid"
@@ -100,10 +99,6 @@ func validateWeight(weight float64) error {
 		return errors.New("weight must be a positive number")
 	}
 	return nil
-}
-
-func roundToTwoDecimalPlaces(num float64) float64 {
-	return math.Round(num*100) / 100
 }
 
 func removeWorkoutLog(slice []wl.WorkoutLog, idx int) []wl.WorkoutLog {
