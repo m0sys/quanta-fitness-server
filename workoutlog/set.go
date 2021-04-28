@@ -10,8 +10,8 @@ import (
 
 // Set entity for representing what a set is.
 type Set struct {
-	SetID          string
-	ActualRepCount int
+	uuid           string
+	actualRepCount int
 }
 
 // NewSet create a new Set.
@@ -21,9 +21,17 @@ func NewSet(actualRepCount int) (Set, error) {
 	}
 
 	return Set{
-		SetID:          uuid.GenerateUUID(),
-		ActualRepCount: actualRepCount,
+		uuid:           uuid.GenerateUUID(),
+		actualRepCount: actualRepCount,
 	}, nil
+}
+
+func (s *Set) SetID() string {
+	return s.uuid
+}
+
+func (s *Set) ActualRepCount() int {
+	return s.actualRepCount
 }
 
 // EditSet edit fields of Set.
@@ -32,7 +40,7 @@ func (s *Set) EditSet(actualRepCount int) error {
 		return err
 	}
 
-	s.ActualRepCount = actualRepCount
+	s.actualRepCount = actualRepCount
 	return nil
 }
 

@@ -37,7 +37,7 @@ func NewManager(repository Repository, athlete *athlete.Athlete) AthleteManager 
 
 func (m *manager) FetchWeightHistory() ([]WeightRecordRes, error) {
 	var history []WeightRecordRes
-	history, err := m.repo.FindAllWeightRecords(m.ath.AthleteID)
+	history, err := m.repo.FindAllWeightRecords(m.ath.AthleteID())
 	if err != nil {
 		log.Printf("%s: couldn't fetch all Weight Records from repo: %s", "manager", err.Error())
 		return history, errors.New("Internal error")
@@ -52,7 +52,7 @@ func (m *manager) UpdateWeight(weight float64) error {
 		return err
 	}
 
-	return m.repo.StoreWeightRecord(m.ath.AthleteID, record)
+	return m.repo.StoreWeightRecord(m.ath.AthleteID(), record)
 }
 
 func (m *manager) SetHeight(height float64) error {

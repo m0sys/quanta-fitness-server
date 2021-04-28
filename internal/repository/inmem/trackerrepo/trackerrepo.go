@@ -26,14 +26,14 @@ func NewTrackerRepo() tckr.Repository {
 func (r *repo) StoreWorkoutLog(wlog wl.WorkoutLog, ath athlete.Athlete) (tckr.WorkoutLogRes, error) {
 	createTime := time.Now()
 	rWlog := inRepoWorkoutLog{
-		LogID:     wlog.LogID,
-		AthleteID: ath.AthleteID,
-		Title:     wlog.Title,
-		Date:      wlog.Date,
+		LogID:     wlog.LogID(),
+		AthleteID: ath.AthleteID(),
+		Title:     wlog.Title(),
+		Date:      wlog.Date(),
 		CreatedAt: createTime,
 		UpdatedAt: createTime,
 	}
-	r.wlogs[wlog.LogID] = rWlog
+	r.wlogs[wlog.LogID()] = rWlog
 
 	return tckr.WorkoutLogRes{
 		LogID:     rWlog.LogID,
@@ -47,16 +47,16 @@ func (r *repo) StoreWorkoutLog(wlog wl.WorkoutLog, ath athlete.Athlete) (tckr.Wo
 func (r *repo) AddExerciseToWorkoutLog(wlog wl.WorkoutLog, exercise wl.Exercise) (tckr.ExerciseRes, error) {
 	createTime := time.Now()
 	rExercise := inRepoExercise{
-		ExerciseID: exercise.ExerciseID,
-		LogID:      wlog.LogID,
-		Name:       exercise.Name,
-		Weight:     exercise.Weight,
-		TargetRep:  exercise.TargetRep,
-		RestTime:   exercise.RestTime,
+		ExerciseID: exercise.ExerciseID(),
+		LogID:      wlog.LogID(),
+		Name:       exercise.Name(),
+		Weight:     exercise.Weight(),
+		TargetRep:  exercise.TargetRep(),
+		RestTime:   exercise.RestTime(),
 		CreatedAt:  createTime,
 		UpdatedAt:  createTime,
 	}
-	r.exercises[exercise.ExerciseID] = rExercise
+	r.exercises[exercise.ExerciseID()] = rExercise
 
 	return tckr.ExerciseRes{
 		ExerciseID: rExercise.ExerciseID,
@@ -72,13 +72,13 @@ func (r *repo) AddExerciseToWorkoutLog(wlog wl.WorkoutLog, exercise wl.Exercise)
 func (r *repo) AddSetToExercise(exercise wl.Exercise, set wl.Set) (tckr.SetRes, error) {
 	createTime := time.Now()
 	rSet := inRepoSet{
-		SetID:          set.SetID,
-		ExerciseID:     exercise.ExerciseID,
-		ActualRepCount: set.ActualRepCount,
+		SetID:          set.SetID(),
+		ExerciseID:     exercise.ExerciseID(),
+		ActualRepCount: set.ActualRepCount(),
 		CreatedAt:      createTime,
 		UpdatedAt:      createTime,
 	}
-	r.sets[set.SetID] = rSet
+	r.sets[set.SetID()] = rSet
 
 	return tckr.SetRes{
 		SetID:          rSet.SetID,
@@ -196,7 +196,7 @@ func (r *repo) FindAllWorkoutLogsForAthlete(ath athlete.Athlete) ([]tckr.Workout
 	var wlogs []tckr.WorkoutLogRes
 
 	for _, val := range r.wlogs {
-		if val.AthleteID == ath.AthleteID {
+		if val.AthleteID == ath.AthleteID() {
 			found := tckr.WorkoutLogRes{
 				LogID:     val.LogID,
 				Title:     val.Title,
@@ -214,7 +214,7 @@ func (r *repo) FindAllExercisesForWorkoutLog(wlog wl.WorkoutLog) ([]tckr.Exercis
 	var exercises []tckr.ExerciseRes
 
 	for _, val := range r.exercises {
-		if val.LogID == wlog.LogID {
+		if val.LogID == wlog.LogID() {
 			found := tckr.ExerciseRes{
 				ExerciseID: val.ExerciseID,
 				Name:       val.Name,
@@ -233,7 +233,7 @@ func (r *repo) FindAllExercisesForWorkoutLog(wlog wl.WorkoutLog) ([]tckr.Exercis
 func (r *repo) FindAllSetsForExercise(exercise wl.Exercise) ([]tckr.SetRes, error) {
 	var sets []tckr.SetRes
 	for _, val := range r.sets {
-		if val.ExerciseID == exercise.ExerciseID {
+		if val.ExerciseID == exercise.ExerciseID() {
 			found := tckr.SetRes{
 				SetID:          val.SetID,
 				ActualRepCount: val.ActualRepCount,

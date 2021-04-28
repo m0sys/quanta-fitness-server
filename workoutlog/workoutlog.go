@@ -12,10 +12,10 @@ import (
 
 // WorkoutLog entity for representing what a workout log is.
 type WorkoutLog struct {
-	LogID     string
-	Title     string
-	Date      time.Time
-	Exercises []Exercise
+	uuid      string
+	title     string
+	date      time.Time
+	exercises []Exercise
 }
 
 // NewWorkoutLog create a new WorkoutLog.
@@ -26,21 +26,47 @@ func NewWorkoutLog(title string) (WorkoutLog, error) {
 	}
 
 	return WorkoutLog{
-		LogID: uuid.GenerateUUID(),
-		Title: title,
-		Date:  time.Now(),
+		uuid:  uuid.GenerateUUID(),
+		title: title,
+		date:  time.Now(),
 	}, nil
+}
+
+func (l *WorkoutLog) LogID() string {
+	return l.uuid
+}
+
+func (l *WorkoutLog) Title() string {
+	return l.title
+}
+
+func (l *WorkoutLog) Date() time.Time {
+	return l.date
+}
+
+func (l *WorkoutLog) NumExercises() int {
+	return len(l.exercises)
+}
+
+func (l *WorkoutLog) InsertExercise(e Exercise, i int) {
+	l.exercises[i] = e
+}
+
+func (l *WorkoutLog) Exercises() []Exercise {
+	tmp := make([]Exercise, len(l.exercises))
+	copy(tmp, l.exercises)
+	return tmp
 }
 
 // AddExercise add Exercise to WorkoutLog.
 func (l *WorkoutLog) AddExercise(exercise Exercise) error {
-	for _, e := range l.Exercises {
-		if e.ExerciseID == exercise.ExerciseID {
+	for _, e := range l.exercises {
+		if e.ExerciseID() == exercise.ExerciseID() {
 			return errors.New("Exercise already logged")
 		}
 	}
 
-	l.Exercises = append(l.Exercises, exercise)
+	l.exercises = append(l.exercises, exercise)
 	return nil
 }
 
@@ -48,9 +74,9 @@ func (l *WorkoutLog) AddExercise(exercise Exercise) error {
 func (l *WorkoutLog) RemoveExercise(exercise Exercise) error {
 	deleted := false
 
-	for i, e := range l.Exercises {
-		if e.ExerciseID == exercise.ExerciseID {
-			l.Exercises = removeExercise(l.Exercises, i)
+	for i, e := range l.exercises {
+		if e.ExerciseID() == exercise.ExerciseID() {
+			l.exercises = removeExercise(l.exercises, i)
 			deleted = true
 		}
 	}
@@ -68,15 +94,15 @@ func (l *WorkoutLog) EditWorkoutLog(title string, date time.Time) error {
 		return err
 	}
 
-	l.Title = title
-	l.Date = date
+	l.title = title
+	l.date = date
 	return nil
 }
 
 // OrderExercises order Exercises in WorkoutLog by their order.
 func (l *WorkoutLog) OrderExercises() {
-	sort.Slice(l.Exercises, func(i, j int) bool {
-		return l.Exercises[i].order < l.Exercises[j].order
+	sort.Slice(l.exercises, func(i, j int) bool {
+		return l.exercises[i].order < l.exercises[j].order
 	})
 }
 

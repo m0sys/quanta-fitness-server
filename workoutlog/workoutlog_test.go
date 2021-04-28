@@ -20,7 +20,7 @@ func TestNewWorkoutLog(t *testing.T) {
 		wlog, err := NewWorkoutLog(gen)
 		require.NoError(t, err)
 		require.NotEmpty(t, wlog)
-		require.Equal(t, gen, wlog.Title)
+		require.Equal(t, gen, wlog.Title())
 	})
 }
 
@@ -37,7 +37,7 @@ func TestAddExercise(t *testing.T) {
 
 		err = wlog.AddExercise(exercise)
 		require.NoError(t, err)
-		require.Equal(t, 1, len(wlog.Exercises))
+		require.Equal(t, 1, len(wlog.exercises))
 
 	})
 
@@ -53,11 +53,11 @@ func TestAddExercise(t *testing.T) {
 
 		err = wlog.AddExercise(exercise)
 		require.NoError(t, err)
-		require.Equal(t, 1, len(wlog.Exercises))
+		require.Equal(t, 1, len(wlog.exercises))
 
 		err = wlog.AddExercise(exercise)
 		require.Error(t, err)
-		require.Equal(t, 1, len(wlog.Exercises))
+		require.Equal(t, 1, len(wlog.exercises))
 
 	})
 }
@@ -74,7 +74,7 @@ func TestRemoveExercise(t *testing.T) {
 
 		err = wlog.RemoveExercise(exercise)
 		require.Error(t, err)
-		require.Equal(t, 0, len(wlog.Exercises))
+		require.Equal(t, 0, len(wlog.exercises))
 
 	})
 
@@ -89,11 +89,11 @@ func TestRemoveExercise(t *testing.T) {
 
 		err = wlog.AddExercise(exercise)
 		require.NoError(t, err)
-		require.Equal(t, 1, len(wlog.Exercises))
+		require.Equal(t, 1, len(wlog.exercises))
 
 		err = wlog.RemoveExercise(exercise)
 		require.NoError(t, err)
-		require.Equal(t, 0, len(wlog.Exercises))
+		require.Equal(t, 0, len(wlog.exercises))
 	})
 }
 
@@ -102,7 +102,7 @@ func TestEditWorkoutLog(t *testing.T) {
 	wlog, err := NewWorkoutLog(gen)
 	require.NoError(t, err)
 	require.NotEmpty(t, wlog)
-	require.Equal(t, gen, wlog.Title)
+	require.Equal(t, gen, wlog.Title())
 	t.Run("When title is more than 75 chars", func(t *testing.T) {
 		err = wlog.EditWorkoutLog(random.String(76), time.Now())
 		require.Error(t, err)
@@ -113,7 +113,7 @@ func TestEditWorkoutLog(t *testing.T) {
 		err = wlog.EditWorkoutLog(gen2, time.Now())
 		require.NoError(t, err)
 
-		require.NotEqual(t, gen, wlog.Title)
-		require.Equal(t, gen2, wlog.Title)
+		require.NotEqual(t, gen, wlog.Title())
+		require.Equal(t, gen2, wlog.Title())
 	})
 }

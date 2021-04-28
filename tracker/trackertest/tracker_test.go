@@ -17,7 +17,7 @@ func TestCreateWorkoutLog(t *testing.T) {
 	require.NoError(t, err)
 	require.NotEmpty(t, res)
 	require.Equal(t, gen, res.Title)
-	require.Equal(t, res.LogID, testAthlete.WorkoutLogs[0].LogID)
+	require.Equal(t, res.LogID, testAthlete.WorkoutLogs()[0].LogID())
 }
 
 func TestAddExerciseToWorkoutLog(t *testing.T) {

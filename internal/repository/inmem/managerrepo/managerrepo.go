@@ -38,8 +38,8 @@ func (r *repo) FindAllWeightRecords(aid string) ([]manager.WeightRecordRes, erro
 func (r *repo) StoreWeightRecord(aid string, record athlete.WeightRecord) error {
 	r.records[r.lastRecord] = inRepoRecord{
 		AthleteID: aid,
-		Weight:    record.Amount,
-		Date:      record.Date,
+		Weight:    record.Amount(),
+		Date:      record.Date(),
 	}
 	r.lastRecord++
 	return nil
