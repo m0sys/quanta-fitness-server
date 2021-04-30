@@ -24,5 +24,5 @@ func (m Meter) MeterToFoot() Foot {
 }
 
 func (f Foot) FootToMeter() Meter {
-	return Foot(f * FootToMeterConvFact)
+	return Meter(f * FootToMeterConvFact)
 }

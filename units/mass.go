@@ -12,6 +12,6 @@ func (kg Kilogram) KGToLB() Pound {
 	return Pound(kg * KGToLBConvFact)
 }
 
-func (lb LB) LBToKG() Kilogram {
+func (lb Pound) LBToKG() Kilogram {
 	return Kilogram(lb * LBToKGConvFact)
 }

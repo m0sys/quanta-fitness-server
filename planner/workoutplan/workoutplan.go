@@ -1,4 +1,4 @@
-package workout
+package workoutplan
 
 import (
 	"errors"
@@ -12,7 +12,7 @@ type WorkoutPlan struct {
 }
 
 // NewWorkoutPlan create a new Workout.
-func NewWorkoutPlan(title string) (Workout, error) {
+func NewWorkoutPlan(title string) (WorkoutPlan, error) {
 	err := validateTitle(title)
 	if err != nil {
 		return WorkoutPlan{}, err
@@ -25,8 +25,22 @@ func NewWorkoutPlan(title string) (Workout, error) {
 	}, nil
 }
 
-// EditWorkoutPlanTitle edit title of Workout.
-func (w *WorkoutPlan) EditWorkoutPlanTitle(title string) error {
+// FIXME: find alternative solution.
+func RestoreWorkoutPlan(id, title string) (WorkoutPlan, error) {
+	err := validateTitle(title)
+	if err != nil {
+		return WorkoutPlan{}, err
+
+	}
+
+	return WorkoutPlan{
+		uuid:  id,
+		title: title,
+	}, nil
+}
+
+// EditTitle edit title of WorkoutPlan.
+func (w *WorkoutPlan) EditTitle(title string) error {
 	err := validateTitle(title)
 	if err != nil {
 		return err
