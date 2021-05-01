@@ -1,6 +1,7 @@
 package adapters
 
 import (
+	"errors"
 	"time"
 
 	"github.com/mhd53/quanta-fitness-server/athlete"
@@ -110,8 +111,24 @@ func (r *repo) FindExerciseByNameAndWorkoutPlanID(wplan wp.WorkoutPlan, e exerci
 	return false, nil
 }
 
-func (r *repo) RemoveExercise(exercise e.Exercise) error {
-	delete(r.exercises, exercise.ID())
+func (r *repo) RemoveExercise(e exercise.Exercise) error {
+	delete(r.exercises, e.ID())
+	return nil
+}
+
+func (r *repo) UpdateWorkoutPlan(wplan wp.WorkoutPlan, title string) error {
+	prev, ok := r.wplans[wplan.ID()]
+	if !ok {
+		return errors.New("WorkoutPlan not found!")
+	}
+
+	r.wplans[wplan.ID()] = inRepoWorkoutPlan{
+		ID:        prev.ID,
+		AthleteID: prev.AthleteID,
+		Title:     title,
+		CreatedAt: prev.CreatedAt,
+		UpdatedAt: time.Now(),
+	}
 	return nil
 }
 

@@ -47,7 +47,7 @@ func (p PlanningService) AddNewExerciseToWorkoutPlan(
 	name string,
 	metrics e.Metrics,
 ) (e.Exercise, error) {
-	if wplan.AthleteID() != ath.AthleteID() {
+	if !isAuthorizedWP(ath, wplan) {
 		return e.Exercise{}, ErrUnauthorizedAccess
 	}
 
@@ -85,12 +85,16 @@ func (p PlanningService) AddNewExerciseToWorkoutPlan(
 	return exercise, nil
 }
 
+func isAuthorizedWP(ath athlete.Athlete, wplan wp.WorkoutPlan) bool {
+	return wplan.AthleteID() == ath.AthleteID()
+}
+
 func (p PlanningService) RemoveExerciseFromWorkoutPlan(
 	ath athlete.Athlete,
 	wplan wp.WorkoutPlan,
 	exercise e.Exercise,
 ) error {
-	if wplan.AthleteID() != ath.AthleteID() || exercise.AthleteID != ath.AthleteID() || exercise.WorkoutPlanID() != wplan.ID() {
+	if !isAuthorizedWP(ath, wplan) || !isAuthorizedE(ath, wplan, exercise) {
 		return ErrUnauthorizedAccess
 	}
 
@@ -114,10 +118,38 @@ func (p PlanningService) RemoveExerciseFromWorkoutPlan(
 		return ErrExerciseNotFound
 	}
 
-	err := p.repo.RemoveExercise(exercise)
+	err = p.repo.RemoveExercise(exercise)
 	if err != nil {
 		log.Printf("%s: %s", errSlur, err.Error())
 		return errInternal
+	}
+
+	return nil
+}
+
+func isAuthorizedE(ath athlete.Athlete, wplan wp.WorkoutPlan, exercise e.Exercise) bool {
+	return ath.AthleteID() == exercise.AthleteID() && wplan.ID() == exercise.WorkoutPlanID()
+}
+
+func (p PlanningService) EditWorkoutPlanTitle(ath athlete.Athlete, wplan wp.WorkoutPlan, title string) error {
+
+	if !isAuthorizedWP(ath, wplan) {
+		return ErrUnauthorizedAccess
+	}
+
+	found, err := p.repo.FindWorkoutPlanByID(wplan)
+	if err != nil {
+		log.Printf("%s: %s", errSlur, err.Error())
+		return errInternal
+	}
+
+	if !found {
+		return ErrWorkoutPlanNotFound
+	}
+
+	err = p.repo.UpdateWorkoutPlan(wplan, title)
+	if err != nil {
+		return err
 	}
 
 	return nil
