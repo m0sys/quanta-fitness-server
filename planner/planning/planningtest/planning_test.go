@@ -45,7 +45,7 @@ func TestAddNewExerciseToWorkoutPlan(t *testing.T) {
 	t.Run("When WorkoutPlan not found", func(t *testing.T) {
 		title := random.String(75)
 		name := random.String(75)
-		wplan, err := wp.NewWorkoutPlan("1", title)
+		wplan, err := wp.NewWorkoutPlan(ath.AthleteID(), title)
 		require.NoError(t, err)
 
 		metrics, err := e.NewMetrics(
@@ -334,6 +334,50 @@ func TestRemoveExerciseFromWorkoutPlan(t *testing.T) {
 		require.NoError(t, err)
 
 		// TODO: Check that exercise is no longer stored in WorkoutPlan
+	})
+}
+
+func TestEditWorkoutPlanTitle(t *testing.T) {
+	service, ath := setup()
+	t.Run("When unauthorized", func(t *testing.T) {
+		title := random.String(75)
+
+		wplan, err := wp.NewWorkoutPlan(ath.AthleteID(), title)
+		require.NoError(t, err)
+
+		ath2 := athlete.NewAthlete()
+		title2 := random.String(75)
+
+		err = service.EditWorkoutPlanTitle(ath2, wplan, title2)
+		require.Error(t, err)
+		require.Equal(t, p.ErrUnauthorizedAccess.Error(), err.Error())
+	})
+
+	t.Run("When WorkoutPlan not found", func(t *testing.T) {
+		title := random.String(75)
+
+		wplan, err := wp.NewWorkoutPlan(ath.AthleteID(), title)
+		require.NoError(t, err)
+
+		title2 := random.String(75)
+
+		err = service.EditWorkoutPlanTitle(ath, wplan, title2)
+		require.Error(t, err)
+		require.Equal(t, p.ErrWorkoutPlanNotFound.Error(), err.Error())
+	})
+
+	t.Run("When success", func(t *testing.T) {
+		title := random.String(75)
+
+		wplan, err := service.CreateNewWorkoutPlan(ath, title)
+		require.NoError(t, err)
+
+		title2 := random.String(75)
+
+		err = service.EditWorkoutPlanTitle(ath, wplan, title2)
+		require.NoError(t, err)
+
+		// TODO: Check that succesfully updated field.
 	})
 }
 
