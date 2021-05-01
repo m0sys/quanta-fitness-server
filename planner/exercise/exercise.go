@@ -1,10 +1,10 @@
 package exercise
 
-/*
 import (
 	"errors"
 	"math"
 
+	"github.com/mhd53/quanta-fitness-server/pkg/uuid"
 	"github.com/mhd53/quanta-fitness-server/units"
 )
 
@@ -15,33 +15,137 @@ type Exercise struct {
 }
 
 type Metrics struct {
-	TargetRep    int
-	Weight       units.Kilogram
-	RestDuration units.Second
-	NumSets      int
+	targetRep int
+	numSets   int
+	weight    units.Kilogram
+	restDur   units.Second
 }
 
-func NewExercise(name string, metrics Metrics) Exercise {
-	err := validateExerciseFields(
-		name,
-		metrics.Weight,
-		metrics.RestDuration,
-		metrics.TargetRep,
-		metrics.NumSets,
-	)
-
-	if err != nil {
+func NewExercise(name string, metrics Metrics) (Exercise, error) {
+	if err := validateName(name); err != nil {
 		return Exercise{}, err
 	}
+
+	return Exercise{
+		uuid:    uuid.GenerateUUID(),
+		name:    name,
+		metrics: metrics,
+	}, nil
 }
 
-// Helper funcs.
-
-func validateExerciseFields(name string, weight, restDur float64, targetRep int, numSets int) error {
+func (e *Exercise) EditName(name string) error {
 	if err := validateName(name); err != nil {
 		return err
 	}
 
+	e.name = name
+	return nil
+}
+
+func (e *Exercise) EditTargetRep(targetRep int) error {
+	newMetrics, err := NewMetrics(
+		targetRep,
+		e.metrics.NumSets(),
+		float64(e.metrics.Weight()),
+		float64(e.metrics.RestDur()),
+	)
+	if err != nil {
+		return err
+	}
+
+	e.metrics = newMetrics
+	return nil
+}
+
+func (e *Exercise) EditNumSets(numSets int) error {
+	newMetrics, err := NewMetrics(
+		e.metrics.TargetRep(),
+		numSets,
+		float64(e.metrics.Weight()),
+		float64(e.metrics.RestDur()),
+	)
+	if err != nil {
+		return err
+	}
+
+	e.metrics = newMetrics
+	return nil
+}
+
+func (e *Exercise) EditWeight(weight float64) error {
+	newMetrics, err := NewMetrics(
+		e.metrics.TargetRep(),
+		e.metrics.NumSets(),
+		weight,
+		float64(e.metrics.RestDur()),
+	)
+	if err != nil {
+		return err
+	}
+
+	e.metrics = newMetrics
+	return nil
+}
+
+func (e *Exercise) EditRestDur(restDur float64) error {
+	newMetrics, err := NewMetrics(
+		e.metrics.TargetRep(),
+		e.metrics.NumSets(),
+		float64(e.metrics.Weight()),
+		restDur,
+	)
+	if err != nil {
+		return err
+	}
+
+	e.metrics = newMetrics
+	return nil
+}
+
+func (e *Exercise) ID() string {
+	return e.uuid
+}
+
+func (e *Exercise) Name() string {
+	return e.name
+}
+
+func (e *Exercise) Metrics() Metrics {
+	return e.metrics
+}
+
+func NewMetrics(targetRep, numSets int, weight, restDur float64) (Metrics, error) {
+	if err := validateMetrics(targetRep, numSets, weight, restDur); err != nil {
+		return Metrics{}, err
+	}
+
+	return Metrics{
+		targetRep: targetRep,
+		numSets:   numSets,
+		weight:    units.Kilogram(roundToTwoDecimalPlaces(weight)),
+		restDur:   units.Second(roundToTwoDecimalPlaces(restDur)),
+	}, nil
+}
+
+func (m *Metrics) TargetRep() int {
+	return m.targetRep
+}
+
+func (m *Metrics) NumSets() int {
+	return m.numSets
+}
+
+func (m *Metrics) Weight() units.Kilogram {
+	return m.weight
+}
+
+func (m *Metrics) RestDur() units.Second {
+	return m.restDur
+}
+
+// Helper funcs.
+
+func validateMetrics(targetRep, numSets int, weight, restDur float64) error {
 	if err := validateWeight(weight); err != nil {
 		return err
 	}
@@ -61,38 +165,46 @@ func validateExerciseFields(name string, weight, restDur float64, targetRep int,
 	return nil
 }
 
+var (
+	ErrInvalidName      = errors.New("name must be less than 76 characters")
+	ErrInvalidTargetRep = errors.New("target rep must be a positive number")
+	ErrInvalidNumSets   = errors.New("num sets must be a positive number")
+	ErrInvalidWeight    = errors.New("weight must be a positive number")
+	ErrInvalidRestDur   = errors.New("rest duration must be a positive number")
+)
+
 func validateName(name string) error {
 	if len(name) > 75 {
-		return errors.New("name must be less than 76 characters")
+		return ErrInvalidName
 	}
 
-	return nil
-}
-
-func validateWeight(weight float64) error {
-	if weight < 0 {
-		return errors.New("weight must be a positive number")
-	}
-	return nil
-}
-
-func validateRestDur(restDur float64) error {
-	if restTime < 0 {
-		return errors.New("rest duration must be a positive number")
-	}
 	return nil
 }
 
 func validateTargetRep(targetRep int) error {
 	if targetRep < 0 {
-		return errors.New("target rep must be a positive number")
+		return ErrInvalidTargetRep
 	}
 	return nil
 }
 
 func validateNumSets(numSets int) error {
 	if numSets < 0 {
-		return errors.New("num sets must be a positive number")
+		return ErrInvalidNumSets
+	}
+	return nil
+}
+
+func validateWeight(weight float64) error {
+	if weight < 0 {
+		return ErrInvalidWeight
+	}
+	return nil
+}
+
+func validateRestDur(restDur float64) error {
+	if restDur < 0 {
+		return ErrInvalidRestDur
 	}
 	return nil
 }
@@ -100,4 +212,3 @@ func validateNumSets(numSets int) error {
 func roundToTwoDecimalPlaces(num float64) float64 {
 	return math.Round(num*100) / 100
 }
-*/

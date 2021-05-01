@@ -52,6 +52,11 @@ func RepCount() int {
 	return Int(5, 15)
 }
 
+// NumSets generate a random number of sets.
+func NumSets() int {
+	return Int(1, 25)
+}
+
 // Height generate a random height in m.
 func Height() float64 {
 	return Float(1.0, 2.0)
