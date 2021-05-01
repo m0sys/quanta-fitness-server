@@ -6,7 +6,7 @@ import (
 	"github.com/mhd53/quanta-fitness-server/athlete"
 	"github.com/mhd53/quanta-fitness-server/internal/random"
 	"github.com/mhd53/quanta-fitness-server/planner/adapters"
-	"github.com/mhd53/quanta-fitness-server/planner/exercise"
+	e "github.com/mhd53/quanta-fitness-server/planner/exercise"
 	p "github.com/mhd53/quanta-fitness-server/planner/planning"
 	wp "github.com/mhd53/quanta-fitness-server/planner/workoutplan"
 	"github.com/stretchr/testify/require"
@@ -62,7 +62,7 @@ func TestAddNewExerciseToWorkoutPlan(t *testing.T) {
 		wplan, err := wp.NewWorkoutPlan(title)
 		require.NoError(t, err)
 
-		metrics, err := exercise.NewMetrics(
+		metrics, err := e.NewMetrics(
 			random.RepCount(),
 			random.NumSets(),
 			random.Weight(),
@@ -70,7 +70,7 @@ func TestAddNewExerciseToWorkoutPlan(t *testing.T) {
 		)
 		require.NoError(t, err)
 
-		exercise, err := exercise.NewExercise(random.String(75), metrics)
+		exercise, err := e.NewExercise(random.String(75), metrics)
 		require.NoError(t, err)
 
 		err = service.AddNewExerciseToWorkoutPlan(
@@ -93,7 +93,7 @@ func TestAddNewExerciseToWorkoutPlan(t *testing.T) {
 
 		ath2 := athlete.NewAthlete()
 
-		metrics, err := exercise.NewMetrics(
+		metrics, err := e.NewMetrics(
 			random.RepCount(),
 			random.NumSets(),
 			random.Weight(),
@@ -101,7 +101,7 @@ func TestAddNewExerciseToWorkoutPlan(t *testing.T) {
 		)
 		require.NoError(t, err)
 
-		exercise, err := exercise.NewExercise(random.String(75), metrics)
+		exercise, err := e.NewExercise(random.String(75), metrics)
 		require.NoError(t, err)
 
 		err = service.AddNewExerciseToWorkoutPlan(
@@ -114,6 +114,83 @@ func TestAddNewExerciseToWorkoutPlan(t *testing.T) {
 		require.Equal(t, p.ErrUnauthorizedAccess.Error(), err.Error())
 	})
 
+	t.Run("When Exercise already in WorkoutPlan", func(t *testing.T) {
+		title := random.String(75)
+		wplan, err := wp.NewWorkoutPlan(title)
+		require.NoError(t, err)
+
+		err = service.CreateNewWorkoutPlan(ath, wplan)
+		require.NoError(t, err)
+
+		metrics, err := e.NewMetrics(
+			random.RepCount(),
+			random.NumSets(),
+			random.Weight(),
+			random.RestTime(),
+		)
+		require.NoError(t, err)
+
+		exercise, err := e.NewExercise(random.String(75), metrics)
+		require.NoError(t, err)
+
+		err = service.AddNewExerciseToWorkoutPlan(
+			ath,
+			wplan,
+			exercise,
+		)
+
+		require.NoError(t, err)
+
+		err = service.AddNewExerciseToWorkoutPlan(
+			ath,
+			wplan,
+			exercise,
+		)
+
+		require.Error(t, err)
+		require.Equal(t, p.ErrExerciseAlreadyInWorkoutPlan.Error(), err.Error())
+	})
+
+	t.Run("When Exercise with same name already in WorkoutPlan", func(t *testing.T) {
+		title := random.String(75)
+		wplan, err := wp.NewWorkoutPlan(title)
+		require.NoError(t, err)
+
+		err = service.CreateNewWorkoutPlan(ath, wplan)
+		require.NoError(t, err)
+
+		metrics, err := e.NewMetrics(
+			random.RepCount(),
+			random.NumSets(),
+			random.Weight(),
+			random.RestTime(),
+		)
+		require.NoError(t, err)
+
+		name := random.String(75)
+		exercise, err := e.NewExercise(name, metrics)
+		require.NoError(t, err)
+
+		err = service.AddNewExerciseToWorkoutPlan(
+			ath,
+			wplan,
+			exercise,
+		)
+		require.NoError(t, err)
+
+		exercise, err = e.NewExercise(name, metrics)
+		require.NoError(t, err)
+
+		err = service.AddNewExerciseToWorkoutPlan(
+			ath,
+			wplan,
+			exercise,
+		)
+		require.Error(t, err)
+		require.Equal(t, p.ErrIdentialName.Error(), err.Error())
+
+	})
+
 	t.Run("When success", func(t *testing.T) {
 		title := random.String(75)
 		wplan, err := wp.NewWorkoutPlan(title)
@@ -122,7 +199,7 @@ func TestAddNewExerciseToWorkoutPlan(t *testing.T) {
 		err = service.CreateNewWorkoutPlan(ath, wplan)
 		require.NoError(t, err)
 
-		metrics, err := exercise.NewMetrics(
+		metrics, err := e.NewMetrics(
 			random.RepCount(),
 			random.NumSets(),
 			random.Weight(),
@@ -130,7 +207,7 @@ func TestAddNewExerciseToWorkoutPlan(t *testing.T) {
 		)
 		require.NoError(t, err)
 
-		exercise, err := exercise.NewExercise(random.String(75), metrics)
+		exercise, err := e.NewExercise(random.String(75), metrics)
 		require.NoError(t, err)
 
 		err = service.AddNewExerciseToWorkoutPlan(
