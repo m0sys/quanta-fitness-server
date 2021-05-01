@@ -2,7 +2,7 @@ package planning
 
 import (
 	"github.com/mhd53/quanta-fitness-server/athlete"
-	"github.com/mhd53/quanta-fitness-server/planner/exercise"
+	e "github.com/mhd53/quanta-fitness-server/planner/exercise"
 	wp "github.com/mhd53/quanta-fitness-server/planner/workoutplan"
 )
 
@@ -11,7 +11,8 @@ type Repository interface {
 	FindWorkoutPlanByTitleAndAthleteID(title string, ath athlete.Athlete) (wp.WorkoutPlan, bool, error)
 	FindWorkoutPlanByID(wplan wp.WorkoutPlan) (bool, error)
 	FindWorkoutPlanByIDAndAthleteID(wplan wp.WorkoutPlan, ath athlete.Athlete) (bool, error)
-	StoreExercise(wplan wp.WorkoutPlan, e exercise.Exercise, ath athlete.Athlete) error
-	FindExerciseByID(e exercise.Exercise) (bool, error)
-	FindExerciseByNameAndWorkoutPlanID(wplan wp.WorkoutPlan, e exercise.Exercise) (bool, error)
+	StoreExercise(wplan wp.WorkoutPlan, exercise e.Exercise, ath athlete.Athlete) error
+	FindExerciseByID(exercise e.Exercise) (bool, error)
+	FindExerciseByNameAndWorkoutPlanID(wplan wp.WorkoutPlan, exercise e.Exercise) (bool, error)
+	RemoveExercise(exercise e.Exercise) error
 }

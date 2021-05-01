@@ -118,6 +118,14 @@ func (e *Exercise) Metrics() Metrics {
 	return e.metrics
 }
 
+func (e *Exercise) AthleteID() string {
+	return e.aid
+}
+
+func (e *Exercise) WorkoutPlanID() string {
+	return e.wpid
+}
+
 func NewMetrics(targetRep, numSets int, weight, restDur float64) (Metrics, error) {
 	if err := validateMetrics(targetRep, numSets, weight, restDur); err != nil {
 		return Metrics{}, err

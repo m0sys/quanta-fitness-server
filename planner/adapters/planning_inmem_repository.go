@@ -110,6 +110,11 @@ func (r *repo) FindExerciseByNameAndWorkoutPlanID(wplan wp.WorkoutPlan, e exerci
 	return false, nil
 }
 
+func (r *repo) RemoveExercise(exercise e.Exercise) error {
+	delete(r.exercises, exercise.ID())
+	return nil
+}
+
 type inRepoWorkoutPlan struct {
 	ID        string
 	AthleteID string

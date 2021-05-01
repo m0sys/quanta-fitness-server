@@ -47,6 +47,10 @@ func (p PlanningService) AddNewExerciseToWorkoutPlan(
 	name string,
 	metrics e.Metrics,
 ) (e.Exercise, error) {
+	if wplan.AthleteID() != ath.AthleteID() {
+		return e.Exercise{}, ErrUnauthorizedAccess
+	}
+
 	found, err := p.repo.FindWorkoutPlanByID(wplan)
 	if err != nil {
 		log.Printf("%s: %s", errSlur, err.Error())
@@ -55,10 +59,6 @@ func (p PlanningService) AddNewExerciseToWorkoutPlan(
 
 	if !found {
 		return e.Exercise{}, ErrWorkoutPlanNotFound
-	}
-
-	if wplan.AthleteID() != ath.AthleteID() {
-		return e.Exercise{}, ErrUnauthorizedAccess
 	}
 
 	exercise, err := e.NewExercise(wplan.ID(), ath.AthleteID(), name, metrics)
@@ -83,4 +83,42 @@ func (p PlanningService) AddNewExerciseToWorkoutPlan(
 	}
 
 	return exercise, nil
+}
+
+func (p PlanningService) RemoveExerciseFromWorkoutPlan(
+	ath athlete.Athlete,
+	wplan wp.WorkoutPlan,
+	exercise e.Exercise,
+) error {
+	if wplan.AthleteID() != ath.AthleteID() || exercise.AthleteID != ath.AthleteID() || exercise.WorkoutPlanID() != wplan.ID() {
+		return ErrUnauthorizedAccess
+	}
+
+	found, err := p.repo.FindWorkoutPlanByID(wplan)
+	if err != nil {
+		log.Printf("%s: %s", errSlur, err.Error())
+		return errInternal
+	}
+
+	if !found {
+		return ErrWorkoutPlanNotFound
+	}
+
+	found, err = p.repo.FindExerciseByID(exercise)
+	if err != nil {
+		log.Printf("%s: %s", errSlur, err.Error())
+		return errInternal
+	}
+
+	if !found {
+		return ErrExerciseNotFound
+	}
+
+	err := p.repo.RemoveExercise(exercise)
+	if err != nil {
+		log.Printf("%s: %s", errSlur, err.Error())
+		return errInternal
+	}
+
+	return nil
 }
