@@ -41,7 +41,6 @@ func TestCreateNewWorkoutPlan(t *testing.T) {
 }
 
 func TestAddNewExerciseToWorkoutPlan(t *testing.T) {
-	t.Skip()
 	service, ath := setup()
 	t.Run("When WorkoutPlan not found", func(t *testing.T) {
 		title := random.String(75)
@@ -171,12 +170,14 @@ func TestAddNewExerciseToWorkoutPlan(t *testing.T) {
 
 }
 
-/*
 func TestRemoveExerciseFromWorkoutPlan(t *testing.T) {
 	service, ath := setup()
-	t.Run("When WorkoutPlan not found", func(t *testing.T) {
+
+	t.Run("When unauthorized to access WorkoutPlan", func(t *testing.T) {
 		title := random.String(75)
-		wplan, err := wp.NewWorkoutPlan(title)
+		name := random.String(75)
+
+		wplan, err := wp.NewWorkoutPlan(ath.AthleteID(), title)
 		require.NoError(t, err)
 
 		metrics, err := e.NewMetrics(
@@ -187,20 +188,154 @@ func TestRemoveExerciseFromWorkoutPlan(t *testing.T) {
 		)
 		require.NoError(t, err)
 
-		exercise, err := e.NewExercise(random.String(75), metrics)
 		require.NoError(t, err)
 
-		err = service.AddNewExerciseToWorkoutPlan(
+		exercise, err := e.NewExercise(wplan.ID(), ath.AthleteID(), name, metrics)
+		require.NoError(t, err)
+		require.NotEmpty(t, exercise)
+		require.Equal(t, name, exercise.Name())
+
+		ath2 := athlete.NewAthlete()
+		err = service.RemoveExerciseFromWorkoutPlan(
+			ath2,
+			wplan,
+			exercise,
+		)
+		require.Error(t, err)
+		require.Equal(t, p.ErrUnauthorizedAccess.Error(), err.Error())
+	})
+
+	t.Run("When unauthorized to access Exercise", func(t *testing.T) {
+		title := random.String(75)
+		name := random.String(75)
+
+		wplan, err := wp.NewWorkoutPlan(ath.AthleteID(), title)
+		require.NoError(t, err)
+
+		metrics, err := e.NewMetrics(
+			random.RepCount(),
+			random.NumSets(),
+			random.Weight(),
+			random.RestTime(),
+		)
+		require.NoError(t, err)
+
+		require.NoError(t, err)
+
+		ath2 := athlete.NewAthlete()
+		exercise, err := e.NewExercise(wplan.ID(), ath2.AthleteID(), name, metrics)
+		require.NoError(t, err)
+		require.NotEmpty(t, exercise)
+		require.Equal(t, name, exercise.Name())
+
+		err = service.RemoveExerciseFromWorkoutPlan(
 			ath,
 			wplan,
 			exercise,
 		)
+		require.Error(t, err)
+		require.Equal(t, p.ErrUnauthorizedAccess.Error(), err.Error())
+	})
 
+	t.Run("When WorkoutPlan not found", func(t *testing.T) {
+		title := random.String(75)
+		name := random.String(75)
+
+		wplan, err := wp.NewWorkoutPlan(ath.AthleteID(), title)
+		require.NoError(t, err)
+
+		metrics, err := e.NewMetrics(
+			random.RepCount(),
+			random.NumSets(),
+			random.Weight(),
+			random.RestTime(),
+		)
+		require.NoError(t, err)
+
+		require.NoError(t, err)
+
+		exercise, err := e.NewExercise(wplan.ID(), ath.AthleteID(), name, metrics)
+		require.NoError(t, err)
+		require.NotEmpty(t, exercise)
+		require.Equal(t, name, exercise.Name())
+
+		err = service.RemoveExerciseFromWorkoutPlan(
+			ath,
+			wplan,
+			exercise,
+		)
 		require.Error(t, err)
 		require.Equal(t, p.ErrWorkoutPlanNotFound.Error(), err.Error())
 	})
+	t.Run("When Exercise not found", func(t *testing.T) {
+		title := random.String(75)
+		name := random.String(75)
+
+		wplan, err := service.CreateNewWorkoutPlan(ath, title)
+		require.NoError(t, err)
+
+		metrics, err := e.NewMetrics(
+			random.RepCount(),
+			random.NumSets(),
+			random.Weight(),
+			random.RestTime(),
+		)
+		require.NoError(t, err)
+
+		require.NoError(t, err)
+
+		exercise, err := e.NewExercise(wplan.ID(), ath.AthleteID(), name, metrics)
+		require.NoError(t, err)
+		require.NotEmpty(t, exercise)
+		require.Equal(t, name, exercise.Name())
+
+		err = service.RemoveExerciseFromWorkoutPlan(
+			ath,
+			wplan,
+			exercise,
+		)
+		require.Error(t, err)
+		require.Equal(t, p.ErrExerciseNotFound.Error(), err.Error())
+	})
+
+	t.Run("When success", func(t *testing.T) {
+		title := random.String(75)
+		name := random.String(75)
+
+		wplan, err := service.CreateNewWorkoutPlan(ath, title)
+		require.NoError(t, err)
+
+		metrics, err := e.NewMetrics(
+			random.RepCount(),
+			random.NumSets(),
+			random.Weight(),
+			random.RestTime(),
+		)
+		require.NoError(t, err)
+
+		require.NoError(t, err)
+
+		exercise, err := service.AddNewExerciseToWorkoutPlan(
+			ath,
+			wplan,
+			name,
+			metrics,
+		)
+
+		require.NoError(t, err)
+		require.NotEmpty(t, exercise)
+		require.Equal(t, name, exercise.Name())
+
+		err = service.RemoveExerciseFromWorkoutPlan(
+			ath,
+			wplan,
+			exercise,
+		)
+		require.NoError(t, err)
+
+		// TODO: Check that exercise is no longer stored in WorkoutPlan
+	})
 }
-*/
 
 func setup() (p.PlanningService, athlete.Athlete) {
 	repo := adapters.NewInMemRepo()
