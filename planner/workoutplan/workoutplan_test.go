@@ -9,14 +9,14 @@ import (
 
 func TestNewWorkoutPlan(t *testing.T) {
 	t.Run("When title is more than 75 chars", func(t *testing.T) {
-		wplan, err := NewWorkoutPlan(random.String(76))
+		wplan, err := NewWorkoutPlan("1", random.String(76))
 		require.Error(t, err)
 		require.Empty(t, wplan)
 	})
 
 	t.Run("When title is 75 chars less", func(t *testing.T) {
 		gen := random.String(75)
-		wplan, err := NewWorkoutPlan(gen)
+		wplan, err := NewWorkoutPlan("1", gen)
 		require.NoError(t, err)
 		require.NotEmpty(t, wplan)
 		require.Equal(t, gen, wplan.Title())
@@ -25,7 +25,7 @@ func TestNewWorkoutPlan(t *testing.T) {
 
 func TestEditTitle(t *testing.T) {
 	gen := random.String(75)
-	wplan, err := NewWorkoutPlan(gen)
+	wplan, err := NewWorkoutPlan("1", gen)
 	require.NoError(t, err)
 	require.NotEmpty(t, wplan)
 	require.Equal(t, gen, wplan.Title())

@@ -89,7 +89,6 @@ func (t *tracker) AddExerciseToWorkoutLog(req AddExerciseToWorkoutLogReq) (Exerc
 	if err != nil {
 		log.Printf("error while adding Exercise to WorkoutLog in repo: %s", err.Error())
 		return ExerciseRes{}, errInternal
-
 	}
 
 	return exerciseRes, nil

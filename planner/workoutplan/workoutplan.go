@@ -8,11 +8,12 @@ import (
 
 type WorkoutPlan struct {
 	uuid  string
+	aid   string
 	title string
 }
 
 // NewWorkoutPlan create a new Workout.
-func NewWorkoutPlan(title string) (WorkoutPlan, error) {
+func NewWorkoutPlan(aid, title string) (WorkoutPlan, error) {
 	err := validateTitle(title)
 	if err != nil {
 		return WorkoutPlan{}, err
@@ -21,6 +22,7 @@ func NewWorkoutPlan(title string) (WorkoutPlan, error) {
 
 	return WorkoutPlan{
 		uuid:  uuid.GenerateUUID(),
+		aid:   aid,
 		title: title,
 	}, nil
 }
@@ -56,6 +58,10 @@ func (w *WorkoutPlan) ID() string {
 
 func (w *WorkoutPlan) Title() string {
 	return w.title
+}
+
+func (w *WorkoutPlan) AthleteID() string {
+	return w.aid
 }
 
 // Helper funcs.

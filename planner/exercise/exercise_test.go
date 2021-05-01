@@ -17,7 +17,7 @@ func TestNewExercise(t *testing.T) {
 			random.RestTime(),
 		)
 		require.NoError(t, err)
-		exercise, err := NewExercise(random.String(76), metrics)
+		exercise, err := NewExercise("1", "1", random.String(76), metrics)
 
 		require.Error(t, err)
 		require.Equal(t, ErrInvalidName.Error(), err.Error())
@@ -33,7 +33,7 @@ func TestNewExercise(t *testing.T) {
 		)
 		require.NoError(t, err)
 
-		exercise, err := NewExercise(random.String(75), metrics)
+		exercise, err := NewExercise("1", "1", random.String(75), metrics)
 		require.NoError(t, err)
 		require.NotEmpty(t, exercise)
 	})
@@ -114,7 +114,7 @@ func TestEditExercise(t *testing.T) {
 	)
 	require.NoError(t, err)
 
-	exercise, err := NewExercise(random.String(75), metrics)
+	exercise, err := NewExercise("1", "1", random.String(75), metrics)
 
 	t.Run("When long name", func(t *testing.T) {
 		err = exercise.EditName(random.String(76))

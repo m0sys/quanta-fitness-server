@@ -1,26 +1,11 @@
 package planning
 
 import (
-	"fmt"
 	"log"
 
 	"github.com/mhd53/quanta-fitness-server/athlete"
-	"github.com/mhd53/quanta-fitness-server/planner/exercise"
+	e "github.com/mhd53/quanta-fitness-server/planner/exercise"
 	wp "github.com/mhd53/quanta-fitness-server/planner/workoutplan"
-)
-
-const (
-	errSlur = "planning"
-)
-
-var (
-	errInternal                     = fmt.Errorf("%s: internal error", errSlur)
-	ErrIdentialTitle                = fmt.Errorf("%s: WorkoutPlan with identical title already exists", errSlur)
-	ErrWorkoutPlanAlreadyExists     = fmt.Errorf("%s: WorkoutPlan already exists", errSlur)
-	ErrUnauthorizedAccess           = fmt.Errorf("%s: unauthorized access", errSlur)
-	ErrWorkoutPlanNotFound          = fmt.Errorf("%s: WorkoutPlan not found", errSlur)
-	ErrIdentialName                 = fmt.Errorf("%s: Exercise with identical name already in WorkoutPlan", errSlur)
-	ErrExerciseAlreadyInWorkoutPlan = fmt.Errorf("%s: Exercise already in WorkoutPlan", errSlur)
 )
 
 type PlanningService struct {
@@ -31,81 +16,71 @@ func NewPlanningService(repository Repository) PlanningService {
 	return PlanningService{repo: repository}
 }
 
-func (p PlanningService) CreateNewWorkoutPlan(ath athlete.Athlete, wplan wp.WorkoutPlan) error {
-	found, err := p.repo.FindWorkoutPlanByID(wplan)
+func (p PlanningService) CreateNewWorkoutPlan(ath athlete.Athlete, title string) (wp.WorkoutPlan, error) {
+	wplan, err := wp.NewWorkoutPlan(ath.AthleteID(), title)
+	if err != nil {
+		return wp.WorkoutPlan{}, err
+	}
+
+	_, found, err := p.repo.FindWorkoutPlanByTitleAndAthleteID(wplan.Title(), ath)
 	if err != nil {
 		log.Printf("%s: %s", errSlur, err.Error())
-		return errInternal
+		return wp.WorkoutPlan{}, errInternal
 	}
 
 	if found {
-		return ErrWorkoutPlanAlreadyExists
-	}
-
-	_, found, err = p.repo.FindWorkoutPlanByTitleAndAthleteID(wplan.Title(), ath)
-	if err != nil {
-		log.Printf("%s: %s", errSlur, err.Error())
-		return errInternal
-	}
-
-	if found {
-		return ErrIdentialTitle
+		return wp.WorkoutPlan{}, ErrIdentialTitle
 	}
 
 	err = p.repo.StoreWorkoutPlan(wplan, ath)
 	if err != nil {
 		log.Printf("%s: %s", errSlur, err.Error())
-		return errInternal
+		return wp.WorkoutPlan{}, errInternal
 	}
 
-	return nil
+	return wplan, nil
 }
 
 func (p PlanningService) AddNewExerciseToWorkoutPlan(
 	ath athlete.Athlete,
 	wplan wp.WorkoutPlan,
-	exercise exercise.Exercise,
-) error {
+	name string,
+	metrics e.Metrics,
+) (e.Exercise, error) {
 	found, err := p.repo.FindWorkoutPlanByID(wplan)
 	if err != nil {
 		log.Printf("%s: %s", errSlur, err.Error())
-		return errInternal
+		return e.Exercise{}, errInternal
 	}
 
 	if !found {
-		return ErrWorkoutPlanNotFound
+		return e.Exercise{}, ErrWorkoutPlanNotFound
 	}
 
-	found, err = p.repo.FindWorkoutPlanByIDAndAthleteID(wplan, ath)
+	if wplan.AthleteID() != ath.AthleteID() {
+		return e.Exercise{}, ErrUnauthorizedAccess
+	}
+
+	exercise, err := e.NewExercise(wplan.ID(), ath.AthleteID(), name, metrics)
 	if err != nil {
-		log.Printf("%s: %s", errSlur, err.Error())
-		return errInternal
-	}
-
-	if !found {
-		return ErrUnauthorizedAccess
-	}
-
-	found, err = p.repo.FindExerciseByID(exercise)
-	if err != nil {
-		log.Printf("%s: %s", errSlur, err.Error())
-		return errInternal
-	}
-
-	if found {
-		return ErrExerciseAlreadyInWorkoutPlan
+		return e.Exercise{}, err
 	}
 
 	found, err = p.repo.FindExerciseByNameAndWorkoutPlanID(wplan, exercise)
 	if err != nil {
 		log.Printf("%s: %s", errSlur, err.Error())
-		return errInternal
+		return e.Exercise{}, errInternal
 	}
 
 	if found {
-		return ErrIdentialName
+		return e.Exercise{}, ErrIdentialName
 	}
 
 	err = p.repo.StoreExercise(wplan, exercise, ath)
-	return nil
+	if err != nil {
+		log.Printf("%s: %s", errSlur, err.Error())
+		return e.Exercise{}, errInternal
+	}
+
+	return exercise, nil
 }

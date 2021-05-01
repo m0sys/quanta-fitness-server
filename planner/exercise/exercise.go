@@ -10,6 +10,8 @@ import (
 
 type Exercise struct {
 	uuid    string
+	wpid    string
+	aid     string
 	name    string
 	metrics Metrics
 }
@@ -21,13 +23,15 @@ type Metrics struct {
 	restDur   units.Second
 }
 
-func NewExercise(name string, metrics Metrics) (Exercise, error) {
+func NewExercise(wpid, aid, name string, metrics Metrics) (Exercise, error) {
 	if err := validateName(name); err != nil {
 		return Exercise{}, err
 	}
 
 	return Exercise{
 		uuid:    uuid.GenerateUUID(),
+		wpid:    wpid,
+		aid:     aid,
 		name:    name,
 		metrics: metrics,
 	}, nil
