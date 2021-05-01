@@ -14,11 +14,13 @@ const (
 )
 
 var (
-	errInternal                 = fmt.Errorf("%s: internal error", errSlur)
-	ErrIdentialTitle            = fmt.Errorf("%s: WorkoutPlan with identical title already exists", errSlur)
-	ErrWorkoutPlanAlreadyExists = fmt.Errorf("%s: WorkoutPlan already exists", errSlur)
-	ErrUnauthorizedAccess       = fmt.Errorf("%s: unauthorized access", errSlur)
-	ErrWorkoutPlanNotFound      = fmt.Errorf("%s: WorkoutPlan not found", errSlur)
+	errInternal                     = fmt.Errorf("%s: internal error", errSlur)
+	ErrIdentialTitle                = fmt.Errorf("%s: WorkoutPlan with identical title already exists", errSlur)
+	ErrWorkoutPlanAlreadyExists     = fmt.Errorf("%s: WorkoutPlan already exists", errSlur)
+	ErrUnauthorizedAccess           = fmt.Errorf("%s: unauthorized access", errSlur)
+	ErrWorkoutPlanNotFound          = fmt.Errorf("%s: WorkoutPlan not found", errSlur)
+	ErrIdentialName                 = fmt.Errorf("%s: Exercise with identical name already in WorkoutPlan", errSlur)
+	ErrExerciseAlreadyInWorkoutPlan = fmt.Errorf("%s: Exercise already in WorkoutPlan", errSlur)
 )
 
 type PlanningService struct {
@@ -82,6 +84,26 @@ func (p PlanningService) AddNewExerciseToWorkoutPlan(
 
 	if !found {
 		return ErrUnauthorizedAccess
+	}
+
+	found, err = p.repo.FindExerciseByID(exercise)
+	if err != nil {
+		log.Printf("%s: %s", errSlur, err.Error())
+		return errInternal
+	}
+
+	if found {
+		return ErrExerciseAlreadyInWorkoutPlan
+	}
+
+	found, err = p.repo.FindExerciseByNameAndWorkoutPlanID(wplan, exercise)
+	if err != nil {
+		log.Printf("%s: %s", errSlur, err.Error())
+		return errInternal
+	}
+
+	if found {
+		return ErrIdentialName
 	}
 
 	err = p.repo.StoreExercise(wplan, exercise, ath)

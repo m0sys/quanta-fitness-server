@@ -86,6 +86,30 @@ func (r *repo) StoreExercise(wplan wp.WorkoutPlan, e exercise.Exercise, ath athl
 	return nil
 }
 
+func (r *repo) FindExerciseByID(e exercise.Exercise) (bool, error) {
+	eid := e.ID()
+
+	for _, val := range r.exercises {
+		if val.ID == eid {
+			return true, nil
+		}
+	}
+	return false, nil
+}
+
+func (r *repo) FindExerciseByNameAndWorkoutPlanID(wplan wp.WorkoutPlan, e exercise.Exercise) (bool, error) {
+	name := e.Name()
+	wpid := wplan.ID()
+
+	for _, val := range r.exercises {
+		if val.Name == name && val.WorkoutPlanID == wpid {
+			return true, nil
+		}
+	}
+
+	return false, nil
+}
+
 type inRepoWorkoutPlan struct {
 	ID        string
 	AthleteID string

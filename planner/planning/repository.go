@@ -12,4 +12,6 @@ type Repository interface {
 	FindWorkoutPlanByID(wplan wp.WorkoutPlan) (bool, error)
 	FindWorkoutPlanByIDAndAthleteID(wplan wp.WorkoutPlan, ath athlete.Athlete) (bool, error)
 	StoreExercise(wplan wp.WorkoutPlan, e exercise.Exercise, ath athlete.Athlete) error
+	FindExerciseByID(e exercise.Exercise) (bool, error)
+	FindExerciseByNameAndWorkoutPlanID(wplan wp.WorkoutPlan, e exercise.Exercise) (bool, error)
 }
