@@ -36,19 +36,17 @@ func (r *repo) StoreWorkoutPlan(wplan wp.WorkoutPlan, ath athlete.Athlete) error
 	return nil
 }
 
-func (r *repo) FindWorkoutPlanByTitleAndAthleteID(title string, ath athlete.Athlete) (wp.WorkoutPlan, bool, error) {
+func (r *repo) FindWorkoutPlanByTitleAndAthleteID(wplan wp.WorkoutPlan, ath athlete.Athlete) (bool, error) {
 	aid := ath.AthleteID()
+	title := wplan.Title()
+
 	for _, val := range r.wplans {
 		if val.AthleteID == aid && val.Title == title {
-			found, err := wp.RestoreWorkoutPlan(val.ID, val.AthleteID, val.Title)
-			if err != nil {
-				return wp.WorkoutPlan{}, false, err
-			}
-			return found, true, nil
+			return true, nil
 		}
 	}
 
-	return wp.WorkoutPlan{}, false, nil
+	return false, nil
 }
 
 func (r *repo) FindWorkoutPlanByID(wplan wp.WorkoutPlan) (bool, error) {
@@ -122,13 +120,14 @@ func (r *repo) UpdateWorkoutPlan(wplan wp.WorkoutPlan) error {
 		return errors.New("WorkoutPlan not found!")
 	}
 
-	r.wplans[wplan.ID()] = inRepoWorkoutPlan{
+	data := inRepoWorkoutPlan{
 		ID:        prev.ID,
 		AthleteID: prev.AthleteID,
 		Title:     wplan.Title(),
 		CreatedAt: prev.CreatedAt,
 		UpdatedAt: time.Now(),
 	}
+	r.wplans[wplan.ID()] = data
 	return nil
 }
 

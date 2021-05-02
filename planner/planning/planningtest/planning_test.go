@@ -15,10 +15,13 @@ import (
 func TestCreateNewWorkoutPlan(t *testing.T) {
 	service, ath := setup()
 	t.Run("When success", func(t *testing.T) {
-		wplan, _ := workoutPlanSuccessSetup(t, ath, service)
+		wplan, title := workoutPlanSuccessSetup(t, ath, service)
 		require.NotEmpty(t, wplan)
 
-		// TODO: Check that WorkoutPlan is stored.
+		wplans, err := service.FetchWorkoutPlans(ath)
+		require.NoError(t, err)
+		require.NotEmpty(t, wplans)
+		require.Equal(t, title, wplans[0].Title())
 	})
 
 	t.Run("When WorkoutPlan with given title already exists", func(t *testing.T) {
@@ -85,7 +88,10 @@ func TestAddNewExerciseToWorkoutPlan(t *testing.T) {
 		exercise, _, _ := exerciseSuccessSetup(t, ath, wplan, service)
 		require.NotEmpty(t, exercise)
 
-		// TODO: Check that exercise is stored in WorkoutPlan
+		exercises, err := service.FetchWorkoutPlanExercises(ath, wplan)
+		require.NoError(t, err)
+		require.NotEmpty(t, exercises)
+		require.Equal(t, exercise.ID(), exercises[0].ID())
 	})
 
 	t.Run("When Exercise with same name already in WorkoutPlan", func(t *testing.T) {
@@ -170,7 +176,9 @@ func TestRemoveExerciseFromWorkoutPlan(t *testing.T) {
 		)
 		require.NoError(t, err)
 
-		// TODO: Check that exercise is no longer stored in WorkoutPlan
+		exercises, err := service.FetchWorkoutPlanExercises(ath, wplan)
+		require.NoError(t, err)
+		require.Empty(t, exercises)
 	})
 }
 
@@ -193,15 +201,33 @@ func TestEditWorkoutPlanTitle(t *testing.T) {
 		require.Error(t, err)
 		require.Equal(t, p.ErrWorkoutPlanNotFound.Error(), err.Error())
 	})
+	t.Run("When same title", func(t *testing.T) {
+		ath := athlete.NewAthlete()
+		wplan, title := workoutPlanSuccessSetup(t, ath, service)
+
+		err := service.EditWorkoutPlanTitle(ath, wplan, title)
+		require.Error(t, err)
+		require.Equal(t, p.ErrIdentialTitle.Error(), err.Error())
+
+		wplans, err := service.FetchWorkoutPlans(ath)
+		require.NoError(t, err)
+		require.NotEmpty(t, wplans)
+		require.Equal(t, title, wplans[0].Title())
+		require.Equal(t, title, wplan.Title())
+	})
 
 	t.Run("When success", func(t *testing.T) {
+		ath := athlete.NewAthlete()
 		wplan, _ := workoutPlanSuccessSetup(t, ath, service)
-		title2 := random.String(75)
+		title := random.String(75)
 
-		err := service.EditWorkoutPlanTitle(ath, wplan, title2)
+		err := service.EditWorkoutPlanTitle(ath, wplan, title)
 		require.NoError(t, err)
 
-		// TODO: Check that succesfully updated field.
+		wplans, err := service.FetchWorkoutPlans(ath)
+		require.NoError(t, err)
+		require.NotEmpty(t, wplans)
+		require.Equal(t, title, wplans[0].Title())
 	})
 }
 
@@ -307,6 +333,21 @@ func TestEditExerciseName(t *testing.T) {
 		err := service.EditExerciseName(ath, wplan, exercise, name)
 		require.Error(t, err)
 		require.Equal(t, p.ErrExerciseNotFound.Error(), err.Error())
+	})
+
+	t.Run("When same Exercise name", func(t *testing.T) {
+		wplan, _ := workoutPlanSuccessSetup(t, ath, service)
+		exercise, _, name := exerciseSuccessSetup(t, ath, wplan, service)
+
+		err := service.EditExerciseName(ath, wplan, exercise, name)
+		require.Error(t, err)
+		require.Equal(t, p.ErrIdentialName.Error(), err.Error())
+
+		exercises, err := service.FetchWorkoutPlanExercises(ath, wplan)
+		require.NoError(t, err)
+		require.NotEmpty(t, exercises)
+		require.Equal(t, name, exercises[0].Name())
+		require.Equal(t, name, exercise.Name())
 	})
 
 	t.Run("When success", func(t *testing.T) {

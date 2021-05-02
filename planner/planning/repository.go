@@ -8,7 +8,7 @@ import (
 
 type Repository interface {
 	StoreWorkoutPlan(wplan wp.WorkoutPlan, ath athlete.Athlete) error
-	FindWorkoutPlanByTitleAndAthleteID(title string, ath athlete.Athlete) (wp.WorkoutPlan, bool, error)
+	FindWorkoutPlanByTitleAndAthleteID(wplan wp.WorkoutPlan, ath athlete.Athlete) (bool, error)
 	FindWorkoutPlanByID(wplan wp.WorkoutPlan) (bool, error)
 	FindWorkoutPlanByIDAndAthleteID(wplan wp.WorkoutPlan, ath athlete.Athlete) (bool, error)
 	StoreExercise(wplan wp.WorkoutPlan, exercise e.Exercise, ath athlete.Athlete) error
