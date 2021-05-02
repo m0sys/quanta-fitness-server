@@ -149,7 +149,8 @@ func (p PlanningService) EditWorkoutPlanTitle(ath athlete.Athlete, wplan wp.Work
 
 	err = p.repo.UpdateWorkoutPlan(wplan, title)
 	if err != nil {
-		return err
+		log.Printf("%s: %s", errSlur, err.Error())
+		return errInternal
 	}
 
 	return nil
