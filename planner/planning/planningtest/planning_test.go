@@ -225,7 +225,6 @@ func TestFetchWorkoutPlans(t *testing.T) {
 	})
 }
 
-/*
 func TestFetchWorkoutPlanExercises(t *testing.T) {
 	service, ath := setup()
 	t.Run("When Unauthorized", func(t *testing.T) {
@@ -237,10 +236,36 @@ func TestFetchWorkoutPlanExercises(t *testing.T) {
 		require.Empty(t, exercises)
 	})
 	t.Run("When WorkoutPlan not found", func(t *testing.T) {
+		wplan := workoutPlanNotFoundSetup(t, ath)
 
+		exercises, err := service.FetchWorkoutPlanExercises(ath, wplan)
+		require.Error(t, err)
+		require.Equal(t, p.ErrWorkoutPlanNotFound.Error(), err.Error())
+		require.Empty(t, exercises)
 	})
+
+	t.Run("When no Exercises for WorkoutPlan", func(t *testing.T) {
+		wplan, _ := workoutPlanSuccessSetup(t, ath, service)
+
+		exercises, err := service.FetchWorkoutPlanExercises(ath, wplan)
+		require.NoError(t, err)
+		require.Empty(t, exercises)
+	})
+
+	t.Run("After Exercises have been added to WorkoutPlan", func(t *testing.T) {
+		wplan, _ := workoutPlanSuccessSetup(t, ath, service)
+		n := 5
+		for i := 0; i < n; i++ {
+			exerciseSuccessSetup(t, ath, wplan, service)
+		}
+
+		exercises, err := service.FetchWorkoutPlanExercises(ath, wplan)
+		require.NoError(t, err)
+		require.NotEmpty(t, exercises)
+		require.Equal(t, n, len(exercises))
+	})
+
 }
-*/
 
 func workoutPlanNotFoundSetup(t *testing.T, ath athlete.Athlete) wp.WorkoutPlan {
 	title := random.String(75)
