@@ -16,4 +16,5 @@ type Repository interface {
 	FindExerciseByNameAndWorkoutPlanID(wplan wp.WorkoutPlan, exercise e.Exercise) (bool, error)
 	RemoveExercise(exercise e.Exercise) error
 	UpdateWorkoutPlan(wplan wp.WorkoutPlan, title string) error
+	FindAllWorkoutPlansForAthlete(ath athlete.Athlete) ([]wp.WorkoutPlan, error)
 }

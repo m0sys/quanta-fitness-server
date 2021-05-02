@@ -155,3 +155,15 @@ func (p PlanningService) EditWorkoutPlanTitle(ath athlete.Athlete, wplan wp.Work
 
 	return nil
 }
+
+func (p PlanningService) FetchWorkoutPlans(ath athlete.Athlete) ([]wp.WorkoutPlan, error) {
+	var wplans []wp.WorkoutPlan
+
+	wplans, err := p.repo.FindAllWorkoutPlansForAthlete(ath)
+	if err != nil {
+		log.Printf("%s: %s", errSlur, err.Error())
+		return wplans, errInternal
+	}
+
+	return wplans, nil
+}

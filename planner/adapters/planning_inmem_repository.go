@@ -132,6 +132,23 @@ func (r *repo) UpdateWorkoutPlan(wplan wp.WorkoutPlan, title string) error {
 	return nil
 }
 
+func (r *repo) FindAllWorkoutPlansForAthlete(ath athlete.Athlete) ([]wp.WorkoutPlan, error) {
+	aid := ath.AthleteID()
+	var wplans []wp.WorkoutPlan
+	for _, val := range r.wplans {
+		if val.AthleteID == aid {
+			wplan, err := wp.RestoreWorkoutPlan(val.ID, val.Title)
+			if err != nil {
+				return []wp.WorkoutPlan{}, err
+			}
+
+			wplans = append(wplans, wplan)
+		}
+	}
+
+	return wplans, nil
+}
+
 type inRepoWorkoutPlan struct {
 	ID        string
 	AthleteID string
