@@ -205,6 +205,43 @@ func TestEditWorkoutPlanTitle(t *testing.T) {
 	})
 }
 
+func TestFetchWorkoutPlans(t *testing.T) {
+	service, ath := setup()
+	t.Run("When no WorkoutPlan for Athlete", func(t *testing.T) {
+		wplans, err := service.FetchWorkoutPlans(ath)
+		require.NoError(t, err)
+		require.Empty(t, wplans)
+	})
+
+	t.Run("After creating WorkoutPlans for Athlete", func(t *testing.T) {
+		n := 5
+		for i := 0; i < n; i++ {
+			workoutPlanSuccessSetup(t, ath, service)
+		}
+		wplans, err := service.FetchWorkoutPlans(ath)
+		require.NoError(t, err)
+		require.NotEmpty(t, wplans)
+		require.Equal(t, n, len(wplans))
+	})
+}
+
+/*
+func TestFetchWorkoutPlanExercises(t *testing.T) {
+	service, ath := setup()
+	t.Run("When Unauthorized", func(t *testing.T) {
+		wplan := workoutPlanUnauthorizedSetup(t)
+
+		exercises, err := service.FetchWorkoutPlanExercises(ath, wplan)
+		require.Error(t, err)
+		require.Equal(t, p.ErrUnauthorizedAccess.Error(), err.Error())
+		require.Empty(t, exercises)
+	})
+	t.Run("When WorkoutPlan not found", func(t *testing.T) {
+
+	})
+}
+*/
+
 func workoutPlanNotFoundSetup(t *testing.T, ath athlete.Athlete) wp.WorkoutPlan {
 	title := random.String(75)
 	wplan, err := wp.NewWorkoutPlan(ath.AthleteID(), title)
