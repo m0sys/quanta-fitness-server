@@ -196,6 +196,11 @@ func (r *repo) UpdateExercise(e exercise.Exercise) error {
 	return nil
 }
 
+func (r *repo) RemoveWorkoutPlan(wplan wp.WorkoutPlan) error {
+	delete(r.wplans, wplan.ID())
+	return nil
+}
+
 type inRepoWorkoutPlan struct {
 	ID        string
 	AthleteID string

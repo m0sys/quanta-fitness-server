@@ -19,4 +19,5 @@ type Repository interface {
 	FindAllWorkoutPlansForAthlete(ath athlete.Athlete) ([]wp.WorkoutPlan, error)
 	FindAllExercisesForWorkoutPlan(wplan wp.WorkoutPlan) ([]e.Exercise, error)
 	UpdateExercise(exercise e.Exercise) error
+	RemoveWorkoutPlan(wplan wp.WorkoutPlan) error
 }

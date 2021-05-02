@@ -389,3 +389,27 @@ func (p PlanningService) EditExerciseRestDur(ath athlete.Athlete, wplan wp.Worko
 
 	return nil
 }
+
+func (p PlanningService) RemoveWorkoutPlan(ath athlete.Athlete, wplan wp.WorkoutPlan) error {
+	if !isAuthorizedWP(ath, wplan) {
+		return ErrUnauthorizedAccess
+	}
+
+	found, err := p.repo.FindWorkoutPlanByID(wplan)
+	if err != nil {
+		log.Printf("%s: %s", errSlur, err.Error())
+		return errInternal
+	}
+
+	if !found {
+		return ErrWorkoutPlanNotFound
+	}
+
+	err = p.repo.RemoveWorkoutPlan(wplan)
+	if err != nil {
+		log.Printf("%s: %s", errSlur, err.Error())
+		return errInternal
+	}
+
+	return nil
+}
