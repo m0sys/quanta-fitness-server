@@ -37,6 +37,21 @@ func NewExercise(wpid, aid, name string, metrics Metrics) (Exercise, error) {
 	}, nil
 }
 
+// FIXME: find alternative solution for id checking...
+func RestoreExercise(id, wpid, aid, name string, metrics Metrics) (Exercise, error) {
+	if err := validateName(name); err != nil {
+		return Exercise{}, err
+	}
+
+	return Exercise{
+		uuid:    id,
+		wpid:    wpid,
+		aid:     aid,
+		name:    name,
+		metrics: metrics,
+	}, nil
+}
+
 func (e *Exercise) EditName(name string) error {
 	if err := validateName(name); err != nil {
 		return err

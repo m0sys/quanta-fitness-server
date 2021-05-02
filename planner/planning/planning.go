@@ -167,3 +167,29 @@ func (p PlanningService) FetchWorkoutPlans(ath athlete.Athlete) ([]wp.WorkoutPla
 
 	return wplans, nil
 }
+
+func (p PlanningService) FetchWorkoutPlanExercises(ath athlete.Athlete, wplan wp.WorkoutPlan) ([]e.Exercise, error) {
+	var exercises []e.Exercise
+
+	if !isAuthorizedWP(ath, wplan) {
+		return exercises, ErrUnauthorizedAccess
+	}
+
+	found, err := p.repo.FindWorkoutPlanByID(wplan)
+	if err != nil {
+		log.Printf("%s: %s", errSlur, err.Error())
+		return exercises, errInternal
+	}
+
+	if !found {
+		return exercises, ErrWorkoutPlanNotFound
+	}
+
+	exercises, err = p.repo.FindAllExercisesForWorkoutPlan(wplan)
+	if err != nil {
+		log.Printf("%s: %s", errSlur, err.Error())
+		return exercises, errInternal
+	}
+
+	return exercises, nil
+}

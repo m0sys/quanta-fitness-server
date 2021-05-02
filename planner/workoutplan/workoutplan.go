@@ -27,8 +27,8 @@ func NewWorkoutPlan(aid, title string) (WorkoutPlan, error) {
 	}, nil
 }
 
-// FIXME: find alternative solution.
-func RestoreWorkoutPlan(id, title string) (WorkoutPlan, error) {
+// FIXME: find alternative solution for id checking...
+func RestoreWorkoutPlan(id, aid, title string) (WorkoutPlan, error) {
 	err := validateTitle(title)
 	if err != nil {
 		return WorkoutPlan{}, err
@@ -37,6 +37,7 @@ func RestoreWorkoutPlan(id, title string) (WorkoutPlan, error) {
 
 	return WorkoutPlan{
 		uuid:  id,
+		aid:   aid,
 		title: title,
 	}, nil
 }

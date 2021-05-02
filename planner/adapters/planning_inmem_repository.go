@@ -40,7 +40,7 @@ func (r *repo) FindWorkoutPlanByTitleAndAthleteID(title string, ath athlete.Athl
 	aid := ath.AthleteID()
 	for _, val := range r.wplans {
 		if val.AthleteID == aid && val.Title == title {
-			found, err := wp.RestoreWorkoutPlan(val.ID, val.Title)
+			found, err := wp.RestoreWorkoutPlan(val.ID, val.AthleteID, val.Title)
 			if err != nil {
 				return wp.WorkoutPlan{}, false, err
 			}
@@ -137,7 +137,7 @@ func (r *repo) FindAllWorkoutPlansForAthlete(ath athlete.Athlete) ([]wp.WorkoutP
 	var wplans []wp.WorkoutPlan
 	for _, val := range r.wplans {
 		if val.AthleteID == aid {
-			wplan, err := wp.RestoreWorkoutPlan(val.ID, val.Title)
+			wplan, err := wp.RestoreWorkoutPlan(val.ID, val.AthleteID, val.Title)
 			if err != nil {
 				return []wp.WorkoutPlan{}, err
 			}
@@ -147,6 +147,28 @@ func (r *repo) FindAllWorkoutPlansForAthlete(ath athlete.Athlete) ([]wp.WorkoutP
 	}
 
 	return wplans, nil
+}
+
+func (r *repo) FindAllExercisesForWorkoutPlan(wplan wp.WorkoutPlan) ([]exercise.Exercise, error) {
+	wpid := wplan.ID()
+	var exercises []exercise.Exercise
+	for _, val := range r.exercises {
+		if val.WorkoutPlanID == wpid {
+			metrics, err := exercise.NewMetrics(val.TargetRep, val.NumSets, val.Weight, val.RestDur)
+			if err != nil {
+				return []exercise.Exercise{}, err
+			}
+
+			e, err := exercise.RestoreExercise(val.ID, val.WorkoutPlanID, val.AthleteID, val.Name, metrics)
+			if err != nil {
+				return []exercise.Exercise{}, err
+			}
+
+			exercises = append(exercises, e)
+		}
+	}
+
+	return exercises, nil
 }
 
 type inRepoWorkoutPlan struct {
