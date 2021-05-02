@@ -116,7 +116,7 @@ func (r *repo) RemoveExercise(e exercise.Exercise) error {
 	return nil
 }
 
-func (r *repo) UpdateWorkoutPlan(wplan wp.WorkoutPlan, title string) error {
+func (r *repo) UpdateWorkoutPlan(wplan wp.WorkoutPlan) error {
 	prev, ok := r.wplans[wplan.ID()]
 	if !ok {
 		return errors.New("WorkoutPlan not found!")
@@ -125,7 +125,7 @@ func (r *repo) UpdateWorkoutPlan(wplan wp.WorkoutPlan, title string) error {
 	r.wplans[wplan.ID()] = inRepoWorkoutPlan{
 		ID:        prev.ID,
 		AthleteID: prev.AthleteID,
-		Title:     title,
+		Title:     wplan.Title(),
 		CreatedAt: prev.CreatedAt,
 		UpdatedAt: time.Now(),
 	}
@@ -169,6 +169,31 @@ func (r *repo) FindAllExercisesForWorkoutPlan(wplan wp.WorkoutPlan) ([]exercise.
 	}
 
 	return exercises, nil
+}
+
+func (r *repo) UpdateExercise(e exercise.Exercise) error {
+	prev, ok := r.exercises[e.ID()]
+	if !ok {
+		return errors.New("Exercise not found!")
+	}
+
+	now := time.Now()
+	metrics := e.Metrics()
+	data := inRepoExercise{
+		ID:            e.ID(),
+		WorkoutPlanID: e.WorkoutPlanID(),
+		AthleteID:     e.AthleteID(),
+		Name:          e.Name(),
+		TargetRep:     metrics.TargetRep(),
+		NumSets:       metrics.NumSets(),
+		Weight:        float64(metrics.Weight()),
+		RestDur:       float64(metrics.RestDur()),
+		CreatedAt:     prev.CreatedAt,
+		UpdatedAt:     now,
+	}
+
+	r.exercises[e.ID()] = data
+	return nil
 }
 
 type inRepoWorkoutPlan struct {

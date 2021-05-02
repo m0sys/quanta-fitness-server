@@ -147,7 +147,8 @@ func (p PlanningService) EditWorkoutPlanTitle(ath athlete.Athlete, wplan wp.Work
 		return ErrWorkoutPlanNotFound
 	}
 
-	err = p.repo.UpdateWorkoutPlan(wplan, title)
+	err = wplan.EditTitle(title)
+	err = p.repo.UpdateWorkoutPlan(wplan)
 	if err != nil {
 		log.Printf("%s: %s", errSlur, err.Error())
 		return errInternal
@@ -192,4 +193,199 @@ func (p PlanningService) FetchWorkoutPlanExercises(ath athlete.Athlete, wplan wp
 	}
 
 	return exercises, nil
+}
+
+func (p PlanningService) EditExerciseName(ath athlete.Athlete, wplan wp.WorkoutPlan, exercise e.Exercise, name string) error {
+	if !isAuthorizedWP(ath, wplan) || !isAuthorizedE(ath, wplan, exercise) {
+		return ErrUnauthorizedAccess
+	}
+
+	found, err := p.repo.FindWorkoutPlanByID(wplan)
+	if err != nil {
+		log.Printf("%s: %s", errSlur, err.Error())
+		return errInternal
+	}
+
+	if !found {
+		return ErrWorkoutPlanNotFound
+	}
+
+	found, err = p.repo.FindExerciseByID(exercise)
+	if err != nil {
+		log.Printf("%s: %s", errSlur, err.Error())
+		return errInternal
+	}
+
+	if !found {
+		return ErrExerciseNotFound
+	}
+
+	err = exercise.EditName(name)
+	if err != nil {
+		return err
+	}
+
+	err = p.repo.UpdateExercise(exercise)
+	if err != nil {
+		log.Printf("%s: %s", errSlur, err.Error())
+		return errInternal
+	}
+
+	return nil
+}
+
+func (p PlanningService) EditExerciseTargetRep(ath athlete.Athlete, wplan wp.WorkoutPlan, exercise e.Exercise, targetRep int) error {
+	if !isAuthorizedWP(ath, wplan) || !isAuthorizedE(ath, wplan, exercise) {
+		return ErrUnauthorizedAccess
+	}
+
+	found, err := p.repo.FindWorkoutPlanByID(wplan)
+	if err != nil {
+		log.Printf("%s: %s", errSlur, err.Error())
+		return errInternal
+	}
+
+	if !found {
+		return ErrWorkoutPlanNotFound
+	}
+
+	found, err = p.repo.FindExerciseByID(exercise)
+	if err != nil {
+		log.Printf("%s: %s", errSlur, err.Error())
+		return errInternal
+	}
+
+	if !found {
+		return ErrExerciseNotFound
+	}
+
+	err = exercise.EditTargetRep(targetRep)
+	if err != nil {
+		return err
+	}
+
+	err = p.repo.UpdateExercise(exercise)
+	if err != nil {
+		log.Printf("%s: %s", errSlur, err.Error())
+		return errInternal
+	}
+
+	return nil
+}
+
+func (p PlanningService) EditExerciseNumSets(ath athlete.Athlete, wplan wp.WorkoutPlan, exercise e.Exercise, numSets int) error {
+	if !isAuthorizedWP(ath, wplan) || !isAuthorizedE(ath, wplan, exercise) {
+		return ErrUnauthorizedAccess
+	}
+
+	found, err := p.repo.FindWorkoutPlanByID(wplan)
+	if err != nil {
+		log.Printf("%s: %s", errSlur, err.Error())
+		return errInternal
+	}
+
+	if !found {
+		return ErrWorkoutPlanNotFound
+	}
+
+	found, err = p.repo.FindExerciseByID(exercise)
+	if err != nil {
+		log.Printf("%s: %s", errSlur, err.Error())
+		return errInternal
+	}
+
+	if !found {
+		return ErrExerciseNotFound
+	}
+
+	err = exercise.EditNumSets(numSets)
+	if err != nil {
+		return err
+	}
+
+	err = p.repo.UpdateExercise(exercise)
+	if err != nil {
+		log.Printf("%s: %s", errSlur, err.Error())
+		return errInternal
+	}
+
+	return nil
+}
+
+func (p PlanningService) EditExerciseWeight(ath athlete.Athlete, wplan wp.WorkoutPlan, exercise e.Exercise, weight float64) error {
+	if !isAuthorizedWP(ath, wplan) || !isAuthorizedE(ath, wplan, exercise) {
+		return ErrUnauthorizedAccess
+	}
+
+	found, err := p.repo.FindWorkoutPlanByID(wplan)
+	if err != nil {
+		log.Printf("%s: %s", errSlur, err.Error())
+		return errInternal
+	}
+
+	if !found {
+		return ErrWorkoutPlanNotFound
+	}
+
+	found, err = p.repo.FindExerciseByID(exercise)
+	if err != nil {
+		log.Printf("%s: %s", errSlur, err.Error())
+		return errInternal
+	}
+
+	if !found {
+		return ErrExerciseNotFound
+	}
+
+	err = exercise.EditWeight(weight)
+	if err != nil {
+		return err
+	}
+
+	err = p.repo.UpdateExercise(exercise)
+	if err != nil {
+		log.Printf("%s: %s", errSlur, err.Error())
+		return errInternal
+	}
+
+	return nil
+}
+
+func (p PlanningService) EditExerciseRestDur(ath athlete.Athlete, wplan wp.WorkoutPlan, exercise e.Exercise, restDur float64) error {
+	if !isAuthorizedWP(ath, wplan) || !isAuthorizedE(ath, wplan, exercise) {
+		return ErrUnauthorizedAccess
+	}
+
+	found, err := p.repo.FindWorkoutPlanByID(wplan)
+	if err != nil {
+		log.Printf("%s: %s", errSlur, err.Error())
+		return errInternal
+	}
+
+	if !found {
+		return ErrWorkoutPlanNotFound
+	}
+
+	found, err = p.repo.FindExerciseByID(exercise)
+	if err != nil {
+		log.Printf("%s: %s", errSlur, err.Error())
+		return errInternal
+	}
+
+	if !found {
+		return ErrExerciseNotFound
+	}
+
+	err = exercise.EditRestDur(restDur)
+	if err != nil {
+		return err
+	}
+
+	err = p.repo.UpdateExercise(exercise)
+	if err != nil {
+		log.Printf("%s: %s", errSlur, err.Error())
+		return errInternal
+	}
+
+	return nil
 }

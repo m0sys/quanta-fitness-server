@@ -28,6 +28,7 @@ func NewWorkoutPlan(aid, title string) (WorkoutPlan, error) {
 }
 
 // FIXME: find alternative solution for id checking...
+// This should only be used to restore data from the singular source of truth.
 func RestoreWorkoutPlan(id, aid, title string) (WorkoutPlan, error) {
 	err := validateTitle(title)
 	if err != nil {
