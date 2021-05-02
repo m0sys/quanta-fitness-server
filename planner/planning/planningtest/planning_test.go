@@ -560,6 +560,36 @@ func TestEditExerciseRestDur(t *testing.T) {
 	})
 }
 
+func TestRemoveWorkoutPlan(t *testing.T) {
+	service, ath := setup()
+	t.Run("When Unauthorized", func(t *testing.T) {
+		wplan := workoutPlanUnauthorizedSetup(t)
+
+		err := service.RemoveWorkoutPlan(ath, wplan)
+		require.Error(t, err)
+		require.Equal(t, p.ErrUnauthorizedAccess.Error(), err.Error())
+	})
+
+	t.Run("When WorkoutPlan not found", func(t *testing.T) {
+		wplan := workoutPlanNotFoundSetup(t, ath)
+
+		err := service.RemoveWorkoutPlan(ath, wplan)
+		require.Error(t, err)
+		require.Equal(t, p.ErrWorkoutPlanNotFound.Error(), err.Error())
+	})
+
+	t.Run("When success", func(t *testing.T) {
+		wplan, _ := workoutPlanSuccessSetup(t, ath, service)
+
+		err := service.RemoveWorkoutPlan(ath, wplan)
+		require.NoError(t, err)
+
+		wplans, err := service.FetchWorkoutPlans(ath)
+		require.NoError(t, err)
+		require.Empty(t, wplans)
+	})
+}
+
 func workoutPlanNotFoundSetup(t *testing.T, ath athlete.Athlete) wp.WorkoutPlan {
 	title := random.String(75)
 	wplan, err := wp.NewWorkoutPlan(ath.AthleteID(), title)
