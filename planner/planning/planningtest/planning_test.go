@@ -692,7 +692,7 @@ func exerciseNotFoundSetup(t *testing.T, ath athlete.Athlete, wplan wp.WorkoutPl
 	)
 	require.NoError(t, err)
 
-	exercise, err := e.NewExercise(wplan.ID(), ath.AthleteID(), name, metrics)
+	exercise, err := e.NewExercise(wplan.ID(), ath.AthleteID(), name, metrics, 0)
 	require.NoError(t, err)
 	require.NotEmpty(t, exercise)
 	require.Equal(t, name, exercise.Name())
@@ -711,7 +711,7 @@ func exerciseUnauthorizedSetup(t *testing.T, wplan wp.WorkoutPlan) e.Exercise {
 	)
 	require.NoError(t, err)
 
-	exercise, err := e.NewExercise(wplan.ID(), ath.AthleteID(), name, metrics)
+	exercise, err := e.NewExercise(wplan.ID(), ath.AthleteID(), name, metrics, 0)
 	require.NoError(t, err)
 	require.NotEmpty(t, exercise)
 	require.Equal(t, name, exercise.Name())

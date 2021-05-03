@@ -11,6 +11,8 @@ import (
 	"github.com/mhd53/quanta-fitness-server/planner/workoutplan"
 	wp "github.com/mhd53/quanta-fitness-server/planner/workoutplan"
 	ta "github.com/mhd53/quanta-fitness-server/tracker/adapters"
+	el "github.com/mhd53/quanta-fitness-server/tracker/exerciselog"
+	sl "github.com/mhd53/quanta-fitness-server/tracker/setlog"
 	ts "github.com/mhd53/quanta-fitness-server/tracker/training"
 	wl "github.com/mhd53/quanta-fitness-server/tracker/workoutlog"
 	"github.com/stretchr/testify/require"
@@ -70,7 +72,7 @@ func TestFetchWorkoutLogExerciseLogs(t *testing.T) {
 	wt, pService, tService, ath := setup()
 
 	t.Run("When WorkoutLog not found", func(t *testing.T) {
-		wlog := wl.NewWorkoutLog(ath.AthleteID(), random.String(75))
+		wlog := wlogNotFoundSetup(ath)
 		elogs, err := tService.FetchWorkoutLogExerciseLogs(ath, wlog)
 		require.Error(t, err)
 		require.Empty(t, elogs)
@@ -88,6 +90,17 @@ func TestFetchWorkoutLogExerciseLogs(t *testing.T) {
 		require.NotEmpty(t, wlog)
 		require.Equal(t, wplan.Title(), wlog.Title())
 
+		ath2 := athlete.NewAthlete()
+		elogs, err := tService.FetchWorkoutLogExerciseLogs(ath2, wlog)
+		require.Error(t, err)
+		require.Equal(t, ts.ErrUnauthorizedAccess.Error(), err.Error())
+		require.Empty(t, elogs)
+
+	})
+
+	t.Run("When success", func(t *testing.T) {
+		wlog, n := wlogSuccesSetup(t, ath, pService, wt)
+
 		elogs, err := tService.FetchWorkoutLogExerciseLogs(ath, wlog)
 		require.NoError(t, err)
 		require.NotEmpty(t, elogs)
@@ -95,7 +108,60 @@ func TestFetchWorkoutLogExerciseLogs(t *testing.T) {
 
 	})
 
+}
+
+func TestAddSetLogToExerciseLog(t *testing.T) {
+	wt, pService, tService, ath := setup()
+	t.Run("When WorkoutLog not found", func(t *testing.T) {
+		wlog := wlogNotFoundSetup(ath)
+		elog := elogNotFoundSetup(wlog)
+		metrics := sl.NewMetrics(random.RepCount(), random.RestTime())
+		setlog := sl.NewSetLog(elog.ID(), metrics)
+		err := tService.AddSetLogToExerciseLog(ath, wlog, elog, setlog)
+		require.Error(t, err)
+		require.Equal(t, ts.ErrWorkoutLogNotFound.Error(), err.Error())
+	})
+
+	t.Run("When Unauthorized WorkoutLog", func(t *testing.T) {
+		ath2 := athlete.NewAthlete()
+		wlog := wlogNotFoundSetup(ath2)
+		elog := elogNotFoundSetup(wlog)
+		metrics := sl.NewMetrics(random.RepCount(), random.RestTime())
+		setlog := sl.NewSetLog(elog.ID(), metrics)
+		err := tService.AddSetLogToExerciseLog(ath, wlog, elog, setlog)
+		require.Error(t, err)
+		require.Equal(t, ts.ErrUnauthorizedAccess.Error(), err.Error())
+
+	})
+
+	t.Run("When ExerciseLog not found", func(t *testing.T) {
+		wlog, _ := wlogSuccesSetup(t, ath, pService, wt)
+		elog := elogNotFoundSetup(wlog)
+		metrics := sl.NewMetrics(random.RepCount(), random.RestTime())
+		slog := sl.NewSetLog(elog.ID(), metrics)
+		err := tService.AddSetLogToExerciseLog(ath, wlog, elog, slog)
+		require.Error(t, err)
+		require.Equal(t, ts.ErrExerciseLogNotFound.Error(), err.Error())
+	})
+
 	t.Run("When success", func(t *testing.T) {
+		wlog, _ := wlogSuccesSetup(t, ath, pService, wt)
+
+		elogs, err := tService.FetchWorkoutLogExerciseLogs(ath, wlog)
+		require.NoError(t, err)
+		elog := elogs[0]
+		repCount := random.RepCount()
+		metrics := sl.NewMetrics(repCount, random.RestTime())
+		slog := sl.NewSetLog(elog.ID(), metrics)
+
+		err = tService.AddSetLogToExerciseLog(ath, wlog, elog, slog)
+		require.NoError(t, err)
+
+		slogs, err := tService.FetchSetLogsForExerciseLog(ath, wlog, elog)
+		require.NoError(t, err)
+		require.NotEmpty(t, slogs)
+		metrics = slogs[0].Metrics()
+		require.Equal(t, repCount, metrics.ActualRepCount())
 
 	})
 
@@ -106,6 +172,24 @@ func wplanSetup(t *testing.T, ath athlete.Athlete, service p.PlanningService) wo
 	require.NoError(t, err)
 	require.NotEmpty(t, wplan)
 	return wplan
+}
+
+func wlogNotFoundSetup(ath athlete.Athlete) wl.WorkoutLog {
+	return wl.NewWorkoutLog(ath.AthleteID(), random.String(75))
+}
+
+func wlogSuccesSetup(t *testing.T, ath athlete.Athlete, pService p.PlanningService, wt WorkoutTranslator) (wl.WorkoutLog, int) {
+	wplan := wplanSetup(t, ath, pService)
+	n := 5
+	for i := 0; i < n; i++ {
+		exerciseSetup(t, ath, wplan, pService)
+	}
+	wlog, err := wt.ConvertWorkoutPlan(wplan)
+	require.NoError(t, err)
+	require.NotEmpty(t, wlog)
+	require.Equal(t, wplan.Title(), wlog.Title())
+
+	return wlog, n
 }
 
 func exerciseSetup(t *testing.T, ath athlete.Athlete, wplan wp.WorkoutPlan, service p.PlanningService) e.Exercise {
@@ -131,6 +215,20 @@ func exerciseSetup(t *testing.T, ath athlete.Athlete, wplan wp.WorkoutPlan, serv
 	require.Equal(t, name, exercise.Name())
 
 	return exercise
+}
+
+func elogNotFoundSetup(wlog wl.WorkoutLog) el.ExerciseLog {
+	name := random.String(75)
+
+	metrics := el.NewMetrics(
+		random.RepCount(),
+		random.NumSets(),
+		random.Weight(),
+		random.RestTime(),
+	)
+
+	elog := el.NewExerciseLog(wlog.ID(), name, metrics, 0)
+	return elog
 }
 
 func setup() (WorkoutTranslator, p.PlanningService, ts.TrainingService, athlete.Athlete) {
