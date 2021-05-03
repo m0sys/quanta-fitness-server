@@ -12,6 +12,7 @@ import (
 	wp "github.com/mhd53/quanta-fitness-server/planner/workoutplan"
 	ta "github.com/mhd53/quanta-fitness-server/tracker/adapters"
 	ts "github.com/mhd53/quanta-fitness-server/tracker/training"
+	wl "github.com/mhd53/quanta-fitness-server/tracker/workoutlog"
 	"github.com/stretchr/testify/require"
 )
 
@@ -61,6 +62,41 @@ func TestFetchWorkoutLogs(t *testing.T) {
 		require.NoError(t, err)
 		require.NotEmpty(t, wlogs)
 		require.Equal(t, n, len(wlogs))
+	})
+
+}
+
+func TestFetchWorkoutLogExerciseLogs(t *testing.T) {
+	wt, pService, tService, ath := setup()
+
+	t.Run("When WorkoutLog not found", func(t *testing.T) {
+		wlog := wl.NewWorkoutLog(ath.AthleteID(), random.String(75))
+		elogs, err := tService.FetchWorkoutLogExerciseLogs(ath, wlog)
+		require.Error(t, err)
+		require.Empty(t, elogs)
+		require.Equal(t, ts.ErrWorkoutLogNotFound.Error(), err.Error())
+	})
+
+	t.Run("When Unauthorized", func(t *testing.T) {
+		wplan := wplanSetup(t, ath, pService)
+		n := 5
+		for i := 0; i < n; i++ {
+			exerciseSetup(t, ath, wplan, pService)
+		}
+		wlog, err := wt.ConvertWorkoutPlan(wplan)
+		require.NoError(t, err)
+		require.NotEmpty(t, wlog)
+		require.Equal(t, wplan.Title(), wlog.Title())
+
+		elogs, err := tService.FetchWorkoutLogExerciseLogs(ath, wlog)
+		require.NoError(t, err)
+		require.NotEmpty(t, elogs)
+		require.Equal(t, n, len(elogs))
+
+	})
+
+	t.Run("When success", func(t *testing.T) {
+
 	})
 
 }
