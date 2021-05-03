@@ -51,7 +51,7 @@ func (e *ExerciseLog) WorkoutLogID() string {
 }
 
 func (e *ExerciseLog) Name() string {
-	return e.title
+	return e.name
 }
 
 func (e *ExerciseLog) Metrics() Metrics {

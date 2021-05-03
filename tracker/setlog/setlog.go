@@ -35,7 +35,7 @@ func RestoreSetLog(id, elid string, metrics Metrics) SetLog {
 }
 
 func (s *SetLog) ID() string {
-	return e.uuid
+	return s.uuid
 }
 
 func (s *SetLog) ExerciseLogID() string {
