@@ -1,7 +1,7 @@
 package planning
 
 import (
-	"github.com/mhd53/quanta-fitness-server/athlete"
+	"github.com/mhd53/quanta-fitness-server/manager/athlete"
 	e "github.com/mhd53/quanta-fitness-server/planner/exercise"
 	wp "github.com/mhd53/quanta-fitness-server/planner/workoutplan"
 )

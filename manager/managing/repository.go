@@ -1,6 +1,6 @@
 package manager
 
-import "github.com/mhd53/quanta-fitness-server/athlete"
+import "github.com/mhd53/quanta-fitness-server/manager/athlete"
 
 // Repository repo for persisting all Athlete related data.
 type Repository interface {
