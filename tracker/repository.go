@@ -5,7 +5,7 @@ import (
 	wl "github.com/mhd53/quanta-fitness-server/workoutlog"
 )
 
-// Repository repo for persiting all WorkoutLog related data.
+// Repository repo for persisting all WorkoutLog related data.
 type Repository interface {
 	workoutLogRepo
 }

@@ -13,33 +13,36 @@ func TestSetHeight(t *testing.T) {
 	t.Run("When negative height", func(t *testing.T) {
 		err := athlete.SetHeight(-1.0)
 		require.Error(t, err)
-		require.Equal(t, 0.0, athlete.Height)
+		require.Equal(t, 0.0, athlete.Height())
 	})
 
 	t.Run("When success", func(t *testing.T) {
 		gen := random.Height()
 		err := athlete.SetHeight(gen)
 		require.NoError(t, err)
-		require.Equal(t, gen, athlete.Height)
+		require.Equal(t, gen, athlete.Height())
 	})
 }
 
 func TestUpdateHeight(t *testing.T) {
 	athlete := NewAthlete()
-	require.Equal(t, 0, len(athlete.WeightHistory))
+	require.Equal(t, 0, len(athlete.weightHistory))
 
 	t.Run("When weight is negative", func(t *testing.T) {
-		err := athlete.UpdateWeight(-1)
+		res, err := athlete.UpdateWeight(-1)
 		require.Error(t, err)
-		require.Equal(t, 0, len(athlete.WeightHistory))
+		require.Empty(t, res)
+		require.Equal(t, 0, len(athlete.weightHistory))
 	})
 
 	t.Run("When success", func(t *testing.T) {
 		gen := random.Weight()
-		err := athlete.UpdateWeight(gen)
+		res, err := athlete.UpdateWeight(gen)
 		require.NoError(t, err)
-		require.Equal(t, 1, len(athlete.WeightHistory))
-		require.Equal(t, gen, athlete.WeightHistory[0].Amount)
+		require.NotEmpty(t, res)
+		require.Equal(t, 1, len(athlete.weightHistory))
+		require.Equal(t, gen, athlete.weightHistory[0].amount)
+		require.Equal(t, gen, res.amount)
 
 	})
 }
@@ -52,15 +55,15 @@ func TestAddWorkoutLog(t *testing.T) {
 	t.Run("When success", func(t *testing.T) {
 		err = athlete.AddWorkoutLog(wlog)
 		require.NoError(t, err)
-		require.Equal(t, 1, len(athlete.WorkoutLogs))
-		require.Equal(t, wlog.LogID, athlete.WorkoutLogs[0].LogID)
+		require.Equal(t, 1, len(athlete.workoutLogs))
+		require.Equal(t, wlog.LogID(), athlete.workoutLogs[0].LogID())
 	})
 
 	t.Run("When already logged", func(t *testing.T) {
 		err = athlete.AddWorkoutLog(wlog)
 		require.Error(t, err)
-		require.Equal(t, 1, len(athlete.WorkoutLogs))
-		require.Equal(t, wlog.LogID, athlete.WorkoutLogs[0].LogID)
+		require.Equal(t, 1, len(athlete.workoutLogs))
+		require.Equal(t, wlog.LogID(), athlete.workoutLogs[0].LogID())
 	})
 }
 
@@ -72,17 +75,17 @@ func TestRemoveWorkoutLog(t *testing.T) {
 	t.Run("When success", func(t *testing.T) {
 		err = athlete.AddWorkoutLog(wlog)
 		require.NoError(t, err)
-		require.Equal(t, 1, len(athlete.WorkoutLogs))
-		require.Equal(t, wlog.LogID, athlete.WorkoutLogs[0].LogID)
+		require.Equal(t, 1, len(athlete.workoutLogs))
+		require.Equal(t, wlog.LogID(), athlete.workoutLogs[0].LogID())
 
 		err := athlete.RemoveWorkoutLog(wlog)
 		require.NoError(t, err)
-		require.Equal(t, 0, len(athlete.WorkoutLogs))
+		require.Equal(t, 0, len(athlete.workoutLogs))
 	})
 
 	t.Run("When not found", func(t *testing.T) {
 		err := athlete.RemoveWorkoutLog(wlog)
 		require.Error(t, err)
-		require.Equal(t, 0, len(athlete.WorkoutLogs))
+		require.Equal(t, 0, len(athlete.workoutLogs))
 	})
 }

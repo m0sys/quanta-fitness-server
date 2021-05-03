@@ -60,8 +60,8 @@ func TestAddSet(t *testing.T) {
 
 		err = exercise.AddSet(set)
 		require.NoError(t, err)
-		require.Equal(t, 1, len(exercise.Sets))
-		require.Equal(t, set.SetID, exercise.Sets[0].SetID)
+		require.Equal(t, 1, len(exercise.sets))
+		require.Equal(t, set.SetID(), exercise.sets[0].SetID())
 
 		err = exercise.AddSet(set)
 		require.Error(t, err)
@@ -80,16 +80,16 @@ func TestRemove(t *testing.T) {
 
 		err = exercise.RemoveSet(set)
 		require.Error(t, err)
-		require.Equal(t, 0, len(exercise.Sets))
+		require.Equal(t, 0, len(exercise.sets))
 
 		err = exercise.AddSet(set)
 		require.NoError(t, err)
-		require.Equal(t, 1, len(exercise.Sets))
-		require.Equal(t, set.SetID, exercise.Sets[0].SetID)
+		require.Equal(t, 1, len(exercise.sets))
+		require.Equal(t, set.SetID(), exercise.sets[0].SetID())
 
 		err = exercise.RemoveSet(set)
 		require.NoError(t, err)
-		require.Equal(t, 0, len(exercise.Sets))
+		require.Equal(t, 0, len(exercise.sets))
 
 	})
 }
@@ -108,7 +108,7 @@ func TestEditExercise(t *testing.T) {
 		gen := random.Weight()
 		err = exercise.EditExercise(random.String(75), gen, random.RestTime(), random.RepCount())
 		require.NoError(t, err)
-		require.Equal(t, gen, exercise.Weight)
+		require.Equal(t, gen, exercise.weight)
 	})
 
 }

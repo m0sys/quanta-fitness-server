@@ -4,6 +4,7 @@ package athlete
 
 import (
 	"errors"
+	"math"
 	"time"
 
 	"github.com/mhd53/quanta-fitness-server/pkg/uuid"
@@ -14,22 +15,45 @@ import (
 
 // Athlete entity for representing what an athlete is.
 type Athlete struct {
-	AthleteID     string
-	Height        float64 // in meters
-	WeightHistory []WeightRecord
-	WorkoutLogs   []wl.WorkoutLog
+	uuid          string
+	height        float64 // in meters
+	weightHistory []WeightRecord
+	workoutLogs   []wl.WorkoutLog
 }
 
+// WeightRecord holds recording for Athlete's weight.
 type WeightRecord struct {
-	Amount float64 // in kg
-	Date   time.Time
+	amount float64 // in kg
+	date   time.Time
+}
+
+func (wr *WeightRecord) Amount() float64 {
+	return wr.amount
+}
+
+func (wr *WeightRecord) Date() time.Time {
+	return wr.date
 }
 
 // NewAthlete create a new Athlete.
 func NewAthlete() Athlete {
 	return Athlete{
-		AthleteID: uuid.GenerateUUID(),
+		uuid: uuid.GenerateUUID(),
 	}
+}
+
+func (a *Athlete) WorkoutLogs() []wl.WorkoutLog {
+	tmp := make([]wl.WorkoutLog, len(a.workoutLogs))
+	copy(tmp, a.workoutLogs)
+	return tmp
+}
+
+func (a *Athlete) AthleteID() string {
+	return a.uuid
+}
+
+func (a *Athlete) Height() float64 {
+	return a.height
 }
 
 // SetHeight set the height of Athlete.
@@ -37,34 +61,34 @@ func (a *Athlete) SetHeight(height float64) error {
 	if err := validateHeight(height); err != nil {
 		return err
 	}
-	a.Height = height
+	a.height = height
 	return nil
 }
 
 // UpdateWeight update the weight of Athlete.
-func (a *Athlete) UpdateWeight(weight float64) error {
+func (a *Athlete) UpdateWeight(weight float64) (WeightRecord, error) {
 	if err := validateWeight(weight); err != nil {
-		return err
+		return WeightRecord{}, err
 	}
 
 	newWeight := WeightRecord{
-		Amount: weight,
-		Date:   time.Now(),
+		amount: roundToTwoDecimalPlaces(weight),
+		date:   time.Now(),
 	}
 
-	a.WeightHistory = append(a.WeightHistory, newWeight)
-	return nil
+	a.weightHistory = append(a.weightHistory, newWeight)
+	return newWeight, nil
 }
 
 // AddWorkoutLog add WorkoutLog to Athlete.
 func (a *Athlete) AddWorkoutLog(log wl.WorkoutLog) error {
-	for _, l := range a.WorkoutLogs {
-		if l.LogID == log.LogID {
+	for _, l := range a.workoutLogs {
+		if l.LogID() == log.LogID() {
 			return errors.New("Workout Log is already assigned to Athlete")
 		}
 	}
 
-	a.WorkoutLogs = append(a.WorkoutLogs, log)
+	a.workoutLogs = append(a.workoutLogs, log)
 	return nil
 }
 
@@ -72,9 +96,9 @@ func (a *Athlete) AddWorkoutLog(log wl.WorkoutLog) error {
 func (a *Athlete) RemoveWorkoutLog(log wl.WorkoutLog) error {
 	deleted := false
 
-	for i, l := range a.WorkoutLogs {
-		if l.LogID == log.LogID {
-			a.WorkoutLogs = removeWorkoutLog(a.WorkoutLogs, i)
+	for i, l := range a.workoutLogs {
+		if l.LogID() == log.LogID() {
+			a.workoutLogs = removeWorkoutLog(a.workoutLogs, i)
 			deleted = true
 		}
 	}
@@ -99,6 +123,10 @@ func validateWeight(weight float64) error {
 		return errors.New("weight must be a positive number")
 	}
 	return nil
+}
+
+func roundToTwoDecimalPlaces(num float64) float64 {
+	return math.Round(num*100) / 100
 }
 
 func removeWorkoutLog(slice []wl.WorkoutLog, idx int) []wl.WorkoutLog {

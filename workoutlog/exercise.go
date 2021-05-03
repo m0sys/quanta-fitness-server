@@ -13,13 +13,13 @@ import (
 
 // Exercise entity for representing what an exercise is.
 type Exercise struct {
-	ExerciseID string
-	Name       string
-	Weight     float64 // in kg
-	TargetRep  int
-	RestTime   float64 // in sec
-	Sets       []Set
-	order      int
+	uuid      string
+	name      string
+	weight    float64 // in kg
+	targetRep int
+	restTime  float64 // in sec
+	sets      []Set
+	order     int
 }
 
 // NewExercise create a new Exercise.
@@ -32,24 +32,54 @@ func NewExercise(name string, weight, restTime float64, targetRep int, order int
 	restTime = roundToTwoDecimalPlaces(restTime)
 
 	return Exercise{
-		ExerciseID: uuid.GenerateUUID(),
-		Name:       name,
-		Weight:     roundToTwoDecimalPlaces(weight),
-		RestTime:   roundToTwoDecimalPlaces(restTime),
-		TargetRep:  targetRep,
-		order:      order,
+		uuid:      uuid.GenerateUUID(),
+		name:      name,
+		weight:    roundToTwoDecimalPlaces(weight),
+		restTime:  roundToTwoDecimalPlaces(restTime),
+		targetRep: targetRep,
+		order:     order,
 	}, nil
+}
+
+func (e *Exercise) ExerciseID() string {
+	return e.uuid
+}
+
+func (e *Exercise) Name() string {
+	return e.name
+}
+
+func (e *Exercise) Weight() float64 {
+	return e.weight
+}
+
+func (e *Exercise) TargetRep() int {
+	return e.targetRep
+}
+
+func (e *Exercise) RestTime() float64 {
+	return e.restTime
+}
+
+func (e *Exercise) InsertSet(s Set, i int) {
+	e.sets[i] = s
+}
+
+func (e *Exercise) Sets() []Set {
+	tmp := make([]Set, len(e.sets))
+	copy(tmp, e.sets)
+	return tmp
 }
 
 // AddSet add Set to Exercise.
 func (e *Exercise) AddSet(set Set) error {
-	for _, s := range e.Sets {
-		if s.SetID == set.SetID {
+	for _, s := range e.sets {
+		if s.SetID() == set.SetID() {
 			return errors.New("Set is already logged")
 		}
 	}
 
-	e.Sets = append(e.Sets, set)
+	e.sets = append(e.sets, set)
 	return nil
 }
 
@@ -57,9 +87,9 @@ func (e *Exercise) AddSet(set Set) error {
 func (e *Exercise) RemoveSet(set Set) error {
 	deleted := false
 
-	for i, s := range e.Sets {
-		if s.SetID == set.SetID {
-			e.Sets = removeSet(e.Sets, i)
+	for i, s := range e.sets {
+		if s.SetID() == set.SetID() {
+			e.sets = removeSet(e.sets, i)
 			deleted = true
 		}
 	}
@@ -76,10 +106,10 @@ func (e *Exercise) EditExercise(name string, weight, restTime float64, targetRep
 		return err
 	}
 
-	e.Name = name
-	e.Weight = weight
-	e.RestTime = restTime
-	e.TargetRep = targetRep
+	e.name = name
+	e.weight = weight
+	e.restTime = restTime
+	e.targetRep = targetRep
 	return nil
 }
 

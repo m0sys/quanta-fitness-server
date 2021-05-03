@@ -19,7 +19,7 @@ func TestNewSet(t *testing.T) {
 		set, err := NewSet(gen)
 		require.NoError(t, err)
 		require.NotEmpty(t, set)
-		require.Equal(t, gen, set.ActualRepCount)
+		require.Equal(t, gen, set.ActualRepCount())
 	})
 }
 
@@ -28,7 +28,7 @@ func TestEditSet(t *testing.T) {
 	set, err := NewSet(gen)
 	require.NoError(t, err)
 	require.NotEmpty(t, set)
-	require.Equal(t, gen, set.ActualRepCount)
+	require.Equal(t, gen, set.ActualRepCount())
 
 	t.Run("When negative rep", func(t *testing.T) {
 		err = set.EditSet(-1)
@@ -39,6 +39,6 @@ func TestEditSet(t *testing.T) {
 		gen2 := random.RepCount()
 		err = set.EditSet(gen2)
 		require.NoError(t, err)
-		require.Equal(t, gen2, set.ActualRepCount)
+		require.Equal(t, gen2, set.ActualRepCount())
 	})
 }

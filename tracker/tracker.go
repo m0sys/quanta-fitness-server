@@ -71,11 +71,11 @@ func (t *tracker) AddExerciseToWorkoutLog(req AddExerciseToWorkoutLogReq) (Exerc
 		return ExerciseRes{}, err
 	}
 
-	if err := checkLogIDMismatch(t.wlog.LogID, req.LogID); err != nil {
+	if err := checkLogIDMismatch(t.wlog.LogID(), req.LogID); err != nil {
 		return ExerciseRes{}, err
 	}
 
-	newExercise, err := wl.NewExercise(req.Name, req.Weight, req.RestTime, req.TargetRep, len(t.wlog.Exercises))
+	newExercise, err := wl.NewExercise(req.Name, req.Weight, req.RestTime, req.TargetRep, t.wlog.NumExercises())
 	if err != nil {
 		return ExerciseRes{}, err
 	}
@@ -89,7 +89,6 @@ func (t *tracker) AddExerciseToWorkoutLog(req AddExerciseToWorkoutLogReq) (Exerc
 	if err != nil {
 		log.Printf("error while adding Exercise to WorkoutLog in repo: %s", err.Error())
 		return ExerciseRes{}, errInternal
-
 	}
 
 	return exerciseRes, nil
@@ -100,7 +99,7 @@ func (t *tracker) AddSetToExercise(req AddSetToExerciseReq) (SetRes, error) {
 		return SetRes{}, err
 	}
 
-	if err := checkLogIDMismatch(t.wlog.LogID, req.LogID); err != nil {
+	if err := checkLogIDMismatch(t.wlog.LogID(), req.LogID); err != nil {
 		return SetRes{}, err
 	}
 
@@ -118,7 +117,7 @@ func (t *tracker) AddSetToExercise(req AddSetToExerciseReq) (SetRes, error) {
 		log.Fatal("couldn't add newly created Set to Exercise")
 	}
 
-	t.wlog.Exercises[foundIdx] = exercise
+	t.wlog.InsertExercise(exercise, foundIdx)
 
 	setRes, err := t.repo.AddSetToExercise(exercise, newSet)
 	if err != nil {
@@ -173,7 +172,7 @@ func (t *tracker) RemoveSetFromExercise(setID string, exerciseID string) error {
 		return err
 	}
 
-	err = t.repo.DeleteSet(set.SetID)
+	err = t.repo.DeleteSet(set.SetID())
 
 	if err != nil {
 		log.Printf("%s: couldn't delete Set from repo: %s", "tracker", err.Error())
@@ -188,7 +187,7 @@ func (t *tracker) EditWorkoutLog(req EditWorkoutLogReq) (WorkoutLogRes, error) {
 		return WorkoutLogRes{}, err
 	}
 
-	if err := checkLogIDMismatch(t.wlog.LogID, req.LogID); err != nil {
+	if err := checkLogIDMismatch(t.wlog.LogID(), req.LogID); err != nil {
 		return WorkoutLogRes{}, err
 	}
 
@@ -221,7 +220,7 @@ func (t *tracker) EditExercise(req EditExerciseReq) (ExerciseRes, error) {
 		return ExerciseRes{}, err
 	}
 
-	t.wlog.Exercises[foundIdx] = exercise
+	t.wlog.InsertExercise(exercise, foundIdx)
 
 	res, err := t.repo.UpdateExercise(req)
 	if err != nil {
@@ -253,8 +252,8 @@ func (t *tracker) EditSet(req EditSetReq) (SetRes, error) {
 		return SetRes{}, err
 	}
 
-	exercise.Sets[foundIdxS] = set
-	t.wlog.Exercises[foundIdxE] = exercise
+	exercise.InsertSet(set, foundIdxS)
+	t.wlog.InsertExercise(exercise, foundIdxE)
 
 	res, err := t.repo.UpdateSet(req)
 	if err != nil {
@@ -334,8 +333,9 @@ func findExercise(wlog wl.WorkoutLog, eid string) (bool, int, wl.Exercise) {
 	found := false
 	var foundIdx int
 	var exercise wl.Exercise
-	for i, e := range wlog.Exercises {
-		if e.ExerciseID == eid {
+	exercises := wlog.Exercises()
+	for i, e := range exercises {
+		if e.ExerciseID() == eid {
 			found = true
 			foundIdx = i
 			exercise = e
@@ -349,8 +349,9 @@ func findSet(exercise wl.Exercise, sid string) (bool, int, wl.Set) {
 	found := false
 	var foundIdx int
 	var set wl.Set
-	for i, s := range exercise.Sets {
-		if s.SetID == sid {
+	sets := exercise.Sets()
+	for i, s := range sets {
+		if s.SetID() == sid {
 			found = true
 			foundIdx = i
 			set = s

@@ -1,6 +1,7 @@
 package random
 
 import (
+	"math"
 	"math/rand"
 	"strings"
 	"time"
@@ -38,12 +39,12 @@ func Int(min, max int64) int {
 
 // Weight generate a random weight in kg.
 func Weight() float64 {
-	return Float(10, 198.0)
+	return roundToTwoDecimalPlaces(Float(10, 198.0))
 }
 
 // RestTime generate a random rest time in seconds.
 func RestTime() float64 {
-	return Float(30.0, 150.0)
+	return roundToTwoDecimalPlaces(Float(30.0, 150.0))
 }
 
 // RepCount generate a random rep count.
@@ -51,7 +52,16 @@ func RepCount() int {
 	return Int(5, 15)
 }
 
+// NumSets generate a random number of sets.
+func NumSets() int {
+	return Int(1, 25)
+}
+
 // Height generate a random height in m.
 func Height() float64 {
 	return Float(1.0, 2.0)
+}
+
+func roundToTwoDecimalPlaces(num float64) float64 {
+	return math.Round(num*100) / 100
 }
