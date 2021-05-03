@@ -11,6 +11,7 @@ type ExerciseLog struct {
 	name      string
 	metrics   Metrics
 	completed bool
+	pos       int
 }
 
 type Metrics struct {
@@ -21,13 +22,14 @@ type Metrics struct {
 }
 
 // This constructor should only be used through ExercisePlanToExerciseLogTranslator.
-func NewExerciseLog(wlid, name string, metrics Metrics) ExerciseLog {
+func NewExerciseLog(wlid, name string, metrics Metrics, pos int) ExerciseLog {
 	return ExerciseLog{
 		uuid:      uuid.GenerateUUID(),
 		wlid:      wlid,
 		name:      name,
 		metrics:   metrics,
 		completed: false,
+		pos:       pos,
 	}
 }
 
@@ -64,6 +66,10 @@ func (e *ExerciseLog) Completed() bool {
 
 func (e *ExerciseLog) Complete() {
 	e.completed = true
+}
+
+func (e *ExerciseLog) Pos() int {
+	return e.pos
 }
 
 func NewMetrics(targetRep, numSets int, weight, restDur float64) Metrics {

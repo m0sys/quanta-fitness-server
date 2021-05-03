@@ -15,4 +15,5 @@ var (
 	ErrIdentialName             = fmt.Errorf("%s: Exercise with identical name already in WorkoutPlan", errSlur)
 	ErrExerciseAlreadyExists    = fmt.Errorf("%s: Exercise already Exists", errSlur)
 	ErrExerciseNotFound         = fmt.Errorf("%s: Exercise not found", errSlur)
+	ErrOrderOutOfRange          = fmt.Errorf("%s: Exercise order is out of range", errSlur)
 )

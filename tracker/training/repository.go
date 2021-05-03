@@ -16,4 +16,5 @@ type Repository interface {
 	FindAllExerciseLogsForWorkoutLog(wlog wl.WorkoutLog) ([]elg.ExerciseLog, error)
 	FindAllSetLogsForExerciseLog(elog elg.ExerciseLog) ([]sl.SetLog, error)
 	FindWorkoutLogByID(wlog wl.WorkoutLog) (bool, error)
+	FindExerciseLogByID(elog elg.ExerciseLog) (bool, error)
 }

@@ -11,27 +11,29 @@ import (
 )
 
 type repo struct {
-	wlogs   map[string]inRepoWorkoutLog
-	elogs   map[string]inRepoExerciseLog
-	setlogs map[string]inRepoSetLog
+	wlogs map[string]inRepoWorkoutLog
+	elogs map[string]inRepoExerciseLog
+	slogs map[string]inRepoSetLog
 }
 
 func NewInMemRepo() t.Repository {
 	return &repo{
-		wlogs:   make(map[string]inRepoWorkoutLog),
-		elogs:   make(map[string]inRepoExerciseLog),
-		setlogs: make(map[string]inRepoSetLog),
+		wlogs: make(map[string]inRepoWorkoutLog),
+		elogs: make(map[string]inRepoExerciseLog),
+		slogs: make(map[string]inRepoSetLog),
 	}
 }
 func (r *repo) StoreWorkoutLog(wlog wl.WorkoutLog) error {
 	now := time.Now()
 	data := inRepoWorkoutLog{
-		ID:        wlog.ID(),
-		AthleteID: wlog.AthleteID(),
-		Title:     wlog.Title(),
-		Date:      wlog.Date(),
-		CreatedAt: now,
-		UpdatedAt: now,
+		ID:         wlog.ID(),
+		AthleteID:  wlog.AthleteID(),
+		Title:      wlog.Title(),
+		Date:       wlog.Date(),
+		CurrentPos: wlog.CurrentPos(),
+		Completed:  wlog.Completed(),
+		CreatedAt:  now,
+		UpdatedAt:  now,
 	}
 
 	r.wlogs[wlog.ID()] = data
@@ -58,7 +60,19 @@ func (r *repo) StoreExerciseLog(elog elg.ExerciseLog) error {
 	return nil
 }
 
-func (r *repo) StoreSetLog(setlog sl.SetLog) error {
+func (r *repo) StoreSetLog(slog sl.SetLog) error {
+	metrics := slog.Metrics()
+	now := time.Now()
+	data := inRepoSetLog{
+		ID:             slog.ID(),
+		ExerciseLogID:  slog.ExerciseLogID(),
+		ActualRepCount: metrics.ActualRepCount(),
+		Dur:            float64(metrics.Dur()),
+		CreatedAt:      now,
+		UpdatedAt:      now,
+	}
+
+	r.slogs[slog.ID()] = data
 	return nil
 }
 
@@ -72,7 +86,7 @@ func (r *repo) FindAllWorkoutLogsForAthlete(ath athlete.Athlete) ([]wl.WorkoutLo
 
 	for _, val := range r.wlogs {
 		if val.AthleteID == aid {
-			wlog := wl.RestoreWorkoutLog(val.ID, val.AthleteID, val.Title, val.Date, val.Completed)
+			wlog := wl.RestoreWorkoutLog(val.ID, val.AthleteID, val.Title, val.Date, val.CurrentPos, val.Completed)
 
 			wlogs = append(wlogs, wlog)
 		}
@@ -99,6 +113,18 @@ func (r *repo) FindAllExerciseLogsForWorkoutLog(wlog wl.WorkoutLog) ([]elg.Exerc
 
 func (r *repo) FindAllSetLogsForExerciseLog(elog elg.ExerciseLog) ([]sl.SetLog, error) {
 	var slogs []sl.SetLog
+
+	elid := elog.ID()
+
+	for _, val := range r.slogs {
+		if val.ExerciseLogID == elid {
+			metrics := sl.NewMetrics(val.ActualRepCount, val.Dur)
+
+			slog := sl.RestoreSetLog(val.ID, val.ExerciseLogID, metrics)
+
+			slogs = append(slogs, slog)
+		}
+	}
 	return slogs, nil
 }
 
@@ -108,14 +134,21 @@ func (r *repo) FindWorkoutLogByID(wlog wl.WorkoutLog) (bool, error) {
 
 }
 
+func (r *repo) FindExerciseLogByID(elog elg.ExerciseLog) (bool, error) {
+	_, ok := r.elogs[elog.ID()]
+	return ok, nil
+
+}
+
 type inRepoWorkoutLog struct {
-	ID        string
-	AthleteID string
-	Title     string
-	Completed bool
-	Date      time.Time
-	CreatedAt time.Time
-	UpdatedAt time.Time
+	ID         string
+	AthleteID  string
+	Title      string
+	CurrentPos int
+	Completed  bool
+	Date       time.Time
+	CreatedAt  time.Time
+	UpdatedAt  time.Time
 }
 
 type inRepoExerciseLog struct {

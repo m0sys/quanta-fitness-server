@@ -7,7 +7,8 @@ const (
 )
 
 var (
-	errInternal           = fmt.Errorf("%s: internal error", errSlur)
-	ErrWorkoutLogNotFound = fmt.Errorf("%s: WorkoutLog not found", errSlur)
-	ErrUnauthorizedAccess = fmt.Errorf("%s: unauthorized access", errSlur)
+	errInternal            = fmt.Errorf("%s: internal error", errSlur)
+	ErrWorkoutLogNotFound  = fmt.Errorf("%s: WorkoutLog not found", errSlur)
+	ErrUnauthorizedAccess  = fmt.Errorf("%s: unauthorized access", errSlur)
+	ErrExerciseLogNotFound = fmt.Errorf("%s: ExerciseLog not found", errSlur)
 )

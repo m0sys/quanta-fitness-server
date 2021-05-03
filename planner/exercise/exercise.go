@@ -14,6 +14,7 @@ type Exercise struct {
 	aid     string
 	name    string
 	metrics Metrics
+	pos     int
 }
 
 type Metrics struct {
@@ -23,8 +24,12 @@ type Metrics struct {
 	restDur   units.Second
 }
 
-func NewExercise(wpid, aid, name string, metrics Metrics) (Exercise, error) {
+func NewExercise(wpid, aid, name string, metrics Metrics, pos int) (Exercise, error) {
 	if err := validateName(name); err != nil {
+		return Exercise{}, err
+	}
+
+	if err := validatePos(pos); err != nil {
 		return Exercise{}, err
 	}
 
@@ -34,12 +39,17 @@ func NewExercise(wpid, aid, name string, metrics Metrics) (Exercise, error) {
 		aid:     aid,
 		name:    name,
 		metrics: metrics,
+		pos:     pos,
 	}, nil
 }
 
 // FIXME: find alternative solution for id checking...
-func RestoreExercise(id, wpid, aid, name string, metrics Metrics) (Exercise, error) {
+func RestoreExercise(id, wpid, aid, name string, metrics Metrics, pos int) (Exercise, error) {
 	if err := validateName(name); err != nil {
+		return Exercise{}, err
+	}
+
+	if err := validatePos(pos); err != nil {
 		return Exercise{}, err
 	}
 
@@ -49,6 +59,7 @@ func RestoreExercise(id, wpid, aid, name string, metrics Metrics) (Exercise, err
 		aid:     aid,
 		name:    name,
 		metrics: metrics,
+		pos:     pos,
 	}, nil
 }
 
@@ -141,6 +152,10 @@ func (e *Exercise) WorkoutPlanID() string {
 	return e.wpid
 }
 
+func (e *Exercise) Pos() int {
+	return e.pos
+}
+
 func NewMetrics(targetRep, numSets int, weight, restDur float64) (Metrics, error) {
 	if err := validateMetrics(targetRep, numSets, weight, restDur); err != nil {
 		return Metrics{}, err
@@ -198,6 +213,7 @@ var (
 	ErrInvalidNumSets   = errors.New("num sets must be a positive number")
 	ErrInvalidWeight    = errors.New("weight must be a positive number")
 	ErrInvalidRestDur   = errors.New("rest duration must be a positive number")
+	ErrInvalidPos       = errors.New("position must be a positive number")
 )
 
 func validateName(name string) error {
@@ -205,6 +221,13 @@ func validateName(name string) error {
 		return ErrInvalidName
 	}
 
+	return nil
+}
+
+func validatePos(pos int) error {
+	if pos < 0 {
+		return ErrInvalidPos
+	}
 	return nil
 }
 

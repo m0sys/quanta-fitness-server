@@ -41,7 +41,7 @@ func (wt *WorkoutTranslator) ConvertWorkoutPlan(wplan wp.WorkoutPlan) (wl.Workou
 	for _, e := range exercises {
 		metrics := e.Metrics()
 		lMetrics := elg.NewMetrics(metrics.TargetRep(), metrics.NumSets(), float64(metrics.Weight()), float64(metrics.RestDur()))
-		elog := elg.NewExerciseLog(wlog.ID(), e.Name(), lMetrics)
+		elog := elg.NewExerciseLog(wlog.ID(), e.Name(), lMetrics, e.Pos())
 
 		err = wt.logRepo.StoreExerciseLog(elog)
 		if err != nil {
