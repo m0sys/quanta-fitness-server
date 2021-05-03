@@ -39,6 +39,22 @@ func (r *repo) StoreWorkoutLog(wlog wl.WorkoutLog) error {
 }
 
 func (r *repo) StoreExerciseLog(elog elg.ExerciseLog) error {
+	metrics := elog.Metrics()
+	now := time.Now()
+	data := inRepoExerciseLog{
+		ID:           elog.ID(),
+		WorkoutLogID: elog.WorkoutLogID(),
+		Name:         elog.Name(),
+		TargetRep:    metrics.TargetRep(),
+		NumSets:      metrics.NumSets(),
+		Weight:       float64(metrics.Weight()),
+		RestDur:      float64(metrics.RestDur()),
+		Completed:    elog.Completed(),
+		CreatedAt:    now,
+		UpdatedAt:    now,
+	}
+
+	r.elogs[elog.ID()] = data
 	return nil
 }
 
@@ -53,6 +69,7 @@ func (r *repo) RemoveWorkoutLog(wlog wl.WorkoutLog) error {
 func (r *repo) FindAllWorkoutLogsForAthlete(ath athlete.Athlete) ([]wl.WorkoutLog, error) {
 	aid := ath.AthleteID()
 	var wlogs []wl.WorkoutLog
+
 	for _, val := range r.wlogs {
 		if val.AthleteID == aid {
 			wlog := wl.RestoreWorkoutLog(val.ID, val.AthleteID, val.Title, val.Date, val.Completed)
@@ -65,12 +82,30 @@ func (r *repo) FindAllWorkoutLogsForAthlete(ath athlete.Athlete) ([]wl.WorkoutLo
 }
 func (r *repo) FindAllExerciseLogsForWorkoutLog(wlog wl.WorkoutLog) ([]elg.ExerciseLog, error) {
 	var elogs []elg.ExerciseLog
+	wlid := wlog.ID()
+
+	for _, val := range r.elogs {
+		if val.WorkoutLogID == wlid {
+			metrics := elg.NewMetrics(val.TargetRep, val.NumSets, val.Weight, val.RestDur)
+
+			elog := elg.RestoreExerciseLog(val.ID, val.WorkoutLogID, val.Name, val.Completed, metrics)
+
+			elogs = append(elogs, elog)
+		}
+	}
+
 	return elogs, nil
 }
 
 func (r *repo) FindAllSetLogsForExerciseLog(elog elg.ExerciseLog) ([]sl.SetLog, error) {
 	var slogs []sl.SetLog
 	return slogs, nil
+}
+
+func (r *repo) FindWorkoutLogByID(wlog wl.WorkoutLog) (bool, error) {
+	_, ok := r.wlogs[wlog.ID()]
+	return ok, nil
+
 }
 
 type inRepoWorkoutLog struct {
