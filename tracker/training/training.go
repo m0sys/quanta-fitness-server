@@ -61,8 +61,8 @@ func (t TrainingService) validateWlog(ath athlete.Athlete, wlog wl.WorkoutLog) e
 
 	if !found {
 		return ErrWorkoutLogNotFound
-
 	}
+
 	return nil
 }
 
@@ -88,7 +88,6 @@ func (t TrainingService) AddSetLogToExerciseLog(ath athlete.Athlete, wlog wl.Wor
 	eMetrics := elog.Metrics()
 	if len(slogs) == eMetrics.NumSets() {
 		return ErrCannotExceedNumSets
-
 	}
 
 	slog := sl.NewSetLog(elog.ID(), metrics)
@@ -118,7 +117,6 @@ func (t TrainingService) validateElog(ath athlete.Athlete, wlog wl.WorkoutLog, e
 
 	if !found {
 		return ErrExerciseLogNotFound
-
 	}
 
 	return nil
@@ -212,5 +210,4 @@ func (t TrainingService) RemoveWorkoutLog(ath athlete.Athlete, wlog wl.WorkoutLo
 	}
 
 	return nil
-
 }

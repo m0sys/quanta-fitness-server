@@ -19,7 +19,7 @@ import (
 )
 
 func TestConvertWorkout(t *testing.T) {
-	wt, pService, _, ath := setup()
+	wt, pService, tService, ath := setup()
 
 	t.Run("When no Exercise in WorkoutPlan", func(t *testing.T) {
 		wplan := wplanSetup(t, ath, pService)
@@ -37,7 +37,9 @@ func TestConvertWorkout(t *testing.T) {
 		require.NotEmpty(t, wlog)
 		require.Equal(t, wplan.Title(), wlog.Title())
 
-		// TODO: Check that WorkoutLog is stored.
+		wlogs, err := tService.FetchWorkoutLogs(ath)
+		require.NoError(t, err)
+		require.NotEmpty(t, wlogs)
 	})
 }
 
@@ -51,12 +53,9 @@ func TestFetchWorkoutLogs(t *testing.T) {
 	})
 
 	t.Run("When  WorkoutLogs for Athlete exist", func(t *testing.T) {
-		wplan := wplanSetup(t, ath, pService)
-		exerciseSetup(t, ath, wplan, pService)
 		n := 5
 		for i := 0; i < n; i++ {
-			wlog, err := wt.ConvertWorkoutPlan(wplan)
-			require.NoError(t, err)
+			wlog, _ := wlogSuccesSetup(t, ath, pService, wt)
 			require.NotEmpty(t, wlog)
 		}
 
@@ -80,22 +79,13 @@ func TestFetchWorkoutLogExerciseLogs(t *testing.T) {
 	})
 
 	t.Run("When Unauthorized", func(t *testing.T) {
-		wplan := wplanSetup(t, ath, pService)
-		n := 5
-		for i := 0; i < n; i++ {
-			exerciseSetup(t, ath, wplan, pService)
-		}
-		wlog, err := wt.ConvertWorkoutPlan(wplan)
-		require.NoError(t, err)
-		require.NotEmpty(t, wlog)
-		require.Equal(t, wplan.Title(), wlog.Title())
+		wlog, _ := wlogSuccesSetup(t, ath, pService, wt)
 
 		ath2 := athlete.NewAthlete()
 		elogs, err := tService.FetchWorkoutLogExerciseLogs(ath2, wlog)
 		require.Error(t, err)
 		require.Equal(t, ts.ErrUnauthorizedAccess.Error(), err.Error())
 		require.Empty(t, elogs)
-
 	})
 
 	t.Run("When success", func(t *testing.T) {
@@ -105,9 +95,7 @@ func TestFetchWorkoutLogExerciseLogs(t *testing.T) {
 		require.NoError(t, err)
 		require.NotEmpty(t, elogs)
 		require.Equal(t, n, len(elogs))
-
 	})
-
 }
 
 func TestMoveToNextExerciseLog(t *testing.T) {
@@ -254,7 +242,6 @@ func TestRemoveWorkoutLog(t *testing.T) {
 		err := tService.RemoveWorkoutLog(ath, wlog)
 		require.NoError(t, err)
 
-		// TODO: Check not found
 		wlogs, err := tService.FetchWorkoutLogs(ath)
 		require.NoError(t, err)
 		require.Empty(t, wlogs)
