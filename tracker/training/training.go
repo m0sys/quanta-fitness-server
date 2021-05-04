@@ -174,3 +174,43 @@ func (t TrainingService) FetchSetLogsForExerciseLog(ath athlete.Athlete, wlog wl
 
 	return slogs, nil
 }
+
+func (t TrainingService) RemoveWorkoutLog(ath athlete.Athlete, wlog wl.WorkoutLog) error {
+	if err := t.validateWlog(ath, wlog); err != nil {
+		return err
+	}
+
+	elogs, err := t.repo.FindAllExerciseLogsForWorkoutLog(wlog)
+	if err != nil {
+		log.Printf("%s: %s", errSlur, err.Error())
+		return errInternal
+	}
+
+	for _, elog := range elogs {
+		slogs, err := t.repo.FindAllSetLogsForExerciseLog(elog)
+		if err != nil {
+			log.Printf("%s: %s", errSlur, err.Error())
+			return errInternal
+		}
+
+		for _, slog := range slogs {
+			if err := t.repo.RemoveSetLog(slog); err != nil {
+				log.Printf("%s: %s", errSlur, err.Error())
+				return errInternal
+			}
+		}
+
+		if err := t.repo.RemoveExerciseLog(elog); err != nil {
+			log.Printf("%s: %s", errSlur, err.Error())
+			return errInternal
+		}
+	}
+
+	if err := t.repo.RemoveWorkoutLog(wlog); err != nil {
+		log.Printf("%s: %s", errSlur, err.Error())
+		return errInternal
+	}
+
+	return nil
+
+}

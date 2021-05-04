@@ -18,4 +18,6 @@ type Repository interface {
 	FindWorkoutLogByID(wlog wl.WorkoutLog) (bool, error)
 	FindExerciseLogByID(elog elg.ExerciseLog) (bool, error)
 	UpdateWorkoutLog(wlog wl.WorkoutLog) error
+	RemoveExerciseLog(elog elg.ExerciseLog) error
+	RemoveSetLog(slog sl.SetLog) error
 }

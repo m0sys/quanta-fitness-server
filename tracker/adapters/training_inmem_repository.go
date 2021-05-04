@@ -77,10 +77,6 @@ func (r *repo) StoreSetLog(slog sl.SetLog) error {
 	return nil
 }
 
-func (r *repo) RemoveWorkoutLog(wlog wl.WorkoutLog) error {
-	return nil
-}
-
 func (r *repo) FindAllWorkoutLogsForAthlete(ath athlete.Athlete) ([]wl.WorkoutLog, error) {
 	aid := ath.AthleteID()
 	var wlogs []wl.WorkoutLog
@@ -139,6 +135,21 @@ func (r *repo) FindExerciseLogByID(elog elg.ExerciseLog) (bool, error) {
 	_, ok := r.elogs[elog.ID()]
 	return ok, nil
 
+}
+
+func (r *repo) RemoveWorkoutLog(wlog wl.WorkoutLog) error {
+	delete(r.wlogs, wlog.ID())
+	return nil
+}
+
+func (r *repo) RemoveExerciseLog(elog elg.ExerciseLog) error {
+	delete(r.elogs, elog.ID())
+	return nil
+}
+
+func (r *repo) RemoveSetLog(slog sl.SetLog) error {
+	delete(r.slogs, slog.ID())
+	return nil
 }
 
 func (r *repo) UpdateWorkoutLog(wlog wl.WorkoutLog) error {
