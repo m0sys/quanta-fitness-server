@@ -232,6 +232,35 @@ func TestAddSetLogToExerciseLog(t *testing.T) {
 
 }
 
+func TestRemoveWorkoutLog(t *testing.T) {
+	wt, pService, tService, ath := setup()
+	t.Run("When WorkoutLog not found", func(t *testing.T) {
+		wlog := wlogNotFoundSetup(ath)
+		err := tService.RemoveWorkoutLog(ath, wlog)
+		require.Error(t, err)
+		require.Equal(t, ts.ErrWorkoutLogNotFound.Error(), err.Error())
+	})
+
+	t.Run("When unauthorized access to WorkoutLog", func(t *testing.T) {
+		ath2 := athlete.NewAthlete()
+		wlog, _ := wlogSuccesSetup(t, ath2, pService, wt)
+		err := tService.RemoveWorkoutLog(ath, wlog)
+		require.Error(t, err)
+		require.Equal(t, ts.ErrUnauthorizedAccess.Error(), err.Error())
+	})
+
+	t.Run("When success", func(t *testing.T) {
+		wlog, _ := wlogSuccesSetup(t, ath, pService, wt)
+		err := tService.RemoveWorkoutLog(ath, wlog)
+		require.NoError(t, err)
+
+		// TODO: Check not found
+		wlogs, err := tService.FetchWorkoutLogs(ath)
+		require.NoError(t, err)
+		require.Empty(t, wlogs)
+	})
+}
+
 func wplanSetup(t *testing.T, ath athlete.Athlete, service p.PlanningService) workoutplan.WorkoutPlan {
 	wplan, err := service.CreateNewWorkoutPlan(ath, random.String(75))
 	require.NoError(t, err)
