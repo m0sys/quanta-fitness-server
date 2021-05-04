@@ -12,7 +12,7 @@ import (
 	"errors"
 	"log"
 
-	"github.com/mhd53/quanta-fitness-server/athlete"
+	"github.com/mhd53/quanta-fitness-server/manager/athlete"
 )
 
 // AthleteManager manages Athlete's personal data such as weight.

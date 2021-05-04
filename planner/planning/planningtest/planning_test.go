@@ -3,8 +3,8 @@ package planningtest
 import (
 	"testing"
 
-	"github.com/mhd53/quanta-fitness-server/athlete"
 	"github.com/mhd53/quanta-fitness-server/internal/random"
+	"github.com/mhd53/quanta-fitness-server/manager/athlete"
 	"github.com/mhd53/quanta-fitness-server/planner/adapters"
 	e "github.com/mhd53/quanta-fitness-server/planner/exercise"
 	p "github.com/mhd53/quanta-fitness-server/planner/planning"
@@ -692,7 +692,7 @@ func exerciseNotFoundSetup(t *testing.T, ath athlete.Athlete, wplan wp.WorkoutPl
 	)
 	require.NoError(t, err)
 
-	exercise, err := e.NewExercise(wplan.ID(), ath.AthleteID(), name, metrics)
+	exercise, err := e.NewExercise(wplan.ID(), ath.AthleteID(), name, metrics, 0)
 	require.NoError(t, err)
 	require.NotEmpty(t, exercise)
 	require.Equal(t, name, exercise.Name())
@@ -711,7 +711,7 @@ func exerciseUnauthorizedSetup(t *testing.T, wplan wp.WorkoutPlan) e.Exercise {
 	)
 	require.NoError(t, err)
 
-	exercise, err := e.NewExercise(wplan.ID(), ath.AthleteID(), name, metrics)
+	exercise, err := e.NewExercise(wplan.ID(), ath.AthleteID(), name, metrics, 0)
 	require.NoError(t, err)
 	require.NotEmpty(t, exercise)
 	require.Equal(t, name, exercise.Name())

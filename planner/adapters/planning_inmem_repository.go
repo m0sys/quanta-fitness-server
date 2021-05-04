@@ -4,7 +4,7 @@ import (
 	"errors"
 	"time"
 
-	"github.com/mhd53/quanta-fitness-server/athlete"
+	"github.com/mhd53/quanta-fitness-server/manager/athlete"
 	"github.com/mhd53/quanta-fitness-server/planner/exercise"
 	p "github.com/mhd53/quanta-fitness-server/planner/planning"
 	wp "github.com/mhd53/quanta-fitness-server/planner/workoutplan"
@@ -77,6 +77,7 @@ func (r *repo) StoreExercise(wplan wp.WorkoutPlan, e exercise.Exercise, ath athl
 		NumSets:       metrics.NumSets(),
 		Weight:        float64(metrics.Weight()),
 		RestDur:       float64(metrics.RestDur()),
+		Pos:           e.Pos(),
 		CreatedAt:     now,
 		UpdatedAt:     now,
 	}
@@ -158,7 +159,7 @@ func (r *repo) FindAllExercisesForWorkoutPlan(wplan wp.WorkoutPlan) ([]exercise.
 				return []exercise.Exercise{}, err
 			}
 
-			e, err := exercise.RestoreExercise(val.ID, val.WorkoutPlanID, val.AthleteID, val.Name, metrics)
+			e, err := exercise.RestoreExercise(val.ID, val.WorkoutPlanID, val.AthleteID, val.Name, metrics, val.Pos)
 			if err != nil {
 				return []exercise.Exercise{}, err
 			}
@@ -217,6 +218,7 @@ type inRepoExercise struct {
 	NumSets       int
 	Weight        float64
 	RestDur       float64
+	Pos           int
 	CreatedAt     time.Time
 	UpdatedAt     time.Time
 }

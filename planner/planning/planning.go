@@ -3,7 +3,7 @@ package planning
 import (
 	"log"
 
-	"github.com/mhd53/quanta-fitness-server/athlete"
+	"github.com/mhd53/quanta-fitness-server/manager/athlete"
 	e "github.com/mhd53/quanta-fitness-server/planner/exercise"
 	wp "github.com/mhd53/quanta-fitness-server/planner/workoutplan"
 )
@@ -51,7 +51,12 @@ func (p PlanningService) AddNewExerciseToWorkoutPlan(
 		return e.Exercise{}, err
 	}
 
-	exercise, err := e.NewExercise(wplan.ID(), ath.AthleteID(), name, metrics)
+	pos, err := p.genPos(wplan)
+	if err != nil {
+		return e.Exercise{}, err
+	}
+
+	exercise, err := e.NewExercise(wplan.ID(), ath.AthleteID(), name, metrics, pos)
 	if err != nil {
 		return e.Exercise{}, err
 	}
@@ -95,6 +100,22 @@ func (p PlanningService) validateWorkoutPlan(ath athlete.Athlete, wplan wp.Worko
 
 func isAuthorizedWP(ath athlete.Athlete, wplan wp.WorkoutPlan) bool {
 	return wplan.AthleteID() == ath.AthleteID()
+}
+
+func (p PlanningService) genPos(wplan wp.WorkoutPlan) (int, error) {
+	exercises, err := p.repo.FindAllExercisesForWorkoutPlan(wplan)
+	if err != nil {
+		log.Printf("%s: %s", errSlur, err.Error())
+		return -1, errInternal
+	}
+
+	length := len(exercises)
+
+	if length == 0 {
+		return 0, nil
+	}
+
+	return exercises[length-1].Pos() + 1, nil
 }
 
 func (p PlanningService) RemoveExerciseFromWorkoutPlan(

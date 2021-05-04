@@ -1,9 +1,9 @@
 package managertest
 
 import (
-	"github.com/mhd53/quanta-fitness-server/athlete"
 	"github.com/mhd53/quanta-fitness-server/internal/repository/inmem/managerrepo"
 	"github.com/mhd53/quanta-fitness-server/manager"
+	"github.com/mhd53/quanta-fitness-server/manager/athlete"
 )
 
 func setup() manager.AthleteManager {
