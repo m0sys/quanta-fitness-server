@@ -40,6 +40,13 @@ func NewAthlete() Athlete {
 	}
 }
 
+// This should only be used to restore Athlete from persistence layer.
+func RestoreAthlete(id string) Athlete {
+	return Athlete{
+		uuid: id,
+	}
+}
+
 func (a *Athlete) AthleteID() string {
 	return a.uuid
 }

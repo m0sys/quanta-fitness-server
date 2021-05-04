@@ -1,9 +1,12 @@
-package manager
+package managing
 
-import "github.com/mhd53/quanta-fitness-server/manager/athlete"
+import (
+	"github.com/mhd53/quanta-fitness-server/account/user"
+	"github.com/mhd53/quanta-fitness-server/manager/athlete"
+)
 
 // Repository repo for persisting all Athlete related data.
 type Repository interface {
-	FindAllWeightRecords(aid string) ([]WeightRecordRes, error)
-	StoreWeightRecord(aid string, record athlete.WeightRecord) error
+	StoreAthlete(usr user.User, ath athlete.Athlete) error
+	FindAthleteByUname(usr user.User) (athlete.Athlete, bool, error)
 }
