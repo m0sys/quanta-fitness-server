@@ -47,6 +47,30 @@ func TestSignUp(t *testing.T) {
 	})
 }
 
+func TestLogin(t *testing.T) {
+	service := setup()
+	t.Run("When User doesn't exist", func(t *testing.T) {
+		user, err := service.Login(random.String(10), random.String(100))
+		require.Error(t, err)
+		require.Empty(t, user)
+		require.Equal(t, a.ErrUnameNotFound.Error(), err.Error())
+	})
+
+	t.Run("When incorrect password", func(t *testing.T) {
+		uname := random.String(10)
+		password := random.String(100)
+
+		user, err := service.SignUp(uname, random.Email(), password)
+		require.NoError(t, err)
+		require.NotEmpty(t, user)
+
+		user, err = service.Login(uname, random.String(100))
+		require.Error(t, err)
+		require.Empty(t, user)
+		require.Equal(t, a.ErrIncorrectPassword.Error(), err.Error())
+	})
+}
+
 func setup() a.AccountService {
 	repo := adapters.NewInMemRepo()
 	return a.NewAccountService(repo)
