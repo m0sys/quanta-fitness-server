@@ -110,14 +110,63 @@ func TestFetchWorkoutLogExerciseLogs(t *testing.T) {
 
 }
 
+func TestMoveToNextExerciseLog(t *testing.T) {
+	wt, pService, tService, ath := setup()
+	t.Run("When WorkoutLog not found", func(t *testing.T) {
+		wlog := wlogNotFoundSetup(ath)
+		_, elog, err := tService.MoveToNextExerciseLog(ath, wlog)
+		require.Error(t, err)
+		require.Empty(t, elog)
+		require.Equal(t, ts.ErrWorkoutLogNotFound.Error(), err.Error())
+	})
+
+	t.Run("When unauthorized access", func(t *testing.T) {
+		ath2 := athlete.NewAthlete()
+		wlog, _ := wlogSuccesSetup(t, ath, pService, wt)
+		_, elog, err := tService.MoveToNextExerciseLog(ath2, wlog)
+		require.Error(t, err)
+		require.Empty(t, elog)
+		require.Equal(t, ts.ErrUnauthorizedAccess.Error(), err.Error())
+	})
+
+	t.Run("When success", func(t *testing.T) {
+		wlog, _ := wlogSuccesSetup(t, ath, pService, wt)
+		_, elog, err := tService.MoveToNextExerciseLog(ath, wlog)
+		require.NoError(t, err)
+		require.NotEmpty(t, elog)
+	})
+
+	t.Run("When WorkoutLog already completed", func(t *testing.T) {
+		var elog el.ExerciseLog
+		var wlog wl.WorkoutLog
+		var err error
+		n := 5
+		wlog, _ = wlogSuccesSetup(t, ath, pService, wt)
+
+		for i := 0; i < n; i++ {
+			currPos := wlog.CurrentPos()
+			wlog, elog, err = tService.MoveToNextExerciseLog(ath, wlog)
+			require.NoError(t, err)
+			require.NotEmpty(t, elog)
+			require.Equal(t, currPos+1, wlog.CurrentPos())
+		}
+
+		currPos := wlog.CurrentPos()
+		wlog, elog, err = tService.MoveToNextExerciseLog(ath, wlog)
+		require.Error(t, err)
+		require.Empty(t, elog)
+		require.Equal(t, ts.ErrWorkoutLogAlreadyCompleted.Error(), err.Error())
+		require.Equal(t, currPos, wlog.CurrentPos())
+	})
+}
+
 func TestAddSetLogToExerciseLog(t *testing.T) {
 	wt, pService, tService, ath := setup()
 	t.Run("When WorkoutLog not found", func(t *testing.T) {
 		wlog := wlogNotFoundSetup(ath)
 		elog := elogNotFoundSetup(wlog)
 		metrics := sl.NewMetrics(random.RepCount(), random.RestTime())
-		setlog := sl.NewSetLog(elog.ID(), metrics)
-		err := tService.AddSetLogToExerciseLog(ath, wlog, elog, setlog)
+		err := tService.AddSetLogToExerciseLog(ath, wlog, elog, metrics)
 		require.Error(t, err)
 		require.Equal(t, ts.ErrWorkoutLogNotFound.Error(), err.Error())
 	})
@@ -127,8 +176,7 @@ func TestAddSetLogToExerciseLog(t *testing.T) {
 		wlog := wlogNotFoundSetup(ath2)
 		elog := elogNotFoundSetup(wlog)
 		metrics := sl.NewMetrics(random.RepCount(), random.RestTime())
-		setlog := sl.NewSetLog(elog.ID(), metrics)
-		err := tService.AddSetLogToExerciseLog(ath, wlog, elog, setlog)
+		err := tService.AddSetLogToExerciseLog(ath, wlog, elog, metrics)
 		require.Error(t, err)
 		require.Equal(t, ts.ErrUnauthorizedAccess.Error(), err.Error())
 
@@ -138,8 +186,7 @@ func TestAddSetLogToExerciseLog(t *testing.T) {
 		wlog, _ := wlogSuccesSetup(t, ath, pService, wt)
 		elog := elogNotFoundSetup(wlog)
 		metrics := sl.NewMetrics(random.RepCount(), random.RestTime())
-		slog := sl.NewSetLog(elog.ID(), metrics)
-		err := tService.AddSetLogToExerciseLog(ath, wlog, elog, slog)
+		err := tService.AddSetLogToExerciseLog(ath, wlog, elog, metrics)
 		require.Error(t, err)
 		require.Equal(t, ts.ErrExerciseLogNotFound.Error(), err.Error())
 	})
@@ -152,9 +199,8 @@ func TestAddSetLogToExerciseLog(t *testing.T) {
 		elog := elogs[0]
 		repCount := random.RepCount()
 		metrics := sl.NewMetrics(repCount, random.RestTime())
-		slog := sl.NewSetLog(elog.ID(), metrics)
 
-		err = tService.AddSetLogToExerciseLog(ath, wlog, elog, slog)
+		err = tService.AddSetLogToExerciseLog(ath, wlog, elog, metrics)
 		require.NoError(t, err)
 
 		slogs, err := tService.FetchSetLogsForExerciseLog(ath, wlog, elog)
@@ -162,7 +208,26 @@ func TestAddSetLogToExerciseLog(t *testing.T) {
 		require.NotEmpty(t, slogs)
 		metrics = slogs[0].Metrics()
 		require.Equal(t, repCount, metrics.ActualRepCount())
+	})
 
+	t.Run("When attempting to exceed num sets for ExerciseLog", func(t *testing.T) {
+		n := 4
+		wlog, _ := wlogSuccesSetup(t, ath, pService, wt)
+
+		elogs, err := tService.FetchWorkoutLogExerciseLogs(ath, wlog)
+		require.NoError(t, err)
+		elog := elogs[0]
+		repCount := random.RepCount()
+		metrics := sl.NewMetrics(repCount, random.RestTime())
+
+		for i := 0; i < n; i++ {
+			err = tService.AddSetLogToExerciseLog(ath, wlog, elog, metrics)
+			require.NoError(t, err)
+		}
+
+		err = tService.AddSetLogToExerciseLog(ath, wlog, elog, metrics)
+		require.Error(t, err)
+		require.Equal(t, ts.ErrCannotExceedNumSets.Error(), err.Error())
 	})
 
 }
@@ -197,7 +262,7 @@ func exerciseSetup(t *testing.T, ath athlete.Athlete, wplan wp.WorkoutPlan, serv
 
 	metrics, err := e.NewMetrics(
 		random.RepCount(),
-		random.NumSets(),
+		4,
 		random.Weight(),
 		random.RestTime(),
 	)
