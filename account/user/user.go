@@ -52,6 +52,10 @@ func RestoreUser(username, email, hashedPwd string, joined time.Time) (User, err
 	}, nil
 }
 
+func (u *User) CheckPassword(pwd string) error {
+	return bcrypt.CompareHashAndPassword([]byte(u.hashedPwd), []byte(pwd))
+}
+
 func (u *User) Username() string {
 	return u.username
 }
@@ -119,8 +123,4 @@ func hashPassword(pwd string) (string, error) {
 	}
 
 	return string(hashedPwd), nil
-}
-
-func checkPassword(pwd string, hashedPwd string) error {
-	return bcrypt.CompareHashAndPassword([]byte(hashedPwd), []byte(pwd))
 }

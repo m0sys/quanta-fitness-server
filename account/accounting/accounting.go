@@ -64,3 +64,22 @@ func (a AccountService) validateEmail(email string) error {
 
 	return nil
 }
+
+func (a AccountService) Login(uname, pwd string) (user.User, error) {
+	userFound, found, err := a.repo.FindUserByUname(uname)
+	if err != nil {
+		log.Printf("%s: %s", errSlug, err.Error())
+		return user.User{}, errInternal
+	}
+
+	if !found {
+		return user.User{}, ErrUnameNotFound
+	}
+
+	if err := userFound.CheckPassword(pwd); err != nil {
+		log.Printf("%s: %s", errSlug, err.Error())
+		return user.User{}, ErrIncorrectPassword
+	}
+
+	return userFound, nil
+}
