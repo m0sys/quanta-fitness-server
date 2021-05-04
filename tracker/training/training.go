@@ -70,7 +70,7 @@ func isAuthorizedWL(ath athlete.Athlete, wlog wl.WorkoutLog) bool {
 	return wlog.AthleteID() == ath.AthleteID()
 }
 
-func (t TrainingService) AddSetLogToExerciseLog(ath athlete.Athlete, wlog wl.WorkoutLog, elog el.ExerciseLog, slog sl.SetLog) error {
+func (t TrainingService) AddSetLogToExerciseLog(ath athlete.Athlete, wlog wl.WorkoutLog, elog el.ExerciseLog, metrics sl.Metrics) error {
 	if err := t.validateWlog(ath, wlog); err != nil {
 		return err
 	}
@@ -79,7 +79,20 @@ func (t TrainingService) AddSetLogToExerciseLog(ath athlete.Athlete, wlog wl.Wor
 		return err
 	}
 
-	err := t.repo.StoreSetLog(slog)
+	slogs, err := t.repo.FindAllSetLogsForExerciseLog(elog)
+	if err != nil {
+		log.Printf("%s: %s", errSlur, err.Error())
+		return errInternal
+	}
+
+	eMetrics := elog.Metrics()
+	if len(slogs) == eMetrics.NumSets() {
+		return ErrCannotExceedNumSets
+
+	}
+
+	slog := sl.NewSetLog(elog.ID(), metrics)
+	err = t.repo.StoreSetLog(slog)
 	if err != nil {
 		log.Printf("%s: %s", errSlur, err.Error())
 		return errInternal
@@ -110,6 +123,37 @@ func (t TrainingService) validateElog(ath athlete.Athlete, wlog wl.WorkoutLog, e
 
 	return nil
 
+}
+
+func (t TrainingService) MoveToNextExerciseLog(ath athlete.Athlete, wlog wl.WorkoutLog) (wl.WorkoutLog, el.ExerciseLog, error) {
+	if err := t.validateWlog(ath, wlog); err != nil {
+		return wlog, el.ExerciseLog{}, err
+	}
+
+	if wlog.Completed() {
+		return wlog, el.ExerciseLog{}, ErrWorkoutLogAlreadyCompleted
+	}
+
+	elogs, err := t.repo.FindAllExerciseLogsForWorkoutLog(wlog)
+	if err != nil {
+		log.Printf("%s: %s", errSlur, err.Error())
+		return wlog, el.ExerciseLog{}, errInternal
+	}
+
+	prevState := wl.RestoreWorkoutLog(wlog.ID(), wlog.AthleteID(), wlog.Title(), wlog.Date(), wlog.CurrentPos(), wlog.Completed())
+	currPos := wlog.CurrentPos()
+	wlog.NextPos()
+	if wlog.CurrentPos() == len(elogs) {
+		wlog.Complete()
+	}
+
+	err = t.repo.UpdateWorkoutLog(wlog)
+	if err != nil {
+		log.Printf("%s: %s", errSlur, err.Error())
+		return prevState, el.ExerciseLog{}, errInternal
+	}
+
+	return wlog, elogs[currPos], nil
 }
 
 func (t TrainingService) FetchSetLogsForExerciseLog(ath athlete.Athlete, wlog wl.WorkoutLog, elog el.ExerciseLog) ([]sl.SetLog, error) {

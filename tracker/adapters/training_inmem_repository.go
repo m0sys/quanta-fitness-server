@@ -1,6 +1,7 @@
 package adapters
 
 import (
+	"errors"
 	"time"
 
 	"github.com/mhd53/quanta-fitness-server/manager/athlete"
@@ -137,6 +138,29 @@ func (r *repo) FindWorkoutLogByID(wlog wl.WorkoutLog) (bool, error) {
 func (r *repo) FindExerciseLogByID(elog elg.ExerciseLog) (bool, error) {
 	_, ok := r.elogs[elog.ID()]
 	return ok, nil
+
+}
+
+func (r *repo) UpdateWorkoutLog(wlog wl.WorkoutLog) error {
+	prev, ok := r.wlogs[wlog.ID()]
+	if !ok {
+		return errors.New("WorkoutLog not found!")
+	}
+
+	now := time.Now()
+	data := inRepoWorkoutLog{
+		ID:         wlog.ID(),
+		AthleteID:  wlog.AthleteID(),
+		Title:      wlog.Title(),
+		CurrentPos: wlog.CurrentPos(),
+		Completed:  wlog.Completed(),
+		Date:       wlog.Date(),
+		CreatedAt:  prev.CreatedAt,
+		UpdatedAt:  now,
+	}
+
+	r.wlogs[wlog.ID()] = data
+	return nil
 
 }
 
