@@ -1,6 +1,7 @@
 package random
 
 import (
+	"fmt"
 	"math"
 	"math/rand"
 	"strings"
@@ -60,6 +61,11 @@ func NumSets() int {
 // Height generate a random height in m.
 func Height() float64 {
 	return Float(1.0, 2.0)
+}
+
+// Email generate a random email.
+func Email() string {
+	return fmt.Sprintf("%s@email.com", String(10))
 }
 
 func roundToTwoDecimalPlaces(num float64) float64 {

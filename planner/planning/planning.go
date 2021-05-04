@@ -24,7 +24,7 @@ func (p PlanningService) CreateNewWorkoutPlan(ath athlete.Athlete, title string)
 
 	found, err := p.repo.FindWorkoutPlanByTitleAndAthleteID(wplan, ath)
 	if err != nil {
-		log.Printf("%s: %s", errSlur, err.Error())
+		log.Printf("%s: %s", errSlug, err.Error())
 		return wp.WorkoutPlan{}, errInternal
 	}
 
@@ -34,7 +34,7 @@ func (p PlanningService) CreateNewWorkoutPlan(ath athlete.Athlete, title string)
 
 	err = p.repo.StoreWorkoutPlan(wplan, ath)
 	if err != nil {
-		log.Printf("%s: %s", errSlur, err.Error())
+		log.Printf("%s: %s", errSlug, err.Error())
 		return wp.WorkoutPlan{}, errInternal
 	}
 
@@ -63,7 +63,7 @@ func (p PlanningService) AddNewExerciseToWorkoutPlan(
 
 	found, err := p.repo.FindExerciseByNameAndWorkoutPlanID(wplan, exercise)
 	if err != nil {
-		log.Printf("%s: %s", errSlur, err.Error())
+		log.Printf("%s: %s", errSlug, err.Error())
 		return e.Exercise{}, errInternal
 	}
 
@@ -73,7 +73,7 @@ func (p PlanningService) AddNewExerciseToWorkoutPlan(
 
 	err = p.repo.StoreExercise(wplan, exercise, ath)
 	if err != nil {
-		log.Printf("%s: %s", errSlur, err.Error())
+		log.Printf("%s: %s", errSlug, err.Error())
 		return e.Exercise{}, errInternal
 	}
 
@@ -87,7 +87,7 @@ func (p PlanningService) validateWorkoutPlan(ath athlete.Athlete, wplan wp.Worko
 
 	found, err := p.repo.FindWorkoutPlanByID(wplan)
 	if err != nil {
-		log.Printf("%s: %s", errSlur, err.Error())
+		log.Printf("%s: %s", errSlug, err.Error())
 		return errInternal
 	}
 
@@ -105,7 +105,7 @@ func isAuthorizedWP(ath athlete.Athlete, wplan wp.WorkoutPlan) bool {
 func (p PlanningService) genPos(wplan wp.WorkoutPlan) (int, error) {
 	exercises, err := p.repo.FindAllExercisesForWorkoutPlan(wplan)
 	if err != nil {
-		log.Printf("%s: %s", errSlur, err.Error())
+		log.Printf("%s: %s", errSlug, err.Error())
 		return -1, errInternal
 	}
 
@@ -133,7 +133,7 @@ func (p PlanningService) RemoveExerciseFromWorkoutPlan(
 
 	err := p.repo.RemoveExercise(exercise)
 	if err != nil {
-		log.Printf("%s: %s", errSlur, err.Error())
+		log.Printf("%s: %s", errSlug, err.Error())
 		return errInternal
 	}
 
@@ -147,7 +147,7 @@ func (p PlanningService) validateExercise(ath athlete.Athlete, wplan wp.WorkoutP
 
 	found, err := p.repo.FindExerciseByID(exercise)
 	if err != nil {
-		log.Printf("%s: %s", errSlur, err.Error())
+		log.Printf("%s: %s", errSlug, err.Error())
 		return errInternal
 	}
 
@@ -176,7 +176,7 @@ func (p PlanningService) EditWorkoutPlanTitle(ath athlete.Athlete, wplan wp.Work
 
 	found, err := p.repo.FindWorkoutPlanByTitleAndAthleteID(wplan, ath)
 	if err != nil {
-		log.Printf("%s: %s", errSlur, err.Error())
+		log.Printf("%s: %s", errSlug, err.Error())
 		wplan.EditTitle(prevTitle)
 		return errInternal
 	}
@@ -188,7 +188,7 @@ func (p PlanningService) EditWorkoutPlanTitle(ath athlete.Athlete, wplan wp.Work
 
 	err = p.repo.UpdateWorkoutPlan(wplan)
 	if err != nil {
-		log.Printf("%s: %s", errSlur, err.Error())
+		log.Printf("%s: %s", errSlug, err.Error())
 		return errInternal
 	}
 
@@ -200,7 +200,7 @@ func (p PlanningService) FetchWorkoutPlans(ath athlete.Athlete) ([]wp.WorkoutPla
 
 	wplans, err := p.repo.FindAllWorkoutPlansForAthlete(ath)
 	if err != nil {
-		log.Printf("%s: %s", errSlur, err.Error())
+		log.Printf("%s: %s", errSlug, err.Error())
 		return wplans, errInternal
 	}
 
@@ -216,7 +216,7 @@ func (p PlanningService) FetchWorkoutPlanExercises(ath athlete.Athlete, wplan wp
 
 	exercises, err := p.repo.FindAllExercisesForWorkoutPlan(wplan)
 	if err != nil {
-		log.Printf("%s: %s", errSlur, err.Error())
+		log.Printf("%s: %s", errSlug, err.Error())
 		return exercises, errInternal
 	}
 
@@ -241,7 +241,7 @@ func (p PlanningService) EditExerciseName(ath athlete.Athlete, wplan wp.WorkoutP
 
 	found, err := p.repo.FindExerciseByNameAndWorkoutPlanID(wplan, exercise)
 	if err != nil {
-		log.Printf("%s: %s", errSlur, err.Error())
+		log.Printf("%s: %s", errSlug, err.Error())
 		exercise.EditName(prevName)
 		return errInternal
 	}
@@ -253,7 +253,7 @@ func (p PlanningService) EditExerciseName(ath athlete.Athlete, wplan wp.WorkoutP
 
 	err = p.repo.UpdateExercise(exercise)
 	if err != nil {
-		log.Printf("%s: %s", errSlur, err.Error())
+		log.Printf("%s: %s", errSlug, err.Error())
 		return errInternal
 	}
 
@@ -279,7 +279,7 @@ func (p PlanningService) EditExerciseTargetRep(ath athlete.Athlete, wplan wp.Wor
 
 	err = p.repo.UpdateExercise(exercise)
 	if err != nil {
-		log.Printf("%s: %s", errSlur, err.Error())
+		log.Printf("%s: %s", errSlug, err.Error())
 		exercise.EditTargetRep(prevTargetRep)
 		return errInternal
 	}

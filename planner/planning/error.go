@@ -3,17 +3,17 @@ package planning
 import "fmt"
 
 const (
-	errSlur = "planning"
+	errSlug = "planning"
 )
 
 var (
-	errInternal                 = fmt.Errorf("%s: internal error", errSlur)
-	ErrIdentialTitle            = fmt.Errorf("%s: WorkoutPlan with identical title already exists", errSlur)
-	ErrWorkoutPlanAlreadyExists = fmt.Errorf("%s: WorkoutPlan already exists", errSlur)
-	ErrUnauthorizedAccess       = fmt.Errorf("%s: unauthorized access", errSlur)
-	ErrWorkoutPlanNotFound      = fmt.Errorf("%s: WorkoutPlan not found", errSlur)
-	ErrIdentialName             = fmt.Errorf("%s: Exercise with identical name already in WorkoutPlan", errSlur)
-	ErrExerciseAlreadyExists    = fmt.Errorf("%s: Exercise already Exists", errSlur)
-	ErrExerciseNotFound         = fmt.Errorf("%s: Exercise not found", errSlur)
-	ErrOrderOutOfRange          = fmt.Errorf("%s: Exercise order is out of range", errSlur)
+	errInternal                 = fmt.Errorf("%s: internal error", errSlug)
+	ErrIdentialTitle            = fmt.Errorf("%s: WorkoutPlan with identical title already exists", errSlug)
+	ErrWorkoutPlanAlreadyExists = fmt.Errorf("%s: WorkoutPlan already exists", errSlug)
+	ErrUnauthorizedAccess       = fmt.Errorf("%s: unauthorized access", errSlug)
+	ErrWorkoutPlanNotFound      = fmt.Errorf("%s: WorkoutPlan not found", errSlug)
+	ErrIdentialName             = fmt.Errorf("%s: Exercise with identical name already in WorkoutPlan", errSlug)
+	ErrExerciseAlreadyExists    = fmt.Errorf("%s: Exercise already Exists", errSlug)
+	ErrExerciseNotFound         = fmt.Errorf("%s: Exercise not found", errSlug)
+	ErrOrderOutOfRange          = fmt.Errorf("%s: Exercise order is out of range", errSlug)
 )
