@@ -170,19 +170,19 @@ func (p PlanningService) EditWorkoutPlanTitle(ath athlete.Athlete, wplan wp.Work
 
 	err := wplan.EditTitle(title)
 	if err != nil {
-		wplan.EditTitle(prevTitle)
+		wplan.EditTitle(prevTitle) //nolint
 		return err
 	}
 
 	found, err := p.repo.FindWorkoutPlanByTitleAndAthleteID(wplan, ath)
 	if err != nil {
 		log.Printf("%s: %s", errSlug, err.Error())
-		wplan.EditTitle(prevTitle)
+		wplan.EditTitle(prevTitle) //nolint
 		return errInternal
 	}
 
 	if found {
-		wplan.EditTitle(prevTitle)
+		wplan.EditTitle(prevTitle) //nolint
 		return ErrIdentialTitle
 	}
 
@@ -235,19 +235,19 @@ func (p PlanningService) EditExerciseName(ath athlete.Athlete, wplan wp.WorkoutP
 	prevName := exercise.Name()
 	err := exercise.EditName(name)
 	if err != nil {
-		exercise.EditName(prevName)
+		exercise.EditName(prevName) //nolint
 		return err
 	}
 
 	found, err := p.repo.FindExerciseByNameAndWorkoutPlanID(wplan, exercise)
 	if err != nil {
 		log.Printf("%s: %s", errSlug, err.Error())
-		exercise.EditName(prevName)
+		exercise.EditName(prevName) //nolint
 		return errInternal
 	}
 
 	if found {
-		exercise.EditName(prevName)
+		exercise.EditName(prevName) //nolint
 		return ErrIdentialName
 	}
 
@@ -273,14 +273,14 @@ func (p PlanningService) EditExerciseTargetRep(ath athlete.Athlete, wplan wp.Wor
 	prevTargetRep := metrics.TargetRep()
 	err := exercise.EditTargetRep(targetRep)
 	if err != nil {
-		exercise.EditTargetRep(prevTargetRep)
+		exercise.EditTargetRep(prevTargetRep) //nolint
 		return err
 	}
 
 	err = p.repo.UpdateExercise(exercise)
 	if err != nil {
 		log.Printf("%s: %s", errSlug, err.Error())
-		exercise.EditTargetRep(prevTargetRep)
+		exercise.EditTargetRep(prevTargetRep) //nolint
 		return errInternal
 	}
 
@@ -300,14 +300,14 @@ func (p PlanningService) EditExerciseNumSets(ath athlete.Athlete, wplan wp.Worko
 	prevNumSets := metrics.NumSets()
 	err := exercise.EditNumSets(numSets)
 	if err != nil {
-		exercise.EditNumSets(prevNumSets)
+		exercise.EditNumSets(prevNumSets) //nolint
 		return err
 	}
 
 	err = p.repo.UpdateExercise(exercise)
 	if err != nil {
-		log.Printf("%s: %s", errSlur, err.Error())
-		exercise.EditNumSets(prevNumSets)
+		log.Printf("%s: %s", errSlug, err.Error())
+		exercise.EditNumSets(prevNumSets) //nolint
 		return errInternal
 	}
 
@@ -327,14 +327,14 @@ func (p PlanningService) EditExerciseWeight(ath athlete.Athlete, wplan wp.Workou
 	prevWeight := float64(metrics.Weight())
 	err := exercise.EditWeight(weight)
 	if err != nil {
-		exercise.EditWeight(prevWeight)
+		exercise.EditWeight(prevWeight) //nolint
 		return err
 	}
 
 	err = p.repo.UpdateExercise(exercise)
 	if err != nil {
-		log.Printf("%s: %s", errSlur, err.Error())
-		exercise.EditWeight(prevWeight)
+		log.Printf("%s: %s", errSlug, err.Error())
+		exercise.EditWeight(prevWeight) //nolint
 		return errInternal
 	}
 
@@ -354,14 +354,14 @@ func (p PlanningService) EditExerciseRestDur(ath athlete.Athlete, wplan wp.Worko
 	prevRestDur := float64(metrics.RestDur())
 	err := exercise.EditRestDur(restDur)
 	if err != nil {
-		exercise.EditRestDur(prevRestDur)
+		exercise.EditRestDur(prevRestDur) //nolint
 		return err
 	}
 
 	err = p.repo.UpdateExercise(exercise)
 	if err != nil {
-		log.Printf("%s: %s", errSlur, err.Error())
-		exercise.EditRestDur(prevRestDur)
+		log.Printf("%s: %s", errSlug, err.Error())
+		exercise.EditRestDur(prevRestDur) //nolint
 		return errInternal
 	}
 
@@ -375,7 +375,7 @@ func (p PlanningService) RemoveWorkoutPlan(ath athlete.Athlete, wplan wp.Workout
 
 	err := p.repo.RemoveWorkoutPlan(wplan)
 	if err != nil {
-		log.Printf("%s: %s", errSlur, err.Error())
+		log.Printf("%s: %s", errSlug, err.Error())
 		return errInternal
 	}
 

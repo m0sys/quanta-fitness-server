@@ -25,7 +25,7 @@ func TestCreateNewWorkoutPlan(t *testing.T) {
 	})
 
 	t.Run("When WorkoutPlan with given title already exists", func(t *testing.T) {
-		wplan, title := workoutPlanSuccessSetup(t, ath, service)
+		_, title := workoutPlanSuccessSetup(t, ath, service)
 
 		wplan, err := service.CreateNewWorkoutPlan(ath, title)
 		require.Error(t, err)
