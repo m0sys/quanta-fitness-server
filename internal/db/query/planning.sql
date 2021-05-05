@@ -23,12 +23,14 @@ INSERT INTO exercises (
     id,
     aid,
     wpid,
+    name,
     target_rep,
     num_sets,
     weight,
-    rest_duration
+    rest_duration,
+    pos
     ) VALUES (
-    $1, $2, $3, $4, $5, $6, $7);
+    $1, $2, $3, $4, $5, $6, $7, $8, $9);
 
 -- name: FindExerciseByID :one
 SELECT * FROM exercises
@@ -63,7 +65,8 @@ SET name = $2,
     target_rep = $3,
     num_sets = $4,
     weight = $5,
-    rest_duration = $6
+    rest_duration = $6,
+    pos = $7
 WHERE id = $1;
 
 -- name: RemoveWorkoutPlan :exec

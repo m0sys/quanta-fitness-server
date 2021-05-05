@@ -23,6 +23,7 @@ type Exercise struct {
 	NumSets      int32     `json:"num_sets"`
 	Weight       float64   `json:"weight"`
 	RestDuration float64   `json:"rest_duration"`
+	Pos          int32     `json:"pos"`
 	CreatedAt    time.Time `json:"created_at"`
 	UpdatedAt    time.Time `json:"updated_at"`
 }

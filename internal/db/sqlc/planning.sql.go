@@ -10,7 +10,7 @@ import (
 )
 
 const findAllExercisesForWorkoutPlan = `-- name: FindAllExercisesForWorkoutPlan :many
-SELECT id, wpid, aid, name, target_rep, num_sets, weight, rest_duration, created_at, updated_at FROM exercises
+SELECT id, wpid, aid, name, target_rep, num_sets, weight, rest_duration, pos, created_at, updated_at FROM exercises
 WHERE wpid = $1
 `
 
@@ -32,6 +32,7 @@ func (q *Queries) FindAllExercisesForWorkoutPlan(ctx context.Context, wpid uuid.
 			&i.NumSets,
 			&i.Weight,
 			&i.RestDuration,
+			&i.Pos,
 			&i.CreatedAt,
 			&i.UpdatedAt,
 		); err != nil {
@@ -83,7 +84,7 @@ func (q *Queries) FindAllWorkoutPlansForAthlete(ctx context.Context, aid uuid.UU
 }
 
 const findExerciseByID = `-- name: FindExerciseByID :one
-SELECT id, wpid, aid, name, target_rep, num_sets, weight, rest_duration, created_at, updated_at FROM exercises
+SELECT id, wpid, aid, name, target_rep, num_sets, weight, rest_duration, pos, created_at, updated_at FROM exercises
 WHERE id = $1 LIMIT 1
 `
 
@@ -99,6 +100,7 @@ func (q *Queries) FindExerciseByID(ctx context.Context, id uuid.UUID) (Exercise,
 		&i.NumSets,
 		&i.Weight,
 		&i.RestDuration,
+		&i.Pos,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
@@ -106,7 +108,7 @@ func (q *Queries) FindExerciseByID(ctx context.Context, id uuid.UUID) (Exercise,
 }
 
 const findExerciseByNameAndWorkoutPlanID = `-- name: FindExerciseByNameAndWorkoutPlanID :one
-SELECT id, wpid, aid, name, target_rep, num_sets, weight, rest_duration, created_at, updated_at FROM exercises
+SELECT id, wpid, aid, name, target_rep, num_sets, weight, rest_duration, pos, created_at, updated_at FROM exercises
 WHERE name = $1 AND wpid = $2 LIMIT 1
 `
 
@@ -127,6 +129,7 @@ func (q *Queries) FindExerciseByNameAndWorkoutPlanID(ctx context.Context, arg Fi
 		&i.NumSets,
 		&i.Weight,
 		&i.RestDuration,
+		&i.Pos,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
@@ -222,22 +225,26 @@ INSERT INTO exercises (
     id,
     aid,
     wpid,
+    name,
     target_rep,
     num_sets,
     weight,
-    rest_duration
+    rest_duration,
+    pos
     ) VALUES (
-    $1, $2, $3, $4, $5, $6, $7)
+    $1, $2, $3, $4, $5, $6, $7, $8, $9)
 `
 
 type StoreExerciseParams struct {
 	ID           uuid.UUID `json:"id"`
 	Aid          uuid.UUID `json:"aid"`
 	Wpid         uuid.UUID `json:"wpid"`
+	Name         string    `json:"name"`
 	TargetRep    int32     `json:"target_rep"`
 	NumSets      int32     `json:"num_sets"`
 	Weight       float64   `json:"weight"`
 	RestDuration float64   `json:"rest_duration"`
+	Pos          int32     `json:"pos"`
 }
 
 func (q *Queries) StoreExercise(ctx context.Context, arg StoreExerciseParams) error {
@@ -245,10 +252,12 @@ func (q *Queries) StoreExercise(ctx context.Context, arg StoreExerciseParams) er
 		arg.ID,
 		arg.Aid,
 		arg.Wpid,
+		arg.Name,
 		arg.TargetRep,
 		arg.NumSets,
 		arg.Weight,
 		arg.RestDuration,
+		arg.Pos,
 	)
 	return err
 }
@@ -279,7 +288,8 @@ SET name = $2,
     target_rep = $3,
     num_sets = $4,
     weight = $5,
-    rest_duration = $6
+    rest_duration = $6,
+    pos = $7
 WHERE id = $1
 `
 
@@ -290,6 +300,7 @@ type UpdateExerciseParams struct {
 	NumSets      int32     `json:"num_sets"`
 	Weight       float64   `json:"weight"`
 	RestDuration float64   `json:"rest_duration"`
+	Pos          int32     `json:"pos"`
 }
 
 func (q *Queries) UpdateExercise(ctx context.Context, arg UpdateExerciseParams) error {
@@ -300,6 +311,7 @@ func (q *Queries) UpdateExercise(ctx context.Context, arg UpdateExerciseParams) 
 		arg.NumSets,
 		arg.Weight,
 		arg.RestDuration,
+		arg.Pos,
 	)
 	return err
 }

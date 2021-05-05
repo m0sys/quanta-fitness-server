@@ -23,6 +23,7 @@ CREATE TABLE "exercises" (
     "num_sets" int NOT NULL,
     "weight" float8 NOT NULL,
     "rest_duration" float8 NOT NULL,
+    "pos" int NOT NULL,
     "created_at" timestamptz NOT NULL DEFAULT (now()),
     "updated_at" timestamptz NOT NULL DEFAULT (now())
 );
