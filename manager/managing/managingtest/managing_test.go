@@ -28,9 +28,6 @@ func TestFetchAthlete(t *testing.T) {
 	usr, err := user.NewUser(random.String(10), random.Email(), random.String(100))
 	require.NoError(t, err)
 	require.NotEmpty(t, usr)
-	// ath, err := service.CreateNewAthlete(usr)
-	// require.NoError(t, err)
-	// require.NotEmpty(t, ath)
 
 	t.Run("When User not found", func(t *testing.T) {
 		ath, err := service.FetchAthlete(usr)

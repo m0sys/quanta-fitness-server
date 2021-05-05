@@ -51,29 +51,3 @@ func (m ManagingService) FetchAthlete(usr user.User) (athlete.Athlete, error) {
 
 	return ath, nil
 }
-
-/*
-func (m *manager) FetchWeightHistory() ([]WeightRecordRes, error) {
-	var history []WeightRecordRes
-	history, err := m.repo.FindAllWeightRecords(m.ath.AthleteID())
-	if err != nil {
-		log.Printf("%s: couldn't fetch all Weight Records from repo: %s", "manager", err.Error())
-		return history, errors.New("Internal error")
-
-	}
-	return history, nil
-}
-
-func (m *manager) UpdateWeight(weight float64) error {
-	record, err := m.ath.UpdateWeight(weight)
-	if err != nil {
-		return err
-	}
-
-	return m.repo.StoreWeightRecord(m.ath.AthleteID(), record)
-}
-
-func (m *manager) SetHeight(height float64) error {
-	return nil
-}
-*/

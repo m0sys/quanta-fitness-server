@@ -16,8 +16,6 @@ func TestSignUp(t *testing.T) {
 		user, err := service.SignUp(random.String(10), random.Email(), random.String(100))
 		require.NoError(t, err)
 		require.NotEmpty(t, user)
-
-		// TODO: Check that User can been stored.
 	})
 
 	t.Run("When User with uname already taken", func(t *testing.T) {
@@ -68,6 +66,20 @@ func TestLogin(t *testing.T) {
 		require.Error(t, err)
 		require.Empty(t, user)
 		require.Equal(t, a.ErrIncorrectPassword.Error(), err.Error())
+	})
+
+	t.Run("When success", func(t *testing.T) {
+		uname := random.String(10)
+		password := random.String(100)
+
+		userSignUp, err := service.SignUp(uname, random.Email(), password)
+		require.NoError(t, err)
+		require.NotEmpty(t, userSignUp)
+
+		userLogin, err := service.Login(uname, password)
+		require.NoError(t, err)
+		require.NotEmpty(t, userLogin)
+		require.Equal(t, uname, userLogin.Username())
 	})
 }
 

@@ -109,7 +109,6 @@ func validateEmail(email string) error {
 	if validate.Var(email, "required,email") != nil {
 		return errInvalidEmail
 	}
-
 	return nil
 }
 
