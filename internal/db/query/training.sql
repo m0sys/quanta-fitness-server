@@ -3,10 +3,11 @@ INSERT INTO workout_logs (
     id,
     aid,
     title,
+    date,
     current_pos,
     completed
     ) VALUES (
-    $1, $2, $3, $4, $5);
+    $1, $2, $3, $4, $5, $6);
 
 -- name: StoreExerciseLog :exec
 INSERT INTO exercise_logs (

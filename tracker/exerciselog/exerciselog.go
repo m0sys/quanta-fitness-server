@@ -34,13 +34,14 @@ func NewExerciseLog(wlid, name string, metrics Metrics, pos int) ExerciseLog {
 }
 
 // This should only be used to restore data from persistence layer.
-func RestoreExerciseLog(id, wlid, name string, completed bool, metrics Metrics) ExerciseLog {
+func RestoreExerciseLog(id, wlid, name string, completed bool, metrics Metrics, pos int) ExerciseLog {
 	return ExerciseLog{
 		uuid:      id,
 		wlid:      wlid,
 		name:      name,
 		metrics:   metrics,
 		completed: completed,
+		pos:       pos,
 	}
 }
 

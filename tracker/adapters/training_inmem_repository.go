@@ -53,6 +53,7 @@ func (r *repo) StoreExerciseLog(elog elg.ExerciseLog) error {
 		Weight:       float64(metrics.Weight()),
 		RestDur:      float64(metrics.RestDur()),
 		Completed:    elog.Completed(),
+		Pos:          elog.Pos(),
 		CreatedAt:    now,
 		UpdatedAt:    now,
 	}
@@ -99,7 +100,7 @@ func (r *repo) FindAllExerciseLogsForWorkoutLog(wlog wl.WorkoutLog) ([]elg.Exerc
 		if val.WorkoutLogID == wlid {
 			metrics := elg.NewMetrics(val.TargetRep, val.NumSets, val.Weight, val.RestDur)
 
-			elog := elg.RestoreExerciseLog(val.ID, val.WorkoutLogID, val.Name, val.Completed, metrics)
+			elog := elg.RestoreExerciseLog(val.ID, val.WorkoutLogID, val.Name, val.Completed, metrics, val.Pos)
 
 			elogs = append(elogs, elog)
 		}
@@ -195,6 +196,7 @@ type inRepoExerciseLog struct {
 	Weight       float64
 	RestDur      float64
 	Completed    bool
+	Pos          int
 	CreatedAt    time.Time
 	UpdatedAt    time.Time
 }

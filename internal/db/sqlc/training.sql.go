@@ -5,6 +5,7 @@ package db
 
 import (
 	"context"
+	"time"
 
 	"github.com/google/uuid"
 )
@@ -270,16 +271,18 @@ INSERT INTO workout_logs (
     id,
     aid,
     title,
+    date,
     current_pos,
     completed
     ) VALUES (
-    $1, $2, $3, $4, $5)
+    $1, $2, $3, $4, $5, $6)
 `
 
 type StoreWorkoutLogParams struct {
 	ID         uuid.UUID `json:"id"`
 	Aid        uuid.UUID `json:"aid"`
 	Title      string    `json:"title"`
+	Date       time.Time `json:"date"`
 	CurrentPos int32     `json:"current_pos"`
 	Completed  bool      `json:"completed"`
 }
@@ -289,6 +292,7 @@ func (q *Queries) StoreWorkoutLog(ctx context.Context, arg StoreWorkoutLogParams
 		arg.ID,
 		arg.Aid,
 		arg.Title,
+		arg.Date,
 		arg.CurrentPos,
 		arg.Completed,
 	)
