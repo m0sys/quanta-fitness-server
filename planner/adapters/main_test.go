@@ -1,35 +1,41 @@
-package psql
+package adapters
 
 import (
 	"database/sql"
 	"fmt"
 	"log"
+	"os"
+	"testing"
 
 	_ "github.com/lib/pq"
 
 	"github.com/mhd53/quanta-fitness-server/config"
+	db "github.com/mhd53/quanta-fitness-server/internal/db/sqlc"
 )
 
 var (
-	host     string
-	port     string
-	user     string
-	password string
-	dbname   string
-	DbConn   *sql.DB
+	testStore *db.Store
+	testDB    *sql.DB
 )
 
-// FIXME: Figure out how to manage connections in a centralized fashion.
+func TestMain(m *testing.M) {
+	testDB, err := connectDB()
+	if err != nil {
+		log.Fatal("cannot connect to db: ", err)
+	}
 
-func ConnectDB() (*sql.DB, error) {
+	testStore = db.NewStore(testDB)
+	os.Exit(m.Run())
+}
+
+func connectDB() (*sql.DB, error) {
 	// Load config file + set vars.
-	// TODO: Fix this abs path!
-	confs := config.LoadConfg("/home/mo/Desktop/Github/quanta-fitness-server/")
-	host = confs.Database.DBHost
-	port = confs.Database.DBPort
-	user = confs.Database.DBUser
-	password = confs.Database.DBPassword
-	dbname = confs.Database.DBTest
+	confs := config.LoadConfg("../../")
+	host := confs.Database.DBHost
+	port := confs.Database.DBPort
+	user := confs.Database.DBUser
+	password := confs.Database.DBPassword
+	dbname := confs.Database.DBTest
 	fmt.Printf("Loaded Config: host=%s, post=%s, user=%s, pwd=%s, dbname=%s", host, port, user, password, dbname)
 
 	psqlInfo := fmt.Sprintf("host=%s port=%s user=%s "+
