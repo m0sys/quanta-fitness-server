@@ -1,7 +1,6 @@
 package exercise
 
 import (
-	"errors"
 	"math"
 
 	"github.com/mhd53/quanta-fitness-server/pkg/uuid"
@@ -206,15 +205,6 @@ func validateMetrics(targetRep, numSets int, weight, restDur float64) error {
 
 	return nil
 }
-
-var (
-	ErrInvalidName      = errors.New("name must be less than 76 characters")
-	ErrInvalidTargetRep = errors.New("target rep must be a positive number")
-	ErrInvalidNumSets   = errors.New("num sets must be a positive number")
-	ErrInvalidWeight    = errors.New("weight must be a positive number")
-	ErrInvalidRestDur   = errors.New("rest duration must be a positive number")
-	ErrInvalidPos       = errors.New("position must be a positive number")
-)
 
 func validateName(name string) error {
 	if len(name) > 75 {

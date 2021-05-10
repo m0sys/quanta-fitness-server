@@ -5,15 +5,15 @@ import (
 
 	"github.com/mhd53/quanta-fitness-server/internal/random"
 	"github.com/mhd53/quanta-fitness-server/manager/athlete"
-	pa "github.com/mhd53/quanta-fitness-server/planner/adapters"
 	e "github.com/mhd53/quanta-fitness-server/planner/exercise"
 	p "github.com/mhd53/quanta-fitness-server/planner/planning"
+	pa "github.com/mhd53/quanta-fitness-server/planner/planning/adapters"
 	"github.com/mhd53/quanta-fitness-server/planner/workoutplan"
 	wp "github.com/mhd53/quanta-fitness-server/planner/workoutplan"
-	ta "github.com/mhd53/quanta-fitness-server/tracker/adapters"
 	el "github.com/mhd53/quanta-fitness-server/tracker/exerciselog"
 	sl "github.com/mhd53/quanta-fitness-server/tracker/setlog"
 	ts "github.com/mhd53/quanta-fitness-server/tracker/training"
+	ta "github.com/mhd53/quanta-fitness-server/tracker/training/adapters"
 	wl "github.com/mhd53/quanta-fitness-server/tracker/workoutlog"
 	"github.com/stretchr/testify/require"
 )
