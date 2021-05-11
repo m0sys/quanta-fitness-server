@@ -4,7 +4,6 @@ import (
 	"log"
 
 	p "github.com/mhd53/quanta-fitness-server/planner/planning"
-	wp "github.com/mhd53/quanta-fitness-server/planner/workoutplan"
 	elg "github.com/mhd53/quanta-fitness-server/tracker/exerciselog"
 	t "github.com/mhd53/quanta-fitness-server/tracker/training"
 	wl "github.com/mhd53/quanta-fitness-server/tracker/workoutlog"
@@ -22,12 +21,19 @@ func NewWorkoutTranslator(planRepo p.Repository, logRepo t.Repository) WorkoutTr
 	}
 }
 
-/*
-Preconditions:
-	- `wplan` is a valid WorkoutPlan as defined in `PlanningService`.
-*/
-func (wt *WorkoutTranslator) ConvertWorkoutPlan(wplan wp.WorkoutPlan) (wl.WorkoutLog, error) {
-	wlog := wl.NewWorkoutLog(wplan.AthleteID(), wplan.Title())
+func (wt *WorkoutTranslator) ConvertWorkoutPlan(res p.WorkoutPlanRes) (wl.WorkoutLog, error) {
+	wlog := wl.NewWorkoutLog(res.AthleteID, res.Title)
+	wplan, found, err := wt.planRepo.FindWorkoutPlanByID(res.ID)
+	if err != nil {
+		log.Printf("%s: %s", errSlur, err.Error())
+		return wl.WorkoutLog{}, errInternal
+	}
+
+	if !found {
+		log.Printf("%s: %s", errSlur, "WorkoutPlan not found")
+		return wl.WorkoutLog{}, errInternal
+	}
+
 	exercises, err := wt.planRepo.FindAllExercisesForWorkoutPlan(wplan)
 	if err != nil {
 		log.Printf("%s: %s", errSlur, err.Error())

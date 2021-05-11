@@ -5,7 +5,6 @@ import (
 
 	"github.com/mhd53/quanta-fitness-server/internal/random"
 	"github.com/mhd53/quanta-fitness-server/manager/athlete"
-	ma "github.com/mhd53/quanta-fitness-server/manager/managing/adapters"
 	p "github.com/mhd53/quanta-fitness-server/planner/planning"
 	"github.com/mhd53/quanta-fitness-server/planner/planning/adapters"
 	"github.com/stretchr/testify/require"
@@ -919,6 +918,5 @@ func exerciseSuccessSetup(t *testing.T, ath athlete.Athlete, wplan p.WorkoutPlan
 
 func setup() (p.PlanningService, athlete.Athlete) {
 	repo := adapters.NewInMemRepo()
-	mangerRepo := ma.NewInMemRepo()
-	return p.NewPlanningService(repo, mangerRepo), athlete.NewAthlete()
+	return p.NewPlanningService(repo), athlete.NewAthlete()
 }

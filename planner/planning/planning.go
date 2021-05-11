@@ -3,7 +3,6 @@ package planning
 import (
 	"log"
 
-	m "github.com/mhd53/quanta-fitness-server/manager/managing"
 	e "github.com/mhd53/quanta-fitness-server/planner/exercise"
 	wp "github.com/mhd53/quanta-fitness-server/planner/workoutplan"
 )
@@ -12,7 +11,7 @@ type PlanningService struct {
 	repo Repository
 }
 
-func NewPlanningService(repository Repository, mangerRepo m.Repository) PlanningService {
+func NewPlanningService(repository Repository) PlanningService {
 	return PlanningService{
 		repo: repository,
 	}
@@ -495,8 +494,9 @@ func (p PlanningService) RemoveWorkoutPlan(req RemoveWorkoutPlanReq) error {
 
 func mapWorkoutPlanToWorkoutPlanRes(wplan wp.WorkoutPlan) WorkoutPlanRes {
 	return WorkoutPlanRes{
-		ID:    wplan.ID(),
-		Title: wplan.Title(),
+		ID:        wplan.ID(),
+		Title:     wplan.Title(),
+		AthleteID: wplan.AthleteID(),
 	}
 }
 
@@ -505,6 +505,7 @@ func mapExerciseToExerciseRes(exercise e.Exercise) ExerciseRes {
 	return ExerciseRes{
 		ID:            exercise.ID(),
 		WorkoutPlanID: exercise.WorkoutPlanID(),
+		AthleteID:     exercise.AthleteID(),
 		Name:          exercise.Name(),
 		TargetRep:     metrics.TargetRep(),
 		NumSets:       metrics.NumSets(),

@@ -2,9 +2,9 @@ package adapters
 
 import (
 	"errors"
+	"sort"
 	"time"
 
-	"github.com/mhd53/quanta-fitness-server/manager/athlete"
 	elg "github.com/mhd53/quanta-fitness-server/tracker/exerciselog"
 	sl "github.com/mhd53/quanta-fitness-server/tracker/setlog"
 	t "github.com/mhd53/quanta-fitness-server/tracker/training"
@@ -78,35 +78,59 @@ func (r *repo) StoreSetLog(slog sl.SetLog) error {
 	return nil
 }
 
-func (r *repo) FindAllWorkoutLogsForAthlete(ath athlete.Athlete) ([]wl.WorkoutLog, error) {
-	aid := ath.AthleteID()
+func (r *repo) FindAllWorkoutLogsForAthlete(aid string) ([]wl.WorkoutLog, error) {
 	var wlogs []wl.WorkoutLog
 
 	for _, val := range r.wlogs {
 		if val.AthleteID == aid {
-			wlog := wl.RestoreWorkoutLog(val.ID, val.AthleteID, val.Title, val.Date, val.CurrentPos, val.Completed)
-
+			wlog := mapInRepoWorkoutLogToWorkoutLog(val)
 			wlogs = append(wlogs, wlog)
 		}
 	}
 
 	return wlogs, nil
 }
+
+func mapInRepoWorkoutLogToWorkoutLog(val inRepoWorkoutLog) wl.WorkoutLog {
+	wlog := wl.RestoreWorkoutLog(val.ID, val.AthleteID, val.Title, val.Date, val.CurrentPos, val.Completed)
+	return wlog
+}
+
 func (r *repo) FindAllExerciseLogsForWorkoutLog(wlog wl.WorkoutLog) ([]elg.ExerciseLog, error) {
 	var elogs []elg.ExerciseLog
 	wlid := wlog.ID()
 
-	for _, val := range r.elogs {
+	keys := make([]string, 0)
+	for k, _ := range r.elogs {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+
+	for _, key := range keys {
+		val, ok := r.elogs[key]
+		if !ok {
+			return elogs, errors.New("Error while going through elogs")
+		}
+
 		if val.WorkoutLogID == wlid {
-			metrics := elg.NewMetrics(val.TargetRep, val.NumSets, val.Weight, val.RestDur)
-
-			elog := elg.RestoreExerciseLog(val.ID, val.WorkoutLogID, val.Name, val.Completed, metrics, val.Pos)
-
+			elog := mapInRepoExerciseLogToExerciseLog(val)
 			elogs = append(elogs, elog)
 		}
 	}
 
 	return elogs, nil
+}
+
+func mapInRepoExerciseLogToExerciseLog(val inRepoExerciseLog) elg.ExerciseLog {
+	metrics := elg.NewMetrics(val.TargetRep, val.NumSets, val.Weight, val.RestDur)
+	return elg.RestoreExerciseLog(
+		val.ID,
+		val.WorkoutLogID,
+		val.Name,
+		val.Completed,
+		metrics,
+		val.Pos,
+	)
 }
 
 func (r *repo) FindAllSetLogsForExerciseLog(elog elg.ExerciseLog) ([]sl.SetLog, error) {
@@ -126,16 +150,22 @@ func (r *repo) FindAllSetLogsForExerciseLog(elog elg.ExerciseLog) ([]sl.SetLog, 
 	return slogs, nil
 }
 
-func (r *repo) FindWorkoutLogByID(wlog wl.WorkoutLog) (bool, error) {
-	_, ok := r.wlogs[wlog.ID()]
-	return ok, nil
+func (r *repo) FindWorkoutLogByID(id string) (wl.WorkoutLog, bool, error) {
+	val, ok := r.wlogs[id]
+	if !ok {
+		return wl.WorkoutLog{}, false, nil
+	}
 
+	return mapInRepoWorkoutLogToWorkoutLog(val), true, nil
 }
 
-func (r *repo) FindExerciseLogByID(elog elg.ExerciseLog) (bool, error) {
-	_, ok := r.elogs[elog.ID()]
-	return ok, nil
+func (r *repo) FindExerciseLogByID(id string) (elg.ExerciseLog, bool, error) {
+	val, ok := r.elogs[id]
+	if !ok {
+		return elg.ExerciseLog{}, false, nil
+	}
 
+	return mapInRepoExerciseLogToExerciseLog(val), true, nil
 }
 
 func (r *repo) RemoveWorkoutLog(wlog wl.WorkoutLog) error {
