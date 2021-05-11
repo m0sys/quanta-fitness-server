@@ -6,10 +6,8 @@ import (
 	"github.com/mhd53/quanta-fitness-server/internal/random"
 	"github.com/mhd53/quanta-fitness-server/manager/athlete"
 	ma "github.com/mhd53/quanta-fitness-server/manager/managing/adapters"
-	e "github.com/mhd53/quanta-fitness-server/planner/exercise"
 	p "github.com/mhd53/quanta-fitness-server/planner/planning"
 	"github.com/mhd53/quanta-fitness-server/planner/planning/adapters"
-	wp "github.com/mhd53/quanta-fitness-server/planner/workoutplan"
 	"github.com/stretchr/testify/require"
 )
 
@@ -123,12 +121,11 @@ func TestRemoveExerciseFromWorkoutPlan(t *testing.T) {
 	t.Run("When unauthorized to access WorkoutPlan", func(t *testing.T) {
 		wplan, _ := workoutPlanSuccessSetup(t, ath, service)
 		ath2 := athlete.NewAthlete()
-		exercise := exerciseNotFoundSetup(t, ath, wplan)
 
 		req := p.RemoveExerciseFromWorkoutPlanReq{
 			AthleteID:     ath2.AthleteID(),
 			WorkoutPlanID: wplan.ID,
-			ExerciseID:    exercise.ID(),
+			ExerciseID:    "1234",
 		}
 
 		err := service.RemoveExerciseFromWorkoutPlan(req)
@@ -885,14 +882,6 @@ func TestRemoveWorkoutPlan(t *testing.T) {
 	})
 }
 
-func workoutPlanNotFoundSetup(t *testing.T, ath athlete.Athlete) wp.WorkoutPlan {
-	title := random.String(75)
-	wplan, err := wp.NewWorkoutPlan(ath.AthleteID(), title)
-	require.NoError(t, err)
-
-	return wplan
-}
-
 func workoutPlanSuccessSetup(t *testing.T, ath athlete.Athlete, service p.PlanningService) (p.WorkoutPlanRes, string) {
 	title := random.String(75)
 
@@ -904,15 +893,6 @@ func workoutPlanSuccessSetup(t *testing.T, ath athlete.Athlete, service p.Planni
 	require.NoError(t, err)
 	require.NotEmpty(t, res)
 	return res, title
-}
-
-func workoutPlanUnauthorizedSetup(t *testing.T) wp.WorkoutPlan {
-	title := random.String(75)
-	ath := athlete.NewAthlete()
-	wplan, err := wp.NewWorkoutPlan(ath.AthleteID(), title)
-	require.NoError(t, err)
-
-	return wplan
 }
 
 func exerciseSuccessSetup(t *testing.T, ath athlete.Athlete, wplan p.WorkoutPlanRes, service p.PlanningService) (p.ExerciseRes, string) {
@@ -935,44 +915,6 @@ func exerciseSuccessSetup(t *testing.T, ath athlete.Athlete, wplan p.WorkoutPlan
 	require.Equal(t, name, res.Name)
 
 	return res, name
-}
-
-func exerciseNotFoundSetup(t *testing.T, ath athlete.Athlete, wplan p.WorkoutPlanRes) e.Exercise {
-	name := random.String(75)
-
-	metrics, err := e.NewMetrics(
-		random.RepCount(),
-		random.NumSets(),
-		random.Weight(),
-		random.RestTime(),
-	)
-	require.NoError(t, err)
-
-	exercise, err := e.NewExercise(wplan.ID, ath.AthleteID(), name, metrics, 0)
-	require.NoError(t, err)
-	require.NotEmpty(t, exercise)
-	require.Equal(t, name, exercise.Name())
-	return exercise
-}
-
-func exerciseUnauthorizedSetup(t *testing.T, wplan wp.WorkoutPlan) e.Exercise {
-	ath := athlete.NewAthlete()
-	name := random.String(75)
-
-	metrics, err := e.NewMetrics(
-		random.RepCount(),
-		random.NumSets(),
-		random.Weight(),
-		random.RestTime(),
-	)
-	require.NoError(t, err)
-
-	exercise, err := e.NewExercise(wplan.ID(), ath.AthleteID(), name, metrics, 0)
-	require.NoError(t, err)
-	require.NotEmpty(t, exercise)
-	require.Equal(t, name, exercise.Name())
-
-	return exercise
 }
 
 func setup() (p.PlanningService, athlete.Athlete) {
