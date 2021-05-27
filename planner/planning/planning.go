@@ -3,7 +3,6 @@ package planning
 import (
 	"log"
 
-	"github.com/mhd53/quanta-fitness-server/manager/athlete"
 	e "github.com/mhd53/quanta-fitness-server/planner/exercise"
 	wp "github.com/mhd53/quanta-fitness-server/planner/workoutplan"
 )
@@ -13,93 +12,129 @@ type PlanningService struct {
 }
 
 func NewPlanningService(repository Repository) PlanningService {
-	return PlanningService{repo: repository}
+	return PlanningService{
+		repo: repository,
+	}
 }
 
-func (p PlanningService) CreateNewWorkoutPlan(ath athlete.Athlete, title string) (wp.WorkoutPlan, error) {
-	wplan, err := wp.NewWorkoutPlan(ath.AthleteID(), title)
-	if err != nil {
-		return wp.WorkoutPlan{}, err
+// FIXME: assuming that Athlete IDs are valid - meaning that they are stored in manger.
+// NOTE: I am ignoring security concerns for now.
+
+func (p PlanningService) CreateNewWorkoutPlan(req CreateNewWorkoutPlanReq) (WorkoutPlanRes, error) {
+	// TODO: check that aid is a valid Athlete ID - security layer.
+	if err := ValidateCreateNewWorkoutPlanReq(req); err != nil {
+		return WorkoutPlanRes{}, err
 	}
 
-	found, err := p.repo.FindWorkoutPlanByTitleAndAthleteID(wplan, ath)
+	wplan, err := wp.NewWorkoutPlan(req.AthleteID, req.Title)
+	if err != nil {
+		return WorkoutPlanRes{}, err
+	}
+
+	found, err := p.repo.FindWorkoutPlanByTitleAndAthleteID(wplan)
 	if err != nil {
 		log.Printf("%s: %s", errSlug, err.Error())
-		return wp.WorkoutPlan{}, errInternal
+		return WorkoutPlanRes{}, errInternal
 	}
 
 	if found {
-		return wp.WorkoutPlan{}, ErrIdentialTitle
+		return WorkoutPlanRes{}, ErrIdentialTitle
 	}
 
-	err = p.repo.StoreWorkoutPlan(wplan, ath)
+	err = p.repo.StoreWorkoutPlan(wplan)
 	if err != nil {
 		log.Printf("%s: %s", errSlug, err.Error())
-		return wp.WorkoutPlan{}, errInternal
+		return WorkoutPlanRes{}, errInternal
 	}
 
-	return wplan, nil
+	res := mapWorkoutPlanToWorkoutPlanRes(wplan)
+	return res, nil
 }
 
 func (p PlanningService) AddNewExerciseToWorkoutPlan(
-	ath athlete.Athlete,
-	wplan wp.WorkoutPlan,
-	name string,
-	metrics e.Metrics,
-) (e.Exercise, error) {
-	if err := p.validateWorkoutPlan(ath, wplan); err != nil {
-		return e.Exercise{}, err
+	req AddNewExerciseToWorkoutPlanReq,
+) (ExerciseRes, error) {
+	if err := ValidateAddExerciseToWorkoutPlanReq(req); err != nil {
+		return ExerciseRes{}, err
+	}
+
+	if err := p.validateWorkoutPlan(req.AthleteID, req.WorkoutPlanID); err != nil {
+		return ExerciseRes{}, err
+	}
+
+	wplan, err := p.findWorkout(req.WorkoutPlanID)
+	if err != nil {
+		return ExerciseRes{}, err
 	}
 
 	pos, err := p.genPos(wplan)
 	if err != nil {
-		return e.Exercise{}, err
+		return ExerciseRes{}, err
 	}
 
-	exercise, err := e.NewExercise(wplan.ID(), ath.AthleteID(), name, metrics, pos)
+	metrics, err := e.NewMetrics(
+		req.TargetRep,
+		req.NumSets,
+		req.Weight,
+		req.RestDur,
+	)
 	if err != nil {
-		return e.Exercise{}, err
+		return ExerciseRes{}, err
+	}
+	exercise, err := e.NewExercise(req.WorkoutPlanID, req.AthleteID, req.Name, metrics, pos)
+	if err != nil {
+		return ExerciseRes{}, err
 	}
 
-	found, err := p.repo.FindExerciseByNameAndWorkoutPlanID(wplan, exercise)
+	found, err := p.repo.FindExerciseByNameAndWorkoutPlanID(req.WorkoutPlanID, req.Name)
 	if err != nil {
 		log.Printf("%s: %s", errSlug, err.Error())
-		return e.Exercise{}, errInternal
+		return ExerciseRes{}, errInternal
 	}
 
 	if found {
-		return e.Exercise{}, ErrIdentialName
+		return ExerciseRes{}, ErrIdentialName
 	}
 
-	err = p.repo.StoreExercise(wplan, exercise, ath)
+	err = p.repo.StoreExercise(wplan, exercise)
 	if err != nil {
 		log.Printf("%s: %s", errSlug, err.Error())
-		return e.Exercise{}, errInternal
+		return ExerciseRes{}, errInternal
 	}
 
-	return exercise, nil
+	res := mapExerciseToExerciseRes(exercise)
+	return res, nil
 }
 
-func (p PlanningService) validateWorkoutPlan(ath athlete.Athlete, wplan wp.WorkoutPlan) error {
-	if !isAuthorizedWP(ath, wplan) {
-		return ErrUnauthorizedAccess
-	}
-
-	found, err := p.repo.FindWorkoutPlanByID(wplan)
+func (p PlanningService) validateWorkoutPlan(aid, wpid string) error {
+	wplan, err := p.findWorkout(wpid)
 	if err != nil {
-		log.Printf("%s: %s", errSlug, err.Error())
-		return errInternal
+		return ErrWorkoutPlanNotFound
 	}
 
-	if !found {
-		return ErrWorkoutPlanNotFound
+	if !isAuthorizedWP(aid, wplan) {
+		return ErrUnauthorizedAccess
 	}
 
 	return nil
 }
 
-func isAuthorizedWP(ath athlete.Athlete, wplan wp.WorkoutPlan) bool {
-	return wplan.AthleteID() == ath.AthleteID()
+func (p PlanningService) findWorkout(id string) (wp.WorkoutPlan, error) {
+	wplan, found, err := p.repo.FindWorkoutPlanByID(id)
+	if err != nil {
+		log.Printf("%s: %s", errSlug, err.Error())
+		return wp.WorkoutPlan{}, errInternal
+	}
+
+	if !found {
+		return wp.WorkoutPlan{}, ErrWorkoutPlanNotFound
+	}
+
+	return wplan, nil
+}
+
+func isAuthorizedWP(aid string, wplan wp.WorkoutPlan) bool {
+	return wplan.AthleteID() == aid
 }
 
 func (p PlanningService) genPos(wplan wp.WorkoutPlan) (int, error) {
@@ -119,19 +154,26 @@ func (p PlanningService) genPos(wplan wp.WorkoutPlan) (int, error) {
 }
 
 func (p PlanningService) RemoveExerciseFromWorkoutPlan(
-	ath athlete.Athlete,
-	wplan wp.WorkoutPlan,
-	exercise e.Exercise,
+	req RemoveExerciseFromWorkoutPlanReq,
 ) error {
-	if err := p.validateWorkoutPlan(ath, wplan); err != nil {
+	if err := ValidateRemoveExerciseFromWorkoutPlanReq(req); err != nil {
 		return err
 	}
 
-	if err := p.validateExercise(ath, wplan, exercise); err != nil {
+	if err := p.validateWorkoutPlan(req.AthleteID, req.WorkoutPlanID); err != nil {
 		return err
 	}
 
-	err := p.repo.RemoveExercise(exercise)
+	if err := p.validateExercise(req.AthleteID, req.WorkoutPlanID, req.ExerciseID); err != nil {
+		return err
+	}
+
+	exercise, err := p.findExercise(req.ExerciseID)
+	if err != nil {
+		return err
+	}
+
+	err = p.repo.RemoveExercise(exercise)
 	if err != nil {
 		log.Printf("%s: %s", errSlug, err.Error())
 		return errInternal
@@ -140,49 +182,62 @@ func (p PlanningService) RemoveExerciseFromWorkoutPlan(
 	return nil
 }
 
-func (p PlanningService) validateExercise(ath athlete.Athlete, wplan wp.WorkoutPlan, exercise e.Exercise) error {
-	if !isAuthorizedE(ath, wplan, exercise) {
+func (p PlanningService) validateExercise(aid, wpid, eid string) error {
+	exercise, err := p.findExercise(eid)
+	if err != nil {
+		return ErrExerciseNotFound
+	}
+	if !isAuthorizedE(aid, wpid, exercise) {
 		return ErrUnauthorizedAccess
 	}
 
-	found, err := p.repo.FindExerciseByID(exercise)
-	if err != nil {
-		log.Printf("%s: %s", errSlug, err.Error())
-		return errInternal
-	}
-
-	if !found {
-		return ErrExerciseNotFound
-	}
 	return nil
 }
 
-func isAuthorizedE(ath athlete.Athlete, wplan wp.WorkoutPlan, exercise e.Exercise) bool {
-	return ath.AthleteID() == exercise.AthleteID() && wplan.ID() == exercise.WorkoutPlanID()
-}
-
-func (p PlanningService) EditWorkoutPlanTitle(ath athlete.Athlete, wplan wp.WorkoutPlan, title string) error {
-	if err := p.validateWorkoutPlan(ath, wplan); err != nil {
-		return err
-	}
-
-	prevTitle := wplan.Title()
-
-	err := wplan.EditTitle(title)
-	if err != nil {
-		wplan.EditTitle(prevTitle) //nolint
-		return err
-	}
-
-	found, err := p.repo.FindWorkoutPlanByTitleAndAthleteID(wplan, ath)
+func (p PlanningService) findExercise(id string) (e.Exercise, error) {
+	exercise, found, err := p.repo.FindExerciseByID(id)
 	if err != nil {
 		log.Printf("%s: %s", errSlug, err.Error())
-		wplan.EditTitle(prevTitle) //nolint
+		return e.Exercise{}, errInternal
+	}
+
+	if !found {
+		return e.Exercise{}, ErrExerciseNotFound
+	}
+
+	return exercise, nil
+}
+
+func isAuthorizedE(aid, wpid string, exercise e.Exercise) bool {
+	return aid == exercise.AthleteID() && wpid == exercise.WorkoutPlanID()
+}
+
+func (p PlanningService) EditWorkoutPlanTitle(req EditWorkoutPlanTitleReq) error {
+	if err := ValidateEditWorkoutPlanTitleReq(req); err != nil {
+		return err
+	}
+
+	if err := p.validateWorkoutPlan(req.AthleteID, req.WorkoutPlanID); err != nil {
+		return err
+	}
+
+	wplan, err := p.findWorkout(req.WorkoutPlanID)
+	if err != nil {
+		return err
+	}
+
+	err = wplan.EditTitle(req.Title)
+	if err != nil {
+		return err
+	}
+
+	found, err := p.repo.FindWorkoutPlanByTitleAndAthleteID(wplan)
+	if err != nil {
+		log.Printf("%s: %s", errSlug, err.Error())
 		return errInternal
 	}
 
 	if found {
-		wplan.EditTitle(prevTitle) //nolint
 		return ErrIdentialTitle
 	}
 
@@ -195,59 +250,86 @@ func (p PlanningService) EditWorkoutPlanTitle(ath athlete.Athlete, wplan wp.Work
 	return nil
 }
 
-func (p PlanningService) FetchWorkoutPlans(ath athlete.Athlete) ([]wp.WorkoutPlan, error) {
-	var wplans []wp.WorkoutPlan
+func (p PlanningService) FetchWorkoutPlans(aid string) ([]WorkoutPlanRes, error) {
+	var results []WorkoutPlanRes
 
-	wplans, err := p.repo.FindAllWorkoutPlansForAthlete(ath)
+	wplans, err := p.repo.FindAllWorkoutPlansForAthlete(aid)
 	if err != nil {
 		log.Printf("%s: %s", errSlug, err.Error())
-		return wplans, errInternal
+		return results, errInternal
 	}
 
-	return wplans, nil
+	for _, wplan := range wplans {
+		res := mapWorkoutPlanToWorkoutPlanRes(wplan)
+		results = append(results, res)
+	}
+
+	return results, nil
 }
 
-func (p PlanningService) FetchWorkoutPlanExercises(ath athlete.Athlete, wplan wp.WorkoutPlan) ([]e.Exercise, error) {
-	var exercises []e.Exercise
+func (p PlanningService) FetchWorkoutPlanExercises(req FetchWorkoutPlanExercisesReq) ([]ExerciseRes, error) {
+	var results []ExerciseRes
 
-	if err := p.validateWorkoutPlan(ath, wplan); err != nil {
-		return exercises, err
+	if err := ValidateFetchWorkoutPlanExercisesReq(req); err != nil {
+		return results, err
+	}
+
+	if err := p.validateWorkoutPlan(req.AthleteID, req.WorkoutPlanID); err != nil {
+		return results, err
+	}
+
+	wplan, err := p.findWorkout(req.WorkoutPlanID)
+	if err != nil {
+		return results, err
 	}
 
 	exercises, err := p.repo.FindAllExercisesForWorkoutPlan(wplan)
 	if err != nil {
 		log.Printf("%s: %s", errSlug, err.Error())
-		return exercises, errInternal
+		return results, errInternal
 	}
 
-	return exercises, nil
+	for _, exercise := range exercises {
+		res := mapExerciseToExerciseRes(exercise)
+		results = append(results, res)
+	}
+
+	return results, nil
 }
 
-func (p PlanningService) EditExerciseName(ath athlete.Athlete, wplan wp.WorkoutPlan, exercise e.Exercise, name string) error {
-	if err := p.validateWorkoutPlan(ath, wplan); err != nil {
+// FIXME: Sending one request that edits multiple fields is better than sending
+//		 n requests to edit n fields. - Refactor!
+
+func (p PlanningService) EditExerciseName(req EditExerciseNameReq) error {
+	if err := ValidateEditExerciseNameReq(req); err != nil {
 		return err
 	}
 
-	if err := p.validateExercise(ath, wplan, exercise); err != nil {
+	if err := p.validateWorkoutPlan(req.AthleteID, req.WorkoutPlanID); err != nil {
 		return err
 	}
 
-	prevName := exercise.Name()
-	err := exercise.EditName(name)
+	if err := p.validateExercise(req.AthleteID, req.WorkoutPlanID, req.ExerciseID); err != nil {
+		return err
+	}
+
+	exercise, err := p.findExercise(req.ExerciseID)
 	if err != nil {
-		exercise.EditName(prevName) //nolint
 		return err
 	}
 
-	found, err := p.repo.FindExerciseByNameAndWorkoutPlanID(wplan, exercise)
+	err = exercise.EditName(req.Name)
+	if err != nil {
+		return err
+	}
+
+	found, err := p.repo.FindExerciseByNameAndWorkoutPlanID(req.WorkoutPlanID, req.Name)
 	if err != nil {
 		log.Printf("%s: %s", errSlug, err.Error())
-		exercise.EditName(prevName) //nolint
 		return errInternal
 	}
 
 	if found {
-		exercise.EditName(prevName) //nolint
 		return ErrIdentialName
 	}
 
@@ -260,124 +342,177 @@ func (p PlanningService) EditExerciseName(ath athlete.Athlete, wplan wp.WorkoutP
 	return nil
 }
 
-func (p PlanningService) EditExerciseTargetRep(ath athlete.Athlete, wplan wp.WorkoutPlan, exercise e.Exercise, targetRep int) error {
-	if err := p.validateWorkoutPlan(ath, wplan); err != nil {
+func (p PlanningService) EditExerciseTargetRep(req EditExerciseTargetRepReq) error {
+	if err := ValidateEditExerciseTargetRepReq(req); err != nil {
 		return err
 	}
 
-	if err := p.validateExercise(ath, wplan, exercise); err != nil {
+	if err := p.validateWorkoutPlan(req.AthleteID, req.WorkoutPlanID); err != nil {
 		return err
 	}
 
-	metrics := exercise.Metrics()
-	prevTargetRep := metrics.TargetRep()
-	err := exercise.EditTargetRep(targetRep)
+	if err := p.validateExercise(req.AthleteID, req.WorkoutPlanID, req.ExerciseID); err != nil {
+		return err
+	}
+
+	exercise, err := p.findExercise(req.ExerciseID)
 	if err != nil {
-		exercise.EditTargetRep(prevTargetRep) //nolint
+		return err
+	}
+
+	err = exercise.EditTargetRep(req.TargetRep)
+	if err != nil {
 		return err
 	}
 
 	err = p.repo.UpdateExercise(exercise)
 	if err != nil {
 		log.Printf("%s: %s", errSlug, err.Error())
-		exercise.EditTargetRep(prevTargetRep) //nolint
 		return errInternal
 	}
 
 	return nil
 }
 
-func (p PlanningService) EditExerciseNumSets(ath athlete.Athlete, wplan wp.WorkoutPlan, exercise e.Exercise, numSets int) error {
-	if err := p.validateWorkoutPlan(ath, wplan); err != nil {
+func (p PlanningService) EditExerciseNumSets(req EditExerciseNumSetsReq) error {
+	if err := ValidateEditExerciseNumSetsReq(req); err != nil {
 		return err
 	}
 
-	if err := p.validateExercise(ath, wplan, exercise); err != nil {
+	if err := p.validateWorkoutPlan(req.AthleteID, req.WorkoutPlanID); err != nil {
 		return err
 	}
 
-	metrics := exercise.Metrics()
-	prevNumSets := metrics.NumSets()
-	err := exercise.EditNumSets(numSets)
+	if err := p.validateExercise(req.AthleteID, req.WorkoutPlanID, req.ExerciseID); err != nil {
+		return err
+	}
+
+	exercise, err := p.findExercise(req.ExerciseID)
 	if err != nil {
-		exercise.EditNumSets(prevNumSets) //nolint
+		return err
+	}
+
+	err = exercise.EditNumSets(req.NumSets)
+	if err != nil {
 		return err
 	}
 
 	err = p.repo.UpdateExercise(exercise)
 	if err != nil {
 		log.Printf("%s: %s", errSlug, err.Error())
-		exercise.EditNumSets(prevNumSets) //nolint
 		return errInternal
 	}
 
 	return nil
 }
 
-func (p PlanningService) EditExerciseWeight(ath athlete.Athlete, wplan wp.WorkoutPlan, exercise e.Exercise, weight float64) error {
-	if err := p.validateWorkoutPlan(ath, wplan); err != nil {
+func (p PlanningService) EditExerciseWeight(req EditExerciseWeightReq) error {
+	if err := ValidateEditExerciseWeightReq(req); err != nil {
 		return err
 	}
 
-	if err := p.validateExercise(ath, wplan, exercise); err != nil {
+	if err := p.validateWorkoutPlan(req.AthleteID, req.WorkoutPlanID); err != nil {
 		return err
 	}
 
-	metrics := exercise.Metrics()
-	prevWeight := float64(metrics.Weight())
-	err := exercise.EditWeight(weight)
+	if err := p.validateExercise(req.AthleteID, req.WorkoutPlanID, req.ExerciseID); err != nil {
+		return err
+	}
+
+	exercise, err := p.findExercise(req.ExerciseID)
 	if err != nil {
-		exercise.EditWeight(prevWeight) //nolint
+		return err
+	}
+
+	err = exercise.EditWeight(req.Weight)
+	if err != nil {
 		return err
 	}
 
 	err = p.repo.UpdateExercise(exercise)
 	if err != nil {
 		log.Printf("%s: %s", errSlug, err.Error())
-		exercise.EditWeight(prevWeight) //nolint
 		return errInternal
 	}
 
 	return nil
 }
 
-func (p PlanningService) EditExerciseRestDur(ath athlete.Athlete, wplan wp.WorkoutPlan, exercise e.Exercise, restDur float64) error {
-	if err := p.validateWorkoutPlan(ath, wplan); err != nil {
+func (p PlanningService) EditExerciseRestDur(req EditExerciseRestDurReq) error {
+	if err := ValidateEditExerciseRestDurReq(req); err != nil {
 		return err
 	}
 
-	if err := p.validateExercise(ath, wplan, exercise); err != nil {
+	if err := p.validateWorkoutPlan(req.AthleteID, req.WorkoutPlanID); err != nil {
 		return err
 	}
 
-	metrics := exercise.Metrics()
-	prevRestDur := float64(metrics.RestDur())
-	err := exercise.EditRestDur(restDur)
+	if err := p.validateExercise(req.AthleteID, req.WorkoutPlanID, req.ExerciseID); err != nil {
+		return err
+	}
+
+	exercise, err := p.findExercise(req.ExerciseID)
 	if err != nil {
-		exercise.EditRestDur(prevRestDur) //nolint
+		return err
+	}
+
+	err = exercise.EditRestDur(req.RestDur)
+	if err != nil {
 		return err
 	}
 
 	err = p.repo.UpdateExercise(exercise)
 	if err != nil {
 		log.Printf("%s: %s", errSlug, err.Error())
-		exercise.EditRestDur(prevRestDur) //nolint
 		return errInternal
 	}
 
 	return nil
 }
 
-func (p PlanningService) RemoveWorkoutPlan(ath athlete.Athlete, wplan wp.WorkoutPlan) error {
-	if err := p.validateWorkoutPlan(ath, wplan); err != nil {
+func (p PlanningService) RemoveWorkoutPlan(req RemoveWorkoutPlanReq) error {
+	if err := ValidateRemoveWorkoutPlanReq(req); err != nil {
 		return err
 	}
 
-	err := p.repo.RemoveWorkoutPlan(wplan)
+	if err := p.validateWorkoutPlan(req.AthleteID, req.WorkoutPlanID); err != nil {
+		return err
+	}
+
+	wplan, err := p.findWorkout(req.WorkoutPlanID)
+	if err != nil {
+		return err
+	}
+
+	err = p.repo.RemoveWorkoutPlan(wplan)
 	if err != nil {
 		log.Printf("%s: %s", errSlug, err.Error())
 		return errInternal
 	}
 
 	return nil
+}
+
+// Mapper funcs.
+
+func mapWorkoutPlanToWorkoutPlanRes(wplan wp.WorkoutPlan) WorkoutPlanRes {
+	return WorkoutPlanRes{
+		ID:        wplan.ID(),
+		Title:     wplan.Title(),
+		AthleteID: wplan.AthleteID(),
+	}
+}
+
+func mapExerciseToExerciseRes(exercise e.Exercise) ExerciseRes {
+	metrics := exercise.Metrics()
+	return ExerciseRes{
+		ID:            exercise.ID(),
+		WorkoutPlanID: exercise.WorkoutPlanID(),
+		AthleteID:     exercise.AthleteID(),
+		Name:          exercise.Name(),
+		TargetRep:     metrics.TargetRep(),
+		NumSets:       metrics.NumSets(),
+		Weight:        metrics.Weight(),
+		RestDur:       metrics.RestDur(),
+	}
 }

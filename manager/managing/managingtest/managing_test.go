@@ -5,8 +5,8 @@ import (
 
 	"github.com/mhd53/quanta-fitness-server/account/user"
 	"github.com/mhd53/quanta-fitness-server/internal/random"
-	"github.com/mhd53/quanta-fitness-server/manager/adapters"
 	m "github.com/mhd53/quanta-fitness-server/manager/managing"
+	"github.com/mhd53/quanta-fitness-server/manager/managing/adapters"
 	"github.com/stretchr/testify/require"
 )
 

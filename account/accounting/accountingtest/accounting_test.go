@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	a "github.com/mhd53/quanta-fitness-server/account/accounting"
-	"github.com/mhd53/quanta-fitness-server/account/adapters"
+	"github.com/mhd53/quanta-fitness-server/account/accounting/adapters"
 	"github.com/mhd53/quanta-fitness-server/internal/random"
 	"github.com/stretchr/testify/require"
 )

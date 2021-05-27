@@ -5,15 +5,11 @@ import (
 
 	"github.com/mhd53/quanta-fitness-server/internal/random"
 	"github.com/mhd53/quanta-fitness-server/manager/athlete"
-	pa "github.com/mhd53/quanta-fitness-server/planner/adapters"
-	e "github.com/mhd53/quanta-fitness-server/planner/exercise"
 	p "github.com/mhd53/quanta-fitness-server/planner/planning"
-	"github.com/mhd53/quanta-fitness-server/planner/workoutplan"
-	wp "github.com/mhd53/quanta-fitness-server/planner/workoutplan"
-	ta "github.com/mhd53/quanta-fitness-server/tracker/adapters"
+	pa "github.com/mhd53/quanta-fitness-server/planner/planning/adapters"
 	el "github.com/mhd53/quanta-fitness-server/tracker/exerciselog"
-	sl "github.com/mhd53/quanta-fitness-server/tracker/setlog"
 	ts "github.com/mhd53/quanta-fitness-server/tracker/training"
+	ta "github.com/mhd53/quanta-fitness-server/tracker/training/adapters"
 	wl "github.com/mhd53/quanta-fitness-server/tracker/workoutlog"
 	"github.com/stretchr/testify/require"
 )
@@ -35,9 +31,9 @@ func TestConvertWorkout(t *testing.T) {
 		wlog, err := wt.ConvertWorkoutPlan(wplan)
 		require.NoError(t, err)
 		require.NotEmpty(t, wlog)
-		require.Equal(t, wplan.Title(), wlog.Title())
+		require.Equal(t, wplan.Title, wlog.Title())
 
-		wlogs, err := tService.FetchWorkoutLogs(ath)
+		wlogs, err := tService.FetchWorkoutLogs(ath.AthleteID())
 		require.NoError(t, err)
 		require.NotEmpty(t, wlogs)
 	})
@@ -47,7 +43,7 @@ func TestFetchWorkoutLogs(t *testing.T) {
 	wt, pService, tService, ath := setup()
 
 	t.Run("When no WorkoutLog for Athlete", func(t *testing.T) {
-		wlogs, err := tService.FetchWorkoutLogs(ath)
+		wlogs, err := tService.FetchWorkoutLogs(ath.AthleteID())
 		require.NoError(t, err)
 		require.Empty(t, wlogs)
 	})
@@ -59,7 +55,7 @@ func TestFetchWorkoutLogs(t *testing.T) {
 			require.NotEmpty(t, wlog)
 		}
 
-		wlogs, err := tService.FetchWorkoutLogs(ath)
+		wlogs, err := tService.FetchWorkoutLogs(ath.AthleteID())
 		require.NoError(t, err)
 		require.NotEmpty(t, wlogs)
 		require.Equal(t, n, len(wlogs))
@@ -71,8 +67,12 @@ func TestFetchWorkoutLogExerciseLogs(t *testing.T) {
 	wt, pService, tService, ath := setup()
 
 	t.Run("When WorkoutLog not found", func(t *testing.T) {
-		wlog := wlogNotFoundSetup(ath)
-		elogs, err := tService.FetchWorkoutLogExerciseLogs(ath, wlog)
+		req := ts.FetchWorkoutLogExerciseLogsReq{
+			AthleteID:    ath.AthleteID(),
+			WorkoutLogID: "1234",
+		}
+
+		elogs, err := tService.FetchWorkoutLogExerciseLogs(req)
 		require.Error(t, err)
 		require.Empty(t, elogs)
 		require.Equal(t, ts.ErrWorkoutLogNotFound.Error(), err.Error())
@@ -82,7 +82,12 @@ func TestFetchWorkoutLogExerciseLogs(t *testing.T) {
 		wlog, _ := wlogSuccesSetup(t, ath, pService, wt)
 
 		ath2 := athlete.NewAthlete()
-		elogs, err := tService.FetchWorkoutLogExerciseLogs(ath2, wlog)
+		req := ts.FetchWorkoutLogExerciseLogsReq{
+			AthleteID:    ath2.AthleteID(),
+			WorkoutLogID: wlog.ID(),
+		}
+
+		elogs, err := tService.FetchWorkoutLogExerciseLogs(req)
 		require.Error(t, err)
 		require.Equal(t, ts.ErrUnauthorizedAccess.Error(), err.Error())
 		require.Empty(t, elogs)
@@ -91,168 +96,258 @@ func TestFetchWorkoutLogExerciseLogs(t *testing.T) {
 	t.Run("When success", func(t *testing.T) {
 		wlog, n := wlogSuccesSetup(t, ath, pService, wt)
 
-		elogs, err := tService.FetchWorkoutLogExerciseLogs(ath, wlog)
+		req := ts.FetchWorkoutLogExerciseLogsReq{
+			AthleteID:    ath.AthleteID(),
+			WorkoutLogID: wlog.ID(),
+		}
+		elogs, err := tService.FetchWorkoutLogExerciseLogs(req)
 		require.NoError(t, err)
 		require.NotEmpty(t, elogs)
 		require.Equal(t, n, len(elogs))
 	})
 }
 
-func TestMoveToNextExerciseLog(t *testing.T) {
-	wt, pService, tService, ath := setup()
-	t.Run("When WorkoutLog not found", func(t *testing.T) {
-		wlog := wlogNotFoundSetup(ath)
-		_, elog, err := tService.MoveToNextExerciseLog(ath, wlog)
-		require.Error(t, err)
-		require.Empty(t, elog)
-		require.Equal(t, ts.ErrWorkoutLogNotFound.Error(), err.Error())
-	})
-
-	t.Run("When unauthorized access", func(t *testing.T) {
-		ath2 := athlete.NewAthlete()
-		wlog, _ := wlogSuccesSetup(t, ath, pService, wt)
-		_, elog, err := tService.MoveToNextExerciseLog(ath2, wlog)
-		require.Error(t, err)
-		require.Empty(t, elog)
-		require.Equal(t, ts.ErrUnauthorizedAccess.Error(), err.Error())
-	})
-
-	t.Run("When success", func(t *testing.T) {
-		wlog, _ := wlogSuccesSetup(t, ath, pService, wt)
-		_, elog, err := tService.MoveToNextExerciseLog(ath, wlog)
-		require.NoError(t, err)
-		require.NotEmpty(t, elog)
-	})
-
-	t.Run("When WorkoutLog already completed", func(t *testing.T) {
-		var elog el.ExerciseLog
-		var wlog wl.WorkoutLog
-		var err error
-		n := 5
-		wlog, _ = wlogSuccesSetup(t, ath, pService, wt)
-
-		for i := 0; i < n; i++ {
-			currPos := wlog.CurrentPos()
-			wlog, elog, err = tService.MoveToNextExerciseLog(ath, wlog)
-			require.NoError(t, err)
-			require.NotEmpty(t, elog)
-			require.Equal(t, currPos+1, wlog.CurrentPos())
-		}
-
-		currPos := wlog.CurrentPos()
-		wlog, elog, err = tService.MoveToNextExerciseLog(ath, wlog)
-		require.Error(t, err)
-		require.Empty(t, elog)
-		require.Equal(t, ts.ErrWorkoutLogAlreadyCompleted.Error(), err.Error())
-		require.Equal(t, currPos, wlog.CurrentPos())
-	})
-}
-
 func TestAddSetLogToExerciseLog(t *testing.T) {
 	wt, pService, tService, ath := setup()
 	t.Run("When WorkoutLog not found", func(t *testing.T) {
-		wlog := wlogNotFoundSetup(ath)
-		elog := elogNotFoundSetup(wlog)
-		metrics := sl.NewMetrics(random.RepCount(), random.RestTime())
-		err := tService.AddSetLogToExerciseLog(ath, wlog, elog, metrics)
+		req := ts.AddSetLogToExerciseLogReq{
+			AthleteID:      ath.AthleteID(),
+			WorkoutLogID:   "1234",
+			ExerciseLogID:  "1234",
+			ActualRepCount: random.RepCount(),
+			Duration:       random.RestTime(),
+		}
+
+		err := tService.AddSetLogToExerciseLog(req)
 		require.Error(t, err)
 		require.Equal(t, ts.ErrWorkoutLogNotFound.Error(), err.Error())
-	})
-
-	t.Run("When Unauthorized WorkoutLog", func(t *testing.T) {
-		ath2 := athlete.NewAthlete()
-		wlog := wlogNotFoundSetup(ath2)
-		elog := elogNotFoundSetup(wlog)
-		metrics := sl.NewMetrics(random.RepCount(), random.RestTime())
-		err := tService.AddSetLogToExerciseLog(ath, wlog, elog, metrics)
-		require.Error(t, err)
-		require.Equal(t, ts.ErrUnauthorizedAccess.Error(), err.Error())
-
 	})
 
 	t.Run("When ExerciseLog not found", func(t *testing.T) {
 		wlog, _ := wlogSuccesSetup(t, ath, pService, wt)
-		elog := elogNotFoundSetup(wlog)
-		metrics := sl.NewMetrics(random.RepCount(), random.RestTime())
-		err := tService.AddSetLogToExerciseLog(ath, wlog, elog, metrics)
+		req := ts.AddSetLogToExerciseLogReq{
+			AthleteID:      ath.AthleteID(),
+			WorkoutLogID:   wlog.ID(),
+			ExerciseLogID:  "1234",
+			ActualRepCount: random.RepCount(),
+			Duration:       random.RestTime(),
+		}
+
+		err := tService.AddSetLogToExerciseLog(req)
 		require.Error(t, err)
 		require.Equal(t, ts.ErrExerciseLogNotFound.Error(), err.Error())
 	})
 
-	t.Run("When success", func(t *testing.T) {
+	t.Run("When Unauthorized WorkoutLog", func(t *testing.T) {
+		ath2 := athlete.NewAthlete()
 		wlog, _ := wlogSuccesSetup(t, ath, pService, wt)
-
-		elogs, err := tService.FetchWorkoutLogExerciseLogs(ath, wlog)
+		req := ts.FetchWorkoutLogExerciseLogsReq{
+			AthleteID:    ath.AthleteID(),
+			WorkoutLogID: wlog.ID(),
+		}
+		elogs, err := tService.FetchWorkoutLogExerciseLogs(req)
 		require.NoError(t, err)
 		elog := elogs[0]
-		repCount := random.RepCount()
-		metrics := sl.NewMetrics(repCount, random.RestTime())
 
-		err = tService.AddSetLogToExerciseLog(ath, wlog, elog, metrics)
+		req2 := ts.AddSetLogToExerciseLogReq{
+			AthleteID:      ath2.AthleteID(),
+			WorkoutLogID:   wlog.ID(),
+			ExerciseLogID:  elog.ID,
+			ActualRepCount: random.RepCount(),
+			Duration:       random.RestTime(),
+		}
+
+		err = tService.AddSetLogToExerciseLog(req2)
+		require.Error(t, err)
+		require.Equal(t, ts.ErrUnauthorizedAccess.Error(), err.Error())
+
+	})
+
+	t.Run("When success", func(t *testing.T) {
+		wlog, _ := wlogSuccesSetup(t, ath, pService, wt)
+		req := ts.FetchWorkoutLogExerciseLogsReq{
+			AthleteID:    ath.AthleteID(),
+			WorkoutLogID: wlog.ID(),
+		}
+		repCount := random.RepCount()
+		elogs, err := tService.FetchWorkoutLogExerciseLogs(req)
+		require.NoError(t, err)
+		elog := elogs[0]
+
+		req2 := ts.AddSetLogToExerciseLogReq{
+			AthleteID:      ath.AthleteID(),
+			WorkoutLogID:   wlog.ID(),
+			ExerciseLogID:  elog.ID,
+			ActualRepCount: repCount,
+			Duration:       random.RestTime(),
+		}
+		err = tService.AddSetLogToExerciseLog(req2)
 		require.NoError(t, err)
 
-		slogs, err := tService.FetchSetLogsForExerciseLog(ath, wlog, elog)
+		req3 := ts.FetchSetLogsForExerciseLogReq{
+			AthleteID:     ath.AthleteID(),
+			WorkoutLogID:  wlog.ID(),
+			ExerciseLogID: elog.ID,
+		}
+		slogs, err := tService.FetchSetLogsForExerciseLog(req3)
 		require.NoError(t, err)
 		require.NotEmpty(t, slogs)
-		metrics = slogs[0].Metrics()
-		require.Equal(t, repCount, metrics.ActualRepCount())
+		require.Equal(t, repCount, slogs[0].ActualRepCount)
 	})
 
 	t.Run("When attempting to exceed num sets for ExerciseLog", func(t *testing.T) {
 		n := 4
 		wlog, _ := wlogSuccesSetup(t, ath, pService, wt)
+		req := ts.FetchWorkoutLogExerciseLogsReq{
+			AthleteID:    ath.AthleteID(),
+			WorkoutLogID: wlog.ID(),
+		}
 
-		elogs, err := tService.FetchWorkoutLogExerciseLogs(ath, wlog)
+		elogs, err := tService.FetchWorkoutLogExerciseLogs(req)
 		require.NoError(t, err)
 		elog := elogs[0]
-		repCount := random.RepCount()
-		metrics := sl.NewMetrics(repCount, random.RestTime())
+		req2 := ts.AddSetLogToExerciseLogReq{
+			AthleteID:      ath.AthleteID(),
+			WorkoutLogID:   wlog.ID(),
+			ExerciseLogID:  elog.ID,
+			ActualRepCount: random.RepCount(),
+			Duration:       random.RestTime(),
+		}
 
 		for i := 0; i < n; i++ {
-			err = tService.AddSetLogToExerciseLog(ath, wlog, elog, metrics)
+			err = tService.AddSetLogToExerciseLog(req2)
 			require.NoError(t, err)
 		}
 
-		err = tService.AddSetLogToExerciseLog(ath, wlog, elog, metrics)
+		err = tService.AddSetLogToExerciseLog(req2)
 		require.Error(t, err)
 		require.Equal(t, ts.ErrCannotExceedNumSets.Error(), err.Error())
 	})
 
 }
 
-func TestRemoveWorkoutLog(t *testing.T) {
+func TestMoveToNextExerciseLog(t *testing.T) {
 	wt, pService, tService, ath := setup()
 	t.Run("When WorkoutLog not found", func(t *testing.T) {
-		wlog := wlogNotFoundSetup(ath)
-		err := tService.RemoveWorkoutLog(ath, wlog)
+		req := ts.MoveToNextExerciseLogReq{
+			AthleteID:    ath.AthleteID(),
+			WorkoutLogID: "1234",
+		}
+
+		err := tService.MoveToNextExerciseLog(req)
 		require.Error(t, err)
 		require.Equal(t, ts.ErrWorkoutLogNotFound.Error(), err.Error())
 	})
 
-	t.Run("When unauthorized access to WorkoutLog", func(t *testing.T) {
+	t.Run("When unauthorized access", func(t *testing.T) {
 		ath2 := athlete.NewAthlete()
-		wlog, _ := wlogSuccesSetup(t, ath2, pService, wt)
-		err := tService.RemoveWorkoutLog(ath, wlog)
+		wlog, _ := wlogSuccesSetup(t, ath, pService, wt)
+		req := ts.MoveToNextExerciseLogReq{
+			AthleteID:    ath2.AthleteID(),
+			WorkoutLogID: wlog.ID(),
+		}
+		err := tService.MoveToNextExerciseLog(req)
 		require.Error(t, err)
 		require.Equal(t, ts.ErrUnauthorizedAccess.Error(), err.Error())
 	})
 
 	t.Run("When success", func(t *testing.T) {
 		wlog, _ := wlogSuccesSetup(t, ath, pService, wt)
-		err := tService.RemoveWorkoutLog(ath, wlog)
+		req := ts.MoveToNextExerciseLogReq{
+			AthleteID:    ath.AthleteID(),
+			WorkoutLogID: wlog.ID(),
+		}
+		err := tService.MoveToNextExerciseLog(req)
 		require.NoError(t, err)
 
-		wlogs, err := tService.FetchWorkoutLogs(ath)
+		req2 := ts.FetchCurrentExerciseLogReq{
+			AthleteID:    ath.AthleteID(),
+			WorkoutLogID: wlog.ID(),
+		}
+		res, err := tService.FetchCurrentExerciseLog(req2)
 		require.NoError(t, err)
-		require.Empty(t, wlogs)
+		require.NotEmpty(t, res)
+
+		req3 := ts.FetchWorkoutLogExerciseLogsReq{
+			AthleteID:    ath.AthleteID(),
+			WorkoutLogID: wlog.ID(),
+		}
+
+		results, err := tService.FetchWorkoutLogExerciseLogs(req3)
+		require.NoError(t, err)
+		require.NotEmpty(t, results)
+		require.Equal(t, results[1].ID, res.ID)
+	})
+
+	t.Run("When WorkoutLog already completed", func(t *testing.T) {
+		n := 5
+		wlog, _ := wlogSuccesSetup(t, ath, pService, wt)
+		req := ts.MoveToNextExerciseLogReq{
+			AthleteID:    ath.AthleteID(),
+			WorkoutLogID: wlog.ID(),
+		}
+
+		for i := 0; i < n; i++ {
+			err := tService.MoveToNextExerciseLog(req)
+			require.NoError(t, err)
+		}
+
+		err := tService.MoveToNextExerciseLog(req)
+		require.Error(t, err)
+		require.Equal(t, ts.ErrWorkoutLogAlreadyCompleted.Error(), err.Error())
 	})
 }
 
-func wplanSetup(t *testing.T, ath athlete.Athlete, service p.PlanningService) workoutplan.WorkoutPlan {
-	wplan, err := service.CreateNewWorkoutPlan(ath, random.String(75))
+func TestRemoveWorkoutLog(t *testing.T) {
+	wt, pService, tService, ath := setup()
+	t.Run("When WorkoutLog not found", func(t *testing.T) {
+		req := ts.RemoveWorkoutLogReq{
+			AthleteID:    ath.AthleteID(),
+			WorkoutLogID: "1234",
+		}
+		err := tService.RemoveWorkoutLog(req)
+		require.Error(t, err)
+		require.Equal(t, ts.ErrWorkoutLogNotFound.Error(), err.Error())
+	})
+
+	t.Run("When unauthorized access to WorkoutLog", func(t *testing.T) {
+		ath2 := athlete.NewAthlete()
+		wlog, _ := wlogSuccesSetup(t, ath, pService, wt)
+		req := ts.RemoveWorkoutLogReq{
+			AthleteID:    ath2.AthleteID(),
+			WorkoutLogID: wlog.ID(),
+		}
+		err := tService.RemoveWorkoutLog(req)
+		require.Error(t, err)
+		require.Equal(t, ts.ErrUnauthorizedAccess.Error(), err.Error())
+	})
+
+	t.Run("When success", func(t *testing.T) {
+		wlog, _ := wlogSuccesSetup(t, ath, pService, wt)
+		req := ts.RemoveWorkoutLogReq{
+			AthleteID:    ath.AthleteID(),
+			WorkoutLogID: wlog.ID(),
+		}
+		err := tService.RemoveWorkoutLog(req)
+		require.NoError(t, err)
+
+		wlogs, err := tService.FetchWorkoutLogs(ath.AthleteID())
+		require.NoError(t, err)
+		for _, wlog2 := range wlogs {
+			require.NotEqual(t, wlog.ID(), wlog2.ID)
+		}
+	})
+}
+
+func wplanSetup(t *testing.T, ath athlete.Athlete, service p.PlanningService) p.WorkoutPlanRes {
+	req := p.CreateNewWorkoutPlanReq{
+		AthleteID: ath.AthleteID(),
+		Title:     random.String(75),
+	}
+	res, err := service.CreateNewWorkoutPlan(req)
 	require.NoError(t, err)
-	require.NotEmpty(t, wplan)
-	return wplan
+	require.NotEmpty(t, res)
+	return res
 }
 
 func wlogNotFoundSetup(ath athlete.Athlete) wl.WorkoutLog {
@@ -268,34 +363,31 @@ func wlogSuccesSetup(t *testing.T, ath athlete.Athlete, pService p.PlanningServi
 	wlog, err := wt.ConvertWorkoutPlan(wplan)
 	require.NoError(t, err)
 	require.NotEmpty(t, wlog)
-	require.Equal(t, wplan.Title(), wlog.Title())
+	require.Equal(t, wplan.Title, wlog.Title())
 
 	return wlog, n
 }
 
-func exerciseSetup(t *testing.T, ath athlete.Athlete, wplan wp.WorkoutPlan, service p.PlanningService) e.Exercise {
+func exerciseSetup(t *testing.T, ath athlete.Athlete, wplan p.WorkoutPlanRes, service p.PlanningService) p.ExerciseRes {
 	name := random.String(75)
 
-	metrics, err := e.NewMetrics(
-		random.RepCount(),
-		4,
-		random.Weight(),
-		random.RestTime(),
-	)
-	require.NoError(t, err)
+	req := p.AddNewExerciseToWorkoutPlanReq{
+		AthleteID:     ath.AthleteID(),
+		WorkoutPlanID: wplan.ID,
+		Name:          name,
+		TargetRep:     random.RepCount(),
+		NumSets:       4,
+		Weight:        random.Weight(),
+		RestDur:       random.RestTime(),
+	}
 
-	exercise, err := service.AddNewExerciseToWorkoutPlan(
-		ath,
-		wplan,
-		name,
-		metrics,
-	)
+	res, err := service.AddNewExerciseToWorkoutPlan(req)
 
 	require.NoError(t, err)
-	require.NotEmpty(t, exercise)
-	require.Equal(t, name, exercise.Name())
+	require.NotEmpty(t, res)
+	require.Equal(t, name, res.Name)
 
-	return exercise
+	return res
 }
 
 func elogNotFoundSetup(wlog wl.WorkoutLog) el.ExerciseLog {

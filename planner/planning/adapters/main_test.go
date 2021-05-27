@@ -30,7 +30,7 @@ func TestMain(m *testing.M) {
 
 func connectDB() (*sql.DB, error) {
 	// Load config file + set vars.
-	confs := config.LoadConfg("../../")
+	confs := config.LoadConfg("../../../")
 	host := confs.Database.DBHost
 	port := confs.Database.DBPort
 	user := confs.Database.DBUser

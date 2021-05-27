@@ -4,8 +4,8 @@ import (
 	"errors"
 	"time"
 
-	"github.com/mhd53/quanta-fitness-server/manager/athlete"
 	"github.com/mhd53/quanta-fitness-server/planner/exercise"
+	e "github.com/mhd53/quanta-fitness-server/planner/exercise"
 	p "github.com/mhd53/quanta-fitness-server/planner/planning"
 	wp "github.com/mhd53/quanta-fitness-server/planner/workoutplan"
 )
@@ -22,11 +22,11 @@ func NewInMemRepo() p.Repository {
 	}
 }
 
-func (r *repo) StoreWorkoutPlan(wplan wp.WorkoutPlan, ath athlete.Athlete) error {
+func (r *repo) StoreWorkoutPlan(wplan wp.WorkoutPlan) error {
 	now := time.Now()
 	data := inRepoWorkoutPlan{
 		ID:        wplan.ID(),
-		AthleteID: ath.AthleteID(),
+		AthleteID: wplan.AthleteID(),
 		Title:     wplan.Title(),
 		CreatedAt: now,
 		UpdatedAt: now,
@@ -36,8 +36,8 @@ func (r *repo) StoreWorkoutPlan(wplan wp.WorkoutPlan, ath athlete.Athlete) error
 	return nil
 }
 
-func (r *repo) FindWorkoutPlanByTitleAndAthleteID(wplan wp.WorkoutPlan, ath athlete.Athlete) (bool, error) {
-	aid := ath.AthleteID()
+func (r *repo) FindWorkoutPlanByTitleAndAthleteID(wplan wp.WorkoutPlan) (bool, error) {
+	aid := wplan.AthleteID()
 	title := wplan.Title()
 
 	for _, val := range r.wplans {
@@ -49,12 +49,22 @@ func (r *repo) FindWorkoutPlanByTitleAndAthleteID(wplan wp.WorkoutPlan, ath athl
 	return false, nil
 }
 
-func (r *repo) FindWorkoutPlanByID(wplan wp.WorkoutPlan) (bool, error) {
-	_, ok := r.wplans[wplan.ID()]
-	return ok, nil
+func (r *repo) FindWorkoutPlanByID(id string) (wp.WorkoutPlan, bool, error) {
+	val, ok := r.wplans[id]
+
+	if !ok {
+		return wp.WorkoutPlan{}, false, nil
+	}
+
+	wplan, err := wp.RestoreWorkoutPlan(val.ID, val.AthleteID, val.Title)
+	if err != nil {
+		return wp.WorkoutPlan{}, false, err
+	}
+
+	return wplan, ok, nil
 }
-func (r *repo) FindWorkoutPlanByIDAndAthleteID(wplan wp.WorkoutPlan, ath athlete.Athlete) (bool, error) {
-	aid := ath.AthleteID()
+func (r *repo) FindWorkoutPlanByIDAndAthleteID(wplan wp.WorkoutPlan) (bool, error) {
+	aid := wplan.AthleteID()
 	wpid := wplan.ID()
 
 	for _, val := range r.wplans {
@@ -65,42 +75,42 @@ func (r *repo) FindWorkoutPlanByIDAndAthleteID(wplan wp.WorkoutPlan, ath athlete
 
 	return false, nil
 }
-func (r *repo) StoreExercise(wplan wp.WorkoutPlan, e exercise.Exercise, ath athlete.Athlete) error {
+func (r *repo) StoreExercise(wplan wp.WorkoutPlan, exercise e.Exercise) error {
 	now := time.Now()
-	metrics := e.Metrics()
+	metrics := exercise.Metrics()
 	data := inRepoExercise{
-		ID:            e.ID(),
+		ID:            exercise.ID(),
 		WorkoutPlanID: wplan.ID(),
-		AthleteID:     ath.AthleteID(),
-		Name:          e.Name(),
+		AthleteID:     wplan.AthleteID(),
+		Name:          exercise.Name(),
 		TargetRep:     metrics.TargetRep(),
 		NumSets:       metrics.NumSets(),
 		Weight:        float64(metrics.Weight()),
 		RestDur:       float64(metrics.RestDur()),
-		Pos:           e.Pos(),
+		Pos:           exercise.Pos(),
 		CreatedAt:     now,
 		UpdatedAt:     now,
 	}
 
-	r.exercises[e.ID()] = data
+	r.exercises[exercise.ID()] = data
 	return nil
 }
 
-func (r *repo) FindExerciseByID(e exercise.Exercise) (bool, error) {
-	eid := e.ID()
-
-	for _, val := range r.exercises {
-		if val.ID == eid {
-			return true, nil
-		}
+func (r *repo) FindExerciseByID(id string) (e.Exercise, bool, error) {
+	val, ok := r.exercises[id]
+	if !ok {
+		return e.Exercise{}, false, nil
 	}
-	return false, nil
+
+	exercise, err := r.restoreExercise(val)
+	if err != nil {
+		return e.Exercise{}, false, err
+	}
+
+	return exercise, ok, nil
 }
 
-func (r *repo) FindExerciseByNameAndWorkoutPlanID(wplan wp.WorkoutPlan, e exercise.Exercise) (bool, error) {
-	name := e.Name()
-	wpid := wplan.ID()
-
+func (r *repo) FindExerciseByNameAndWorkoutPlanID(wpid, name string) (bool, error) {
 	for _, val := range r.exercises {
 		if val.Name == name && val.WorkoutPlanID == wpid {
 			return true, nil
@@ -110,8 +120,8 @@ func (r *repo) FindExerciseByNameAndWorkoutPlanID(wplan wp.WorkoutPlan, e exerci
 	return false, nil
 }
 
-func (r *repo) RemoveExercise(e exercise.Exercise) error {
-	delete(r.exercises, e.ID())
+func (r *repo) RemoveExercise(exercise e.Exercise) error {
+	delete(r.exercises, exercise.ID())
 	return nil
 }
 
@@ -132,8 +142,7 @@ func (r *repo) UpdateWorkoutPlan(wplan wp.WorkoutPlan) error {
 	return nil
 }
 
-func (r *repo) FindAllWorkoutPlansForAthlete(ath athlete.Athlete) ([]wp.WorkoutPlan, error) {
-	aid := ath.AthleteID()
+func (r *repo) FindAllWorkoutPlansForAthlete(aid string) ([]wp.WorkoutPlan, error) {
 	var wplans []wp.WorkoutPlan
 	for _, val := range r.wplans {
 		if val.AthleteID == aid {
@@ -149,41 +158,50 @@ func (r *repo) FindAllWorkoutPlansForAthlete(ath athlete.Athlete) ([]wp.WorkoutP
 	return wplans, nil
 }
 
-func (r *repo) FindAllExercisesForWorkoutPlan(wplan wp.WorkoutPlan) ([]exercise.Exercise, error) {
+func (r *repo) FindAllExercisesForWorkoutPlan(wplan wp.WorkoutPlan) ([]e.Exercise, error) {
 	wpid := wplan.ID()
-	var exercises []exercise.Exercise
+	var exercises []e.Exercise
 	for _, val := range r.exercises {
 		if val.WorkoutPlanID == wpid {
-			metrics, err := exercise.NewMetrics(val.TargetRep, val.NumSets, val.Weight, val.RestDur)
+			exercise, err := r.restoreExercise(val)
 			if err != nil {
-				return []exercise.Exercise{}, err
+				return []e.Exercise{}, err
 			}
 
-			e, err := exercise.RestoreExercise(val.ID, val.WorkoutPlanID, val.AthleteID, val.Name, metrics, val.Pos)
-			if err != nil {
-				return []exercise.Exercise{}, err
-			}
-
-			exercises = append(exercises, e)
+			exercises = append(exercises, exercise)
 		}
 	}
 
 	return exercises, nil
 }
 
-func (r *repo) UpdateExercise(e exercise.Exercise) error {
-	prev, ok := r.exercises[e.ID()]
+func (r *repo) restoreExercise(val inRepoExercise) (e.Exercise, error) {
+	metrics, err := exercise.NewMetrics(val.TargetRep, val.NumSets, val.Weight, val.RestDur)
+	if err != nil {
+		return e.Exercise{}, err
+	}
+
+	exercise, err := e.RestoreExercise(val.ID, val.WorkoutPlanID, val.AthleteID, val.Name, metrics, val.Pos)
+	if err != nil {
+		return e.Exercise{}, err
+	}
+
+	return exercise, nil
+}
+
+func (r *repo) UpdateExercise(exercise e.Exercise) error {
+	prev, ok := r.exercises[exercise.ID()]
 	if !ok {
 		return errors.New("Exercise not found!")
 	}
 
 	now := time.Now()
-	metrics := e.Metrics()
+	metrics := exercise.Metrics()
 	data := inRepoExercise{
-		ID:            e.ID(),
-		WorkoutPlanID: e.WorkoutPlanID(),
-		AthleteID:     e.AthleteID(),
-		Name:          e.Name(),
+		ID:            exercise.ID(),
+		WorkoutPlanID: exercise.WorkoutPlanID(),
+		AthleteID:     exercise.AthleteID(),
+		Name:          exercise.Name(),
 		TargetRep:     metrics.TargetRep(),
 		NumSets:       metrics.NumSets(),
 		Weight:        float64(metrics.Weight()),
@@ -192,7 +210,7 @@ func (r *repo) UpdateExercise(e exercise.Exercise) error {
 		UpdatedAt:     now,
 	}
 
-	r.exercises[e.ID()] = data
+	r.exercises[exercise.ID()] = data
 	return nil
 }
 

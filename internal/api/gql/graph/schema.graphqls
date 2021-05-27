@@ -1,0 +1,51 @@
+# GraphQL schema example
+#
+# https://gqlgen.com/getting-started/
+
+type WorkoutPlan {
+  id: ID!
+  title: String!
+}
+
+type Exercise {
+    id: ID!,
+    wpid: ID!,
+    name: String!,
+    targetRep: Int!,
+    numSets: Int!,
+    weight: Float!,
+    restDur: Float!,
+}
+
+input NewWorkoutPlan {
+  title: String!
+}
+
+input EditWorkoutPlanTitle {
+    id: ID!
+    title: String!
+}
+
+input NewExercise {
+    wpid: ID!,
+    name: String!,
+    targetRep: Int!,
+    numSets: Int!,
+    weight: Float!,
+    restDur: Float!,
+}
+
+
+type Query {
+    hello: String,
+    workoutPlans: [WorkoutPlan!]!
+    exercises(wpid: String!): [Exercise!]!
+}
+
+type Mutation {
+  createWorkoutPlan(input: NewWorkoutPlan!): WorkoutPlan!
+  editWorkoutPlanTitle(input: EditWorkoutPlanTitle!): Boolean!
+  addExercise(input: NewExercise!): Exercise!
+  removeExercise(id: ID!, wpid: ID!): Boolean!
+  deleteWorkoutPlan(id: ID!): Boolean!
+}

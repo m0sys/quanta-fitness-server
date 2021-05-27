@@ -9,4 +9,5 @@ import (
 type Repository interface {
 	StoreAthlete(usr user.User, ath athlete.Athlete) error
 	FindAthleteByUname(usr user.User) (athlete.Athlete, bool, error)
+	FindAthleteByID(id string) (athlete.Athlete, bool, error)
 }
