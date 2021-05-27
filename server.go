@@ -1,17 +1,19 @@
 package main
 
 import (
-	"github.com/go-chi/chi/v5"
 	"log"
 	"net/http"
 	"os"
 
+	"github.com/go-chi/chi/v5"
+
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
-	"github.com/mhd53/quanta-fitness-server/api/auth"
-	"github.com/mhd53/quanta-fitness-server/database/psql"
-	"github.com/mhd53/quanta-fitness-server/graph"
-	"github.com/mhd53/quanta-fitness-server/graph/generated"
+
+	// "github.com/mhd53/quanta-fitness-server/api/auth"
+	// "github.com/mhd53/quanta-fitness-server/database/psql"
+	"github.com/mhd53/quanta-fitness-server/internal/api/gql/graph"
+	"github.com/mhd53/quanta-fitness-server/internal/api/gql/graph/generated"
 )
 
 const defaultPort = "8080"
@@ -23,7 +25,7 @@ func main() {
 	}
 
 	router := chi.NewRouter()
-	router.Use(auth.Middleware())
+	// router.Use(auth.Middleware())
 
 	srv := handler.NewDefaultServer(generated.NewExecutableSchema(graph.NewResolver()))
 
@@ -31,7 +33,7 @@ func main() {
 	router.Handle("/query", srv)
 
 	// Making sure to defer closing datbase connection...
-	defer psql.DbConn.Close()
+	// defer psql.DbConn.Close()
 
 	log.Printf("connect to http://localhost:%s/ for GraphQL playground", port)
 	log.Fatal(http.ListenAndServe(":"+port, router))

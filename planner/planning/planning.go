@@ -297,6 +297,9 @@ func (p PlanningService) FetchWorkoutPlanExercises(req FetchWorkoutPlanExercises
 	return results, nil
 }
 
+// FIXME: Sending one request that edits multiple fields is better than sending
+//		 n requests to edit n fields. - Refactor!
+
 func (p PlanningService) EditExerciseName(req EditExerciseNameReq) error {
 	if err := ValidateEditExerciseNameReq(req); err != nil {
 		return err

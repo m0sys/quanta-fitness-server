@@ -1,10 +1,11 @@
 package resolver
 
 import (
+	"testing"
+
 	"github.com/99designs/gqlgen/client"
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/stretchr/testify/assert"
-	"testing"
 
 	"github.com/mhd53/quanta-fitness-server/api/auth"
 	"github.com/mhd53/quanta-fitness-server/graph"
