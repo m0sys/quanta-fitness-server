@@ -355,7 +355,7 @@ func TestFetchWorkoutPlanExercises(t *testing.T) {
 
 }
 
-func TestEditExerciseName(t *testing.T) {
+func TestEditExercise(t *testing.T) {
 	service, ath := setup()
 	t.Run("When Unauthorized WorkoutPlan", func(t *testing.T) {
 		ath2 := athlete.NewAthlete()
@@ -363,14 +363,18 @@ func TestEditExerciseName(t *testing.T) {
 		exercise, _ := exerciseSuccessSetup(t, ath, wplan, service)
 		name := random.String(75)
 
-		req := p.EditExerciseNameReq{
+		req := p.EditExerciseReq{
 			AthleteID:     ath2.AthleteID(),
 			WorkoutPlanID: wplan.ID,
 			ExerciseID:    exercise.ID,
 			Name:          name,
+			TargetRep:     exercise.TargetRep,
+			NumSets:       exercise.NumSets,
+			Weight:        float64(exercise.Weight),
+			RestDur:       float64(exercise.RestDur),
 		}
 
-		err := service.EditExerciseName(req)
+		err := service.EditExercise(req)
 		require.Error(t, err)
 		require.Equal(t, p.ErrUnauthorizedAccess.Error(), err.Error())
 	})
@@ -392,14 +396,18 @@ func TestEditExerciseName(t *testing.T) {
 		exercise, _ := exerciseSuccessSetup(t, ath, wplan, service)
 		name := random.String(75)
 
-		req := p.EditExerciseNameReq{
+		req := p.EditExerciseReq{
 			AthleteID:     ath.AthleteID(),
 			WorkoutPlanID: "1234",
 			ExerciseID:    exercise.ID,
 			Name:          name,
+			TargetRep:     exercise.TargetRep,
+			NumSets:       exercise.NumSets,
+			Weight:        float64(exercise.Weight),
+			RestDur:       float64(exercise.RestDur),
 		}
 
-		err := service.EditExerciseName(req)
+		err := service.EditExercise(req)
 		require.Error(t, err)
 		require.Equal(t, p.ErrWorkoutPlanNotFound.Error(), err.Error())
 	})
@@ -408,14 +416,18 @@ func TestEditExerciseName(t *testing.T) {
 		wplan, _ := workoutPlanSuccessSetup(t, ath, service)
 		name := random.String(75)
 
-		req := p.EditExerciseNameReq{
+		req := p.EditExerciseReq{
 			AthleteID:     ath.AthleteID(),
 			WorkoutPlanID: wplan.ID,
 			ExerciseID:    "1234",
 			Name:          name,
+			TargetRep:     random.RepCount(),
+			NumSets:       random.NumSets(),
+			Weight:        random.Weight(),
+			RestDur:       random.RestTime(),
 		}
 
-		err := service.EditExerciseName(req)
+		err := service.EditExercise(req)
 		require.Error(t, err)
 		require.Equal(t, p.ErrExerciseNotFound.Error(), err.Error())
 	})
@@ -424,14 +436,18 @@ func TestEditExerciseName(t *testing.T) {
 		wplan, _ := workoutPlanSuccessSetup(t, ath, service)
 		exercise, name := exerciseSuccessSetup(t, ath, wplan, service)
 
-		req := p.EditExerciseNameReq{
+		req := p.EditExerciseReq{
 			AthleteID:     ath.AthleteID(),
 			WorkoutPlanID: wplan.ID,
 			ExerciseID:    exercise.ID,
 			Name:          name,
+			TargetRep:     exercise.TargetRep,
+			NumSets:       exercise.NumSets,
+			Weight:        float64(exercise.Weight),
+			RestDur:       float64(exercise.RestDur),
 		}
 
-		err := service.EditExerciseName(req)
+		err := service.EditExercise(req)
 		require.Error(t, err)
 		require.Equal(t, p.ErrIdentialName.Error(), err.Error())
 
@@ -451,14 +467,18 @@ func TestEditExerciseName(t *testing.T) {
 		exercise, _ := exerciseSuccessSetup(t, ath, wplan, service)
 		name := random.String(75)
 
-		req := p.EditExerciseNameReq{
+		req := p.EditExerciseReq{
 			AthleteID:     ath.AthleteID(),
 			WorkoutPlanID: wplan.ID,
 			ExerciseID:    exercise.ID,
 			Name:          name,
+			TargetRep:     exercise.TargetRep,
+			NumSets:       exercise.NumSets,
+			Weight:        float64(exercise.Weight),
+			RestDur:       float64(exercise.RestDur),
 		}
 
-		err := service.EditExerciseName(req)
+		err := service.EditExercise(req)
 		require.NoError(t, err)
 
 		req2 := p.FetchWorkoutPlanExercisesReq{
@@ -469,370 +489,6 @@ func TestEditExerciseName(t *testing.T) {
 		require.NoError(t, err)
 		require.NotEmpty(t, exercises)
 		require.Equal(t, name, exercises[0].Name)
-	})
-}
-
-func TestEditExerciseTargetRep(t *testing.T) {
-	service, ath := setup()
-	t.Run("When Unauthorized WorkoutPlan", func(t *testing.T) {
-		ath2 := athlete.NewAthlete()
-		wplan, _ := workoutPlanSuccessSetup(t, ath, service)
-		exercise, _ := exerciseSuccessSetup(t, ath, wplan, service)
-		targetRep := random.RepCount()
-
-		req := p.EditExerciseTargetRepReq{
-			AthleteID:     ath2.AthleteID(),
-			WorkoutPlanID: wplan.ID,
-			ExerciseID:    exercise.ID,
-			TargetRep:     targetRep,
-		}
-
-		err := service.EditExerciseTargetRep(req)
-		require.Error(t, err)
-		require.Equal(t, p.ErrUnauthorizedAccess.Error(), err.Error())
-	})
-
-	/*
-		t.Run("When Unauthorized Exercise", func(t *testing.T) {
-			wplan, _ := workoutPlanSuccessSetup(t, ath, service)
-			exercise := exerciseUnauthorizedSetup(t, wplan)
-			name := random.String(75)
-
-			err := service.EditExerciseName(ath, wplan, exercise, name)
-			require.Error(t, err)
-			require.Equal(t, p.ErrUnauthorizedAccess.Error(), err.Error())
-		})
-	*/
-
-	t.Run("When WorkoutPlan not found", func(t *testing.T) {
-		wplan, _ := workoutPlanSuccessSetup(t, ath, service)
-		exercise, _ := exerciseSuccessSetup(t, ath, wplan, service)
-		targetRep := random.RepCount()
-
-		req := p.EditExerciseTargetRepReq{
-			AthleteID:     ath.AthleteID(),
-			WorkoutPlanID: "1234",
-			ExerciseID:    exercise.ID,
-			TargetRep:     targetRep,
-		}
-
-		err := service.EditExerciseTargetRep(req)
-		require.Error(t, err)
-		require.Equal(t, p.ErrWorkoutPlanNotFound.Error(), err.Error())
-	})
-
-	t.Run("When Exercise not found", func(t *testing.T) {
-		wplan, _ := workoutPlanSuccessSetup(t, ath, service)
-		targetRep := random.RepCount()
-
-		req := p.EditExerciseTargetRepReq{
-			AthleteID:     ath.AthleteID(),
-			WorkoutPlanID: wplan.ID,
-			ExerciseID:    "1234",
-			TargetRep:     targetRep,
-		}
-
-		err := service.EditExerciseTargetRep(req)
-		require.Error(t, err)
-		require.Equal(t, p.ErrExerciseNotFound.Error(), err.Error())
-	})
-
-	t.Run("When success", func(t *testing.T) {
-		wplan, _ := workoutPlanSuccessSetup(t, ath, service)
-		exercise, _ := exerciseSuccessSetup(t, ath, wplan, service)
-		targetRep := random.RepCount()
-
-		req := p.EditExerciseTargetRepReq{
-			AthleteID:     ath.AthleteID(),
-			WorkoutPlanID: wplan.ID,
-			ExerciseID:    exercise.ID,
-			TargetRep:     targetRep,
-		}
-
-		err := service.EditExerciseTargetRep(req)
-		require.NoError(t, err)
-
-		req2 := p.FetchWorkoutPlanExercisesReq{
-			AthleteID:     ath.AthleteID(),
-			WorkoutPlanID: wplan.ID,
-		}
-		exercises, err := service.FetchWorkoutPlanExercises(req2)
-		require.NoError(t, err)
-		require.NotEmpty(t, exercises)
-		require.Equal(t, targetRep, exercises[0].TargetRep)
-	})
-}
-
-func TestEditExerciseNumSets(t *testing.T) {
-	service, ath := setup()
-	t.Run("When Unauthorized WorkoutPlan", func(t *testing.T) {
-		ath2 := athlete.NewAthlete()
-		wplan, _ := workoutPlanSuccessSetup(t, ath, service)
-		exercise, _ := exerciseSuccessSetup(t, ath, wplan, service)
-		numSets := random.NumSets()
-
-		req := p.EditExerciseNumSetsReq{
-			AthleteID:     ath2.AthleteID(),
-			WorkoutPlanID: wplan.ID,
-			ExerciseID:    exercise.ID,
-			NumSets:       numSets,
-		}
-
-		err := service.EditExerciseNumSets(req)
-		require.Error(t, err)
-		require.Equal(t, p.ErrUnauthorizedAccess.Error(), err.Error())
-	})
-
-	/*
-		t.Run("When Unauthorized Exercise", func(t *testing.T) {
-			wplan, _ := workoutPlanSuccessSetup(t, ath, service)
-			exercise := exerciseUnauthorizedSetup(t, wplan)
-			name := random.String(75)
-
-			err := service.EditExerciseName(ath, wplan, exercise, name)
-			require.Error(t, err)
-			require.Equal(t, p.ErrUnauthorizedAccess.Error(), err.Error())
-		})
-	*/
-
-	t.Run("When WorkoutPlan not found", func(t *testing.T) {
-		wplan, _ := workoutPlanSuccessSetup(t, ath, service)
-		exercise, _ := exerciseSuccessSetup(t, ath, wplan, service)
-		numSets := random.NumSets()
-
-		req := p.EditExerciseNumSetsReq{
-			AthleteID:     ath.AthleteID(),
-			WorkoutPlanID: "1234",
-			ExerciseID:    exercise.ID,
-			NumSets:       numSets,
-		}
-
-		err := service.EditExerciseNumSets(req)
-		require.Error(t, err)
-		require.Equal(t, p.ErrWorkoutPlanNotFound.Error(), err.Error())
-	})
-
-	t.Run("When Exercise not found", func(t *testing.T) {
-		wplan, _ := workoutPlanSuccessSetup(t, ath, service)
-		numSets := random.NumSets()
-
-		req := p.EditExerciseNumSetsReq{
-			AthleteID:     ath.AthleteID(),
-			WorkoutPlanID: wplan.ID,
-			ExerciseID:    "1234",
-			NumSets:       numSets,
-		}
-
-		err := service.EditExerciseNumSets(req)
-		require.Error(t, err)
-		require.Equal(t, p.ErrExerciseNotFound.Error(), err.Error())
-	})
-
-	t.Run("When success", func(t *testing.T) {
-		wplan, _ := workoutPlanSuccessSetup(t, ath, service)
-		exercise, _ := exerciseSuccessSetup(t, ath, wplan, service)
-		numSets := random.NumSets()
-
-		req := p.EditExerciseNumSetsReq{
-			AthleteID:     ath.AthleteID(),
-			WorkoutPlanID: wplan.ID,
-			ExerciseID:    exercise.ID,
-			NumSets:       numSets,
-		}
-
-		err := service.EditExerciseNumSets(req)
-		require.NoError(t, err)
-
-		req2 := p.FetchWorkoutPlanExercisesReq{
-			AthleteID:     ath.AthleteID(),
-			WorkoutPlanID: wplan.ID,
-		}
-		exercises, err := service.FetchWorkoutPlanExercises(req2)
-		require.NoError(t, err)
-		require.NotEmpty(t, exercises)
-		require.Equal(t, numSets, exercises[0].NumSets)
-	})
-}
-
-func TestEditExerciseWeight(t *testing.T) {
-	service, ath := setup()
-	t.Run("When Unauthorized WorkoutPlan", func(t *testing.T) {
-		ath2 := athlete.NewAthlete()
-		wplan, _ := workoutPlanSuccessSetup(t, ath, service)
-		exercise, _ := exerciseSuccessSetup(t, ath, wplan, service)
-		weight := random.Weight()
-
-		req := p.EditExerciseWeightReq{
-			AthleteID:     ath2.AthleteID(),
-			WorkoutPlanID: wplan.ID,
-			ExerciseID:    exercise.ID,
-			Weight:        weight,
-		}
-
-		err := service.EditExerciseWeight(req)
-		require.Error(t, err)
-		require.Equal(t, p.ErrUnauthorizedAccess.Error(), err.Error())
-	})
-
-	/*
-		t.Run("When Unauthorized Exercise", func(t *testing.T) {
-			wplan, _ := workoutPlanSuccessSetup(t, ath, service)
-			exercise := exerciseUnauthorizedSetup(t, wplan)
-			name := random.String(75)
-
-			err := service.EditExerciseName(ath, wplan, exercise, name)
-			require.Error(t, err)
-			require.Equal(t, p.ErrUnauthorizedAccess.Error(), err.Error())
-		})
-	*/
-
-	t.Run("When WorkoutPlan not found", func(t *testing.T) {
-		wplan, _ := workoutPlanSuccessSetup(t, ath, service)
-		exercise, _ := exerciseSuccessSetup(t, ath, wplan, service)
-		weight := random.Weight()
-
-		req := p.EditExerciseWeightReq{
-			AthleteID:     ath.AthleteID(),
-			WorkoutPlanID: "1234",
-			ExerciseID:    exercise.ID,
-			Weight:        weight,
-		}
-
-		err := service.EditExerciseWeight(req)
-		require.Error(t, err)
-		require.Equal(t, p.ErrWorkoutPlanNotFound.Error(), err.Error())
-	})
-
-	t.Run("When Exercise not found", func(t *testing.T) {
-		wplan, _ := workoutPlanSuccessSetup(t, ath, service)
-		weight := random.Weight()
-
-		req := p.EditExerciseWeightReq{
-			AthleteID:     ath.AthleteID(),
-			WorkoutPlanID: wplan.ID,
-			ExerciseID:    "1234",
-			Weight:        weight,
-		}
-
-		err := service.EditExerciseWeight(req)
-		require.Error(t, err)
-		require.Equal(t, p.ErrExerciseNotFound.Error(), err.Error())
-	})
-
-	t.Run("When success", func(t *testing.T) {
-		wplan, _ := workoutPlanSuccessSetup(t, ath, service)
-		exercise, _ := exerciseSuccessSetup(t, ath, wplan, service)
-		weight := random.Weight()
-
-		req := p.EditExerciseWeightReq{
-			AthleteID:     ath.AthleteID(),
-			WorkoutPlanID: wplan.ID,
-			ExerciseID:    exercise.ID,
-			Weight:        weight,
-		}
-
-		err := service.EditExerciseWeight(req)
-		require.NoError(t, err)
-
-		req2 := p.FetchWorkoutPlanExercisesReq{
-			AthleteID:     ath.AthleteID(),
-			WorkoutPlanID: wplan.ID,
-		}
-		exercises, err := service.FetchWorkoutPlanExercises(req2)
-		require.NoError(t, err)
-		require.NotEmpty(t, exercises)
-		require.Equal(t, weight, float64(exercises[0].Weight))
-	})
-}
-
-func TestEditExerciseRestDur(t *testing.T) {
-	service, ath := setup()
-	t.Run("When Unauthorized WorkoutPlan", func(t *testing.T) {
-		ath2 := athlete.NewAthlete()
-		wplan, _ := workoutPlanSuccessSetup(t, ath, service)
-		exercise, _ := exerciseSuccessSetup(t, ath, wplan, service)
-		restDur := random.RestTime()
-
-		req := p.EditExerciseRestDurReq{
-			AthleteID:     ath2.AthleteID(),
-			WorkoutPlanID: wplan.ID,
-			ExerciseID:    exercise.ID,
-			RestDur:       restDur,
-		}
-
-		err := service.EditExerciseRestDur(req)
-		require.Error(t, err)
-		require.Equal(t, p.ErrUnauthorizedAccess.Error(), err.Error())
-	})
-
-	/*
-		t.Run("When Unauthorized Exercise", func(t *testing.T) {
-			wplan, _ := workoutPlanSuccessSetup(t, ath, service)
-			exercise := exerciseUnauthorizedSetup(t, wplan)
-			name := random.String(75)
-
-			err := service.EditExerciseName(ath, wplan, exercise, name)
-			require.Error(t, err)
-			require.Equal(t, p.ErrUnauthorizedAccess.Error(), err.Error())
-		})
-	*/
-
-	t.Run("When WorkoutPlan not found", func(t *testing.T) {
-		wplan, _ := workoutPlanSuccessSetup(t, ath, service)
-		exercise, _ := exerciseSuccessSetup(t, ath, wplan, service)
-		restDur := random.RestTime()
-
-		req := p.EditExerciseRestDurReq{
-			AthleteID:     ath.AthleteID(),
-			WorkoutPlanID: "1234",
-			ExerciseID:    exercise.ID,
-			RestDur:       restDur,
-		}
-
-		err := service.EditExerciseRestDur(req)
-		require.Error(t, err)
-		require.Equal(t, p.ErrWorkoutPlanNotFound.Error(), err.Error())
-	})
-
-	t.Run("When Exercise not found", func(t *testing.T) {
-		wplan, _ := workoutPlanSuccessSetup(t, ath, service)
-		restDur := random.RestTime()
-
-		req := p.EditExerciseRestDurReq{
-			AthleteID:     ath.AthleteID(),
-			WorkoutPlanID: wplan.ID,
-			ExerciseID:    "1234",
-			RestDur:       restDur,
-		}
-
-		err := service.EditExerciseRestDur(req)
-		require.Error(t, err)
-		require.Equal(t, p.ErrExerciseNotFound.Error(), err.Error())
-	})
-
-	t.Run("When success", func(t *testing.T) {
-		wplan, _ := workoutPlanSuccessSetup(t, ath, service)
-		exercise, _ := exerciseSuccessSetup(t, ath, wplan, service)
-		restDur := random.RestTime()
-
-		req := p.EditExerciseRestDurReq{
-			AthleteID:     ath.AthleteID(),
-			WorkoutPlanID: wplan.ID,
-			ExerciseID:    exercise.ID,
-			RestDur:       restDur,
-		}
-
-		err := service.EditExerciseRestDur(req)
-		require.NoError(t, err)
-
-		req2 := p.FetchWorkoutPlanExercisesReq{
-			AthleteID:     ath.AthleteID(),
-			WorkoutPlanID: wplan.ID,
-		}
-		exercises, err := service.FetchWorkoutPlanExercises(req2)
-		require.NoError(t, err)
-		require.NotEmpty(t, exercises)
-		require.Equal(t, restDur, float64(exercises[0].RestDur))
 	})
 }
 

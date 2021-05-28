@@ -255,3 +255,42 @@ func ValidateRemoveWorkoutPlanReq(req RemoveWorkoutPlanReq) error {
 
 	return nil
 }
+
+type EditExerciseReq struct {
+	AthleteID     string
+	WorkoutPlanID string
+	ExerciseID    string
+	Name          string
+	TargetRep     int
+	NumSets       int
+	Weight        float64
+	RestDur       float64
+}
+
+func ValidateEditExerciseReq(req EditExerciseReq) error {
+	if req.AthleteID == "" {
+		return ErrAthleteIDCannotBeEmpty
+	}
+
+	if req.WorkoutPlanID == "" {
+		return ErrWorkoutPlanIDCannotBeEmpty
+	}
+
+	if req.ExerciseID == "" {
+		return ErrExerciseIDCannotBeEmpty
+	}
+
+	if req.Name == "" {
+		return ErrNameCannotBeEmpty
+	}
+
+	if req.TargetRep == 0 {
+		return ErrTargetRepCannotBeEmpty
+	}
+
+	if req.NumSets == 0 {
+		return ErrNumSetsCannotBeEmpty
+	}
+
+	return nil
+}

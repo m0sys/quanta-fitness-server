@@ -297,11 +297,8 @@ func (p PlanningService) FetchWorkoutPlanExercises(req FetchWorkoutPlanExercises
 	return results, nil
 }
 
-// FIXME: Sending one request that edits multiple fields is better than sending
-//		 n requests to edit n fields. - Refactor!
-
-func (p PlanningService) EditExerciseName(req EditExerciseNameReq) error {
-	if err := ValidateEditExerciseNameReq(req); err != nil {
+func (p PlanningService) EditExercise(req EditExerciseReq) error {
+	if err := ValidateEditExerciseReq(req); err != nil {
 		return err
 	}
 
@@ -333,61 +330,7 @@ func (p PlanningService) EditExerciseName(req EditExerciseNameReq) error {
 		return ErrIdentialName
 	}
 
-	err = p.repo.UpdateExercise(exercise)
-	if err != nil {
-		log.Printf("%s: %s", errSlug, err.Error())
-		return errInternal
-	}
-
-	return nil
-}
-
-func (p PlanningService) EditExerciseTargetRep(req EditExerciseTargetRepReq) error {
-	if err := ValidateEditExerciseTargetRepReq(req); err != nil {
-		return err
-	}
-
-	if err := p.validateWorkoutPlan(req.AthleteID, req.WorkoutPlanID); err != nil {
-		return err
-	}
-
-	if err := p.validateExercise(req.AthleteID, req.WorkoutPlanID, req.ExerciseID); err != nil {
-		return err
-	}
-
-	exercise, err := p.findExercise(req.ExerciseID)
-	if err != nil {
-		return err
-	}
-
 	err = exercise.EditTargetRep(req.TargetRep)
-	if err != nil {
-		return err
-	}
-
-	err = p.repo.UpdateExercise(exercise)
-	if err != nil {
-		log.Printf("%s: %s", errSlug, err.Error())
-		return errInternal
-	}
-
-	return nil
-}
-
-func (p PlanningService) EditExerciseNumSets(req EditExerciseNumSetsReq) error {
-	if err := ValidateEditExerciseNumSetsReq(req); err != nil {
-		return err
-	}
-
-	if err := p.validateWorkoutPlan(req.AthleteID, req.WorkoutPlanID); err != nil {
-		return err
-	}
-
-	if err := p.validateExercise(req.AthleteID, req.WorkoutPlanID, req.ExerciseID); err != nil {
-		return err
-	}
-
-	exercise, err := p.findExercise(req.ExerciseID)
 	if err != nil {
 		return err
 	}
@@ -397,61 +340,7 @@ func (p PlanningService) EditExerciseNumSets(req EditExerciseNumSetsReq) error {
 		return err
 	}
 
-	err = p.repo.UpdateExercise(exercise)
-	if err != nil {
-		log.Printf("%s: %s", errSlug, err.Error())
-		return errInternal
-	}
-
-	return nil
-}
-
-func (p PlanningService) EditExerciseWeight(req EditExerciseWeightReq) error {
-	if err := ValidateEditExerciseWeightReq(req); err != nil {
-		return err
-	}
-
-	if err := p.validateWorkoutPlan(req.AthleteID, req.WorkoutPlanID); err != nil {
-		return err
-	}
-
-	if err := p.validateExercise(req.AthleteID, req.WorkoutPlanID, req.ExerciseID); err != nil {
-		return err
-	}
-
-	exercise, err := p.findExercise(req.ExerciseID)
-	if err != nil {
-		return err
-	}
-
 	err = exercise.EditWeight(req.Weight)
-	if err != nil {
-		return err
-	}
-
-	err = p.repo.UpdateExercise(exercise)
-	if err != nil {
-		log.Printf("%s: %s", errSlug, err.Error())
-		return errInternal
-	}
-
-	return nil
-}
-
-func (p PlanningService) EditExerciseRestDur(req EditExerciseRestDurReq) error {
-	if err := ValidateEditExerciseRestDurReq(req); err != nil {
-		return err
-	}
-
-	if err := p.validateWorkoutPlan(req.AthleteID, req.WorkoutPlanID); err != nil {
-		return err
-	}
-
-	if err := p.validateExercise(req.AthleteID, req.WorkoutPlanID, req.ExerciseID); err != nil {
-		return err
-	}
-
-	exercise, err := p.findExercise(req.ExerciseID)
 	if err != nil {
 		return err
 	}
