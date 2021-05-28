@@ -35,6 +35,16 @@ input NewExercise {
     restDur: Float!,
 }
 
+input EditExerciseInput {
+    id: ID!,
+    wpid: ID!,
+    name: String!,
+    targetRep: Int!,
+    numSets: Int!,
+    weight: Float!,
+    restDur: Float!,
+}
+
 
 type Query {
     hello: String,
@@ -47,5 +57,6 @@ type Mutation {
   editWorkoutPlanTitle(input: EditWorkoutPlanTitle!): Boolean!
   addExercise(input: NewExercise!): Exercise!
   removeExercise(id: ID!, wpid: ID!): Boolean!
+  editExercise(input: EditExerciseInput!): Boolean!
   deleteWorkoutPlan(id: ID!): Boolean!
 }

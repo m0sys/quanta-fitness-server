@@ -57,6 +57,7 @@ type ComplexityRoot struct {
 		AddExercise          func(childComplexity int, input model.NewExercise) int
 		CreateWorkoutPlan    func(childComplexity int, input model.NewWorkoutPlan) int
 		DeleteWorkoutPlan    func(childComplexity int, id string) int
+		EditExercise         func(childComplexity int, input model.EditExerciseInput) int
 		EditWorkoutPlanTitle func(childComplexity int, input model.EditWorkoutPlanTitle) int
 		RemoveExercise       func(childComplexity int, id string, wpid string) int
 	}
@@ -78,6 +79,7 @@ type MutationResolver interface {
 	EditWorkoutPlanTitle(ctx context.Context, input model.EditWorkoutPlanTitle) (bool, error)
 	AddExercise(ctx context.Context, input model.NewExercise) (*model.Exercise, error)
 	RemoveExercise(ctx context.Context, id string, wpid string) (bool, error)
+	EditExercise(ctx context.Context, input model.EditExerciseInput) (bool, error)
 	DeleteWorkoutPlan(ctx context.Context, id string) (bool, error)
 }
 type QueryResolver interface {
@@ -185,6 +187,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.DeleteWorkoutPlan(childComplexity, args["id"].(string)), true
+
+	case "Mutation.editExercise":
+		if e.complexity.Mutation.EditExercise == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_editExercise_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.EditExercise(childComplexity, args["input"].(model.EditExerciseInput)), true
 
 	case "Mutation.editWorkoutPlanTitle":
 		if e.complexity.Mutation.EditWorkoutPlanTitle == nil {
@@ -351,6 +365,16 @@ input NewExercise {
     restDur: Float!,
 }
 
+input EditExerciseInput {
+    id: ID!,
+    wpid: ID!,
+    name: String!,
+    targetRep: Int!,
+    numSets: Int!,
+    weight: Float!,
+    restDur: Float!,
+}
+
 
 type Query {
     hello: String,
@@ -363,6 +387,7 @@ type Mutation {
   editWorkoutPlanTitle(input: EditWorkoutPlanTitle!): Boolean!
   addExercise(input: NewExercise!): Exercise!
   removeExercise(id: ID!, wpid: ID!): Boolean!
+  editExercise(input: EditExerciseInput!): Boolean!
   deleteWorkoutPlan(id: ID!): Boolean!
 }
 `, BuiltIn: false},
@@ -415,6 +440,21 @@ func (ec *executionContext) field_Mutation_deleteWorkoutPlan_args(ctx context.Co
 		}
 	}
 	args["id"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_editExercise_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.EditExerciseInput
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalNEditExerciseInput2githubᚗcomᚋmhd53ᚋquantaᚑfitnessᚑserverᚋinternalᚋapiᚋgqlᚋgraphᚋmodelᚐEditExerciseInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
 	return args, nil
 }
 
@@ -922,6 +962,48 @@ func (ec *executionContext) _Mutation_removeExercise(ctx context.Context, field 
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Mutation().RemoveExercise(rctx, args["id"].(string), args["wpid"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_editExercise(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_editExercise_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().EditExercise(rctx, args["input"].(model.EditExerciseInput))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2317,6 +2399,74 @@ func (ec *executionContext) ___Type_ofType(ctx context.Context, field graphql.Co
 
 // region    **************************** input.gotpl *****************************
 
+func (ec *executionContext) unmarshalInputEditExerciseInput(ctx context.Context, obj interface{}) (model.EditExerciseInput, error) {
+	var it model.EditExerciseInput
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "id":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+			it.ID, err = ec.unmarshalNID2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "wpid":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("wpid"))
+			it.Wpid, err = ec.unmarshalNID2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "name":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			it.Name, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "targetRep":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("targetRep"))
+			it.TargetRep, err = ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "numSets":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("numSets"))
+			it.NumSets, err = ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "weight":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("weight"))
+			it.Weight, err = ec.unmarshalNFloat2float64(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "restDur":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("restDur"))
+			it.RestDur, err = ec.unmarshalNFloat2float64(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputEditWorkoutPlanTitle(ctx context.Context, obj interface{}) (model.EditWorkoutPlanTitle, error) {
 	var it model.EditWorkoutPlanTitle
 	var asMap = obj.(map[string]interface{})
@@ -2522,6 +2672,11 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			}
 		case "removeExercise":
 			out.Values[i] = ec._Mutation_removeExercise(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "editExercise":
+			out.Values[i] = ec._Mutation_editExercise(ctx, field)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -2900,6 +3055,11 @@ func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.Se
 		}
 	}
 	return res
+}
+
+func (ec *executionContext) unmarshalNEditExerciseInput2githubᚗcomᚋmhd53ᚋquantaᚑfitnessᚑserverᚋinternalᚋapiᚋgqlᚋgraphᚋmodelᚐEditExerciseInput(ctx context.Context, v interface{}) (model.EditExerciseInput, error) {
+	res, err := ec.unmarshalInputEditExerciseInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalNEditWorkoutPlanTitle2githubᚗcomᚋmhd53ᚋquantaᚑfitnessᚑserverᚋinternalᚋapiᚋgqlᚋgraphᚋmodelᚐEditWorkoutPlanTitle(ctx context.Context, v interface{}) (model.EditWorkoutPlanTitle, error) {

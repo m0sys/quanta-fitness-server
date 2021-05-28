@@ -315,19 +315,23 @@ func (p PlanningService) EditExercise(req EditExerciseReq) error {
 		return err
 	}
 
-	err = exercise.EditName(req.Name)
-	if err != nil {
-		return err
-	}
+	sameName := req.Name == exercise.Name()
+	if !sameName {
+		err = exercise.EditName(req.Name)
+		if err != nil {
+			return err
+		}
 
-	found, err := p.repo.FindExerciseByNameAndWorkoutPlanID(req.WorkoutPlanID, req.Name)
-	if err != nil {
-		log.Printf("%s: %s", errSlug, err.Error())
-		return errInternal
-	}
+		found, err := p.repo.FindExerciseByNameAndWorkoutPlanID(req.WorkoutPlanID, req.Name)
+		if err != nil {
+			log.Printf("%s: %s", errSlug, err.Error())
+			return errInternal
+		}
 
-	if found {
-		return ErrIdentialName
+		if found {
+			return ErrIdentialName
+		}
+
 	}
 
 	err = exercise.EditTargetRep(req.TargetRep)

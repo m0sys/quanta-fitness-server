@@ -2,6 +2,16 @@
 
 package model
 
+type EditExerciseInput struct {
+	ID        string  `json:"id"`
+	Wpid      string  `json:"wpid"`
+	Name      string  `json:"name"`
+	TargetRep int     `json:"targetRep"`
+	NumSets   int     `json:"numSets"`
+	Weight    float64 `json:"weight"`
+	RestDur   float64 `json:"restDur"`
+}
+
 type EditWorkoutPlanTitle struct {
 	ID    string `json:"id"`
 	Title string `json:"title"`

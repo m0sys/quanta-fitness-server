@@ -84,6 +84,26 @@ func (r *mutationResolver) RemoveExercise(ctx context.Context, id string, wpid s
 	return true, nil
 }
 
+func (r *mutationResolver) EditExercise(ctx context.Context, input model.EditExerciseInput) (bool, error) {
+	req := p.EditExerciseReq{
+		AthleteID:     "1234",
+		WorkoutPlanID: input.Wpid,
+		ExerciseID:    input.ID,
+		Name:          input.Name,
+		TargetRep:     input.TargetRep,
+		NumSets:       input.NumSets,
+		Weight:        input.Weight,
+		RestDur:       input.RestDur,
+	}
+
+	err := r.planning.EditExercise(req)
+	if err != nil {
+		return false, err
+	}
+
+	return true, nil
+}
+
 func (r *mutationResolver) DeleteWorkoutPlan(ctx context.Context, id string) (bool, error) {
 	req := p.RemoveWorkoutPlanReq{
 		AthleteID:     "1234",
