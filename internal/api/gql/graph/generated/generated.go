@@ -65,12 +65,14 @@ type ComplexityRoot struct {
 	Query struct {
 		Exercises    func(childComplexity int, wpid string) int
 		Hello        func(childComplexity int) int
+		WorkoutPlan  func(childComplexity int, id string) int
 		WorkoutPlans func(childComplexity int) int
 	}
 
 	WorkoutPlan struct {
-		ID    func(childComplexity int) int
-		Title func(childComplexity int) int
+		Exercises func(childComplexity int) int
+		ID        func(childComplexity int) int
+		Title     func(childComplexity int) int
 	}
 }
 
@@ -85,6 +87,7 @@ type MutationResolver interface {
 type QueryResolver interface {
 	Hello(ctx context.Context) (*string, error)
 	WorkoutPlans(ctx context.Context) ([]*model.WorkoutPlan, error)
+	WorkoutPlan(ctx context.Context, id string) (*model.WorkoutPlan, error)
 	Exercises(ctx context.Context, wpid string) ([]*model.Exercise, error)
 }
 
@@ -243,12 +246,31 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.Hello(childComplexity), true
 
+	case "Query.workoutPlan":
+		if e.complexity.Query.WorkoutPlan == nil {
+			break
+		}
+
+		args, err := ec.field_Query_workoutPlan_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.WorkoutPlan(childComplexity, args["id"].(string)), true
+
 	case "Query.workoutPlans":
 		if e.complexity.Query.WorkoutPlans == nil {
 			break
 		}
 
 		return e.complexity.Query.WorkoutPlans(childComplexity), true
+
+	case "WorkoutPlan.exercises":
+		if e.complexity.WorkoutPlan.Exercises == nil {
+			break
+		}
+
+		return e.complexity.WorkoutPlan.Exercises(childComplexity), true
 
 	case "WorkoutPlan.id":
 		if e.complexity.WorkoutPlan.ID == nil {
@@ -333,13 +355,14 @@ var sources = []*ast.Source{
 # https://gqlgen.com/getting-started/
 
 type WorkoutPlan {
-  id: ID!
+  id: String!
   title: String!
+  exercises: [Exercise]!
 }
 
 type Exercise {
-    id: ID!,
-    wpid: ID!,
+    id: String!,
+    wpid: String!,
     name: String!,
     targetRep: Int!,
     numSets: Int!,
@@ -352,12 +375,12 @@ input NewWorkoutPlan {
 }
 
 input EditWorkoutPlanTitle {
-    id: ID!
+    id: String!
     title: String!
 }
 
 input NewExercise {
-    wpid: ID!,
+    wpid: String!,
     name: String!,
     targetRep: Int!,
     numSets: Int!,
@@ -366,8 +389,8 @@ input NewExercise {
 }
 
 input EditExerciseInput {
-    id: ID!,
-    wpid: ID!,
+    id: String!,
+    wpid: String!,
     name: String!,
     targetRep: Int!,
     numSets: Int!,
@@ -379,6 +402,7 @@ input EditExerciseInput {
 type Query {
     hello: String,
     workoutPlans: [WorkoutPlan!]!
+    workoutPlan(id: String!): WorkoutPlan!
     exercises(wpid: String!): [Exercise!]!
 }
 
@@ -386,9 +410,9 @@ type Mutation {
   createWorkoutPlan(input: NewWorkoutPlan!): WorkoutPlan!
   editWorkoutPlanTitle(input: EditWorkoutPlanTitle!): Boolean!
   addExercise(input: NewExercise!): Exercise!
-  removeExercise(id: ID!, wpid: ID!): Boolean!
+  removeExercise(id: String!, wpid: String!): Boolean!
   editExercise(input: EditExerciseInput!): Boolean!
-  deleteWorkoutPlan(id: ID!): Boolean!
+  deleteWorkoutPlan(id: String!): Boolean!
 }
 `, BuiltIn: false},
 }
@@ -434,7 +458,7 @@ func (ec *executionContext) field_Mutation_deleteWorkoutPlan_args(ctx context.Co
 	var arg0 string
 	if tmp, ok := rawArgs["id"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-		arg0, err = ec.unmarshalNID2string(ctx, tmp)
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -479,7 +503,7 @@ func (ec *executionContext) field_Mutation_removeExercise_args(ctx context.Conte
 	var arg0 string
 	if tmp, ok := rawArgs["id"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-		arg0, err = ec.unmarshalNID2string(ctx, tmp)
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -488,7 +512,7 @@ func (ec *executionContext) field_Mutation_removeExercise_args(ctx context.Conte
 	var arg1 string
 	if tmp, ok := rawArgs["wpid"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("wpid"))
-		arg1, err = ec.unmarshalNID2string(ctx, tmp)
+		arg1, err = ec.unmarshalNString2string(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -524,6 +548,21 @@ func (ec *executionContext) field_Query_exercises_args(ctx context.Context, rawA
 		}
 	}
 	args["wpid"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_workoutPlan_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
 	return args, nil
 }
 
@@ -597,7 +636,7 @@ func (ec *executionContext) _Exercise_id(ctx context.Context, field graphql.Coll
 	}
 	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalNID2string(ctx, field.Selections, res)
+	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Exercise_wpid(ctx context.Context, field graphql.CollectedField, obj *model.Exercise) (ret graphql.Marshaler) {
@@ -632,7 +671,7 @@ func (ec *executionContext) _Exercise_wpid(ctx context.Context, field graphql.Co
 	}
 	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalNID2string(ctx, field.Selections, res)
+	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Exercise_name(ctx context.Context, field graphql.CollectedField, obj *model.Exercise) (ret graphql.Marshaler) {
@@ -1129,6 +1168,48 @@ func (ec *executionContext) _Query_workoutPlans(ctx context.Context, field graph
 	return ec.marshalNWorkoutPlan2ᚕᚖgithubᚗcomᚋmhd53ᚋquantaᚑfitnessᚑserverᚋinternalᚋapiᚋgqlᚋgraphᚋmodelᚐWorkoutPlanᚄ(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Query_workoutPlan(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_workoutPlan_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().WorkoutPlan(rctx, args["id"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.WorkoutPlan)
+	fc.Result = res
+	return ec.marshalNWorkoutPlan2ᚖgithubᚗcomᚋmhd53ᚋquantaᚑfitnessᚑserverᚋinternalᚋapiᚋgqlᚋgraphᚋmodelᚐWorkoutPlan(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Query_exercises(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -1274,7 +1355,7 @@ func (ec *executionContext) _WorkoutPlan_id(ctx context.Context, field graphql.C
 	}
 	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalNID2string(ctx, field.Selections, res)
+	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _WorkoutPlan_title(ctx context.Context, field graphql.CollectedField, obj *model.WorkoutPlan) (ret graphql.Marshaler) {
@@ -1310,6 +1391,41 @@ func (ec *executionContext) _WorkoutPlan_title(ctx context.Context, field graphq
 	res := resTmp.(string)
 	fc.Result = res
 	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _WorkoutPlan_exercises(ctx context.Context, field graphql.CollectedField, obj *model.WorkoutPlan) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "WorkoutPlan",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Exercises, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Exercise)
+	fc.Result = res
+	return ec.marshalNExercise2ᚕᚖgithubᚗcomᚋmhd53ᚋquantaᚑfitnessᚑserverᚋinternalᚋapiᚋgqlᚋgraphᚋmodelᚐExercise(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) ___Directive_name(ctx context.Context, field graphql.CollectedField, obj *introspection.Directive) (ret graphql.Marshaler) {
@@ -2409,7 +2525,7 @@ func (ec *executionContext) unmarshalInputEditExerciseInput(ctx context.Context,
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-			it.ID, err = ec.unmarshalNID2string(ctx, v)
+			it.ID, err = ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -2417,7 +2533,7 @@ func (ec *executionContext) unmarshalInputEditExerciseInput(ctx context.Context,
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("wpid"))
-			it.Wpid, err = ec.unmarshalNID2string(ctx, v)
+			it.Wpid, err = ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -2477,7 +2593,7 @@ func (ec *executionContext) unmarshalInputEditWorkoutPlanTitle(ctx context.Conte
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-			it.ID, err = ec.unmarshalNID2string(ctx, v)
+			it.ID, err = ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -2505,7 +2621,7 @@ func (ec *executionContext) unmarshalInputNewExercise(ctx context.Context, obj i
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("wpid"))
-			it.Wpid, err = ec.unmarshalNID2string(ctx, v)
+			it.Wpid, err = ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -2736,6 +2852,20 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				}
 				return res
 			})
+		case "workoutPlan":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_workoutPlan(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
 		case "exercises":
 			field := field
 			out.Concurrently(i, func() (res graphql.Marshaler) {
@@ -2783,6 +2913,11 @@ func (ec *executionContext) _WorkoutPlan(ctx context.Context, sel ast.SelectionS
 			}
 		case "title":
 			out.Values[i] = ec._WorkoutPlan_title(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "exercises":
+			out.Values[i] = ec._WorkoutPlan_exercises(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -3071,6 +3206,43 @@ func (ec *executionContext) marshalNExercise2githubᚗcomᚋmhd53ᚋquantaᚑfit
 	return ec._Exercise(ctx, sel, &v)
 }
 
+func (ec *executionContext) marshalNExercise2ᚕᚖgithubᚗcomᚋmhd53ᚋquantaᚑfitnessᚑserverᚋinternalᚋapiᚋgqlᚋgraphᚋmodelᚐExercise(ctx context.Context, sel ast.SelectionSet, v []*model.Exercise) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalOExercise2ᚖgithubᚗcomᚋmhd53ᚋquantaᚑfitnessᚑserverᚋinternalᚋapiᚋgqlᚋgraphᚋmodelᚐExercise(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+	return ret
+}
+
 func (ec *executionContext) marshalNExercise2ᚕᚖgithubᚗcomᚋmhd53ᚋquantaᚑfitnessᚑserverᚋinternalᚋapiᚋgqlᚋgraphᚋmodelᚐExerciseᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Exercise) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
@@ -3125,21 +3297,6 @@ func (ec *executionContext) unmarshalNFloat2float64(ctx context.Context, v inter
 
 func (ec *executionContext) marshalNFloat2float64(ctx context.Context, sel ast.SelectionSet, v float64) graphql.Marshaler {
 	res := graphql.MarshalFloat(v)
-	if res == graphql.Null {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "must not be null")
-		}
-	}
-	return res
-}
-
-func (ec *executionContext) unmarshalNID2string(ctx context.Context, v interface{}) (string, error) {
-	res, err := graphql.UnmarshalID(v)
-	return res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) marshalNID2string(ctx context.Context, sel ast.SelectionSet, v string) graphql.Marshaler {
-	res := graphql.MarshalID(v)
 	if res == graphql.Null {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -3490,6 +3647,13 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 		return graphql.Null
 	}
 	return graphql.MarshalBoolean(*v)
+}
+
+func (ec *executionContext) marshalOExercise2ᚖgithubᚗcomᚋmhd53ᚋquantaᚑfitnessᚑserverᚋinternalᚋapiᚋgqlᚋgraphᚋmodelᚐExercise(ctx context.Context, sel ast.SelectionSet, v *model.Exercise) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._Exercise(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalOString2string(ctx context.Context, v interface{}) (string, error) {

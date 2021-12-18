@@ -141,6 +141,49 @@ func (r *queryResolver) WorkoutPlans(ctx context.Context) ([]*model.WorkoutPlan,
 	return wplans, nil
 }
 
+func (r *queryResolver) WorkoutPlan(ctx context.Context, id string) (*model.WorkoutPlan, error) {
+	req := p.FetchWorkoutPlanReq{
+		AthleteID: "1234",
+		ID:        id,
+	}
+
+	res, err := r.planning.FetchWorkoutPlan(req)
+	if err != nil {
+		return &model.WorkoutPlan{}, err
+	}
+
+	req2 := p.FetchWorkoutPlanExercisesReq{
+		AthleteID:     "1234",
+		WorkoutPlanID: id,
+	}
+	res2, err := r.planning.FetchWorkoutPlanExercises(req2)
+	if err != nil {
+		return &model.WorkoutPlan{}, err
+	}
+
+	var exercises []*model.Exercise
+
+	for _, e := range res2 {
+		modelExercise := &model.Exercise{
+			ID:        e.ID,
+			Wpid:      e.WorkoutPlanID,
+			Name:      e.Name,
+			TargetRep: e.TargetRep,
+			NumSets:   e.NumSets,
+			Weight:    float64(e.Weight),
+			RestDur:   float64(e.RestDur),
+		}
+
+		exercises = append(exercises, modelExercise)
+	}
+
+	return &model.WorkoutPlan{
+		ID:        res.ID,
+		Title:     res.Title,
+		Exercises: exercises,
+	}, nil
+}
+
 func (r *queryResolver) Exercises(ctx context.Context, wpid string) ([]*model.Exercise, error) {
 	var exercises []*model.Exercise
 

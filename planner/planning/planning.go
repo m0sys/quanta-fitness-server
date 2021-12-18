@@ -267,6 +267,25 @@ func (p PlanningService) FetchWorkoutPlans(aid string) ([]WorkoutPlanRes, error)
 	return results, nil
 }
 
+// FIXME: Better if we merge `FetchWorkoutPlan` and `FetchWorkoutPlanExercises`.
+func (p PlanningService) FetchWorkoutPlan(req FetchWorkoutPlanReq) (WorkoutPlanRes, error) {
+	if err := ValidateFetchWorkoutPlanReq(req); err != nil {
+		return WorkoutPlanRes{}, err
+	}
+
+	if err := p.validateWorkoutPlan(req.AthleteID, req.ID); err != nil {
+		return WorkoutPlanRes{}, err
+	}
+
+	wplan, err := p.findWorkout(req.ID)
+	if err != nil {
+		return WorkoutPlanRes{}, err
+	}
+
+	res := mapWorkoutPlanToWorkoutPlanRes(wplan)
+	return res, nil
+}
+
 func (p PlanningService) FetchWorkoutPlanExercises(req FetchWorkoutPlanExercisesReq) ([]ExerciseRes, error) {
 	var results []ExerciseRes
 

@@ -41,6 +41,7 @@ type NewWorkoutPlan struct {
 }
 
 type WorkoutPlan struct {
-	ID    string `json:"id"`
-	Title string `json:"title"`
+	ID        string      `json:"id"`
+	Title     string      `json:"title"`
+	Exercises []*Exercise `json:"exercises"`
 }

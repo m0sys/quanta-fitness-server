@@ -3,13 +3,14 @@
 # https://gqlgen.com/getting-started/
 
 type WorkoutPlan {
-  id: ID!
+  id: String!
   title: String!
+  exercises: [Exercise]!
 }
 
 type Exercise {
-    id: ID!,
-    wpid: ID!,
+    id: String!,
+    wpid: String!,
     name: String!,
     targetRep: Int!,
     numSets: Int!,
@@ -22,12 +23,12 @@ input NewWorkoutPlan {
 }
 
 input EditWorkoutPlanTitle {
-    id: ID!
+    id: String!
     title: String!
 }
 
 input NewExercise {
-    wpid: ID!,
+    wpid: String!,
     name: String!,
     targetRep: Int!,
     numSets: Int!,
@@ -36,8 +37,8 @@ input NewExercise {
 }
 
 input EditExerciseInput {
-    id: ID!,
-    wpid: ID!,
+    id: String!,
+    wpid: String!,
     name: String!,
     targetRep: Int!,
     numSets: Int!,
@@ -49,6 +50,7 @@ input EditExerciseInput {
 type Query {
     hello: String,
     workoutPlans: [WorkoutPlan!]!
+    workoutPlan(id: String!): WorkoutPlan!
     exercises(wpid: String!): [Exercise!]!
 }
 
@@ -56,7 +58,7 @@ type Mutation {
   createWorkoutPlan(input: NewWorkoutPlan!): WorkoutPlan!
   editWorkoutPlanTitle(input: EditWorkoutPlanTitle!): Boolean!
   addExercise(input: NewExercise!): Exercise!
-  removeExercise(id: ID!, wpid: ID!): Boolean!
+  removeExercise(id: String!, wpid: String!): Boolean!
   editExercise(input: EditExerciseInput!): Boolean!
-  deleteWorkoutPlan(id: ID!): Boolean!
+  deleteWorkoutPlan(id: String!): Boolean!
 }

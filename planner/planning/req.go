@@ -17,6 +17,23 @@ func ValidateCreateNewWorkoutPlanReq(req CreateNewWorkoutPlanReq) error {
 	return nil
 }
 
+type FetchWorkoutPlanReq struct {
+	ID        string
+	AthleteID string
+}
+
+func ValidateFetchWorkoutPlanReq(req FetchWorkoutPlanReq) error {
+	if req.AthleteID == "" {
+		return ErrAthleteIDCannotBeEmpty
+	}
+
+	if req.ID == "" {
+		return ErrWorkoutPlanIDCannotBeEmpty
+	}
+
+	return nil
+}
+
 type AddNewExerciseToWorkoutPlanReq struct {
 	AthleteID     string
 	WorkoutPlanID string
