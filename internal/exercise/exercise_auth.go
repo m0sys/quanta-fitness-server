@@ -3,10 +3,10 @@ package exercise
 import (
 	"fmt"
 
-	es "github.com/mhd53/quanta-fitness-server/internal/datastore/exercisestore"
-	us "github.com/mhd53/quanta-fitness-server/internal/datastore/userstore"
-	"github.com/mhd53/quanta-fitness-server/internal/util"
-	w "github.com/mhd53/quanta-fitness-server/internal/workout"
+	es "github.com/m0sys/quanta-fitness-server/internal/datastore/exercisestore"
+	us "github.com/m0sys/quanta-fitness-server/internal/datastore/userstore"
+	"github.com/m0sys/quanta-fitness-server/internal/util"
+	w "github.com/m0sys/quanta-fitness-server/internal/workout"
 )
 
 type ExerciseAuth interface {

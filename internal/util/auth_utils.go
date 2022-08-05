@@ -2,7 +2,7 @@ package util
 
 import (
 	"fmt"
-	us "github.com/mhd53/quanta-fitness-server/internal/datastore/userstore"
+	us "github.com/m0sys/quanta-fitness-server/internal/datastore/userstore"
 )
 
 func CheckUserExists(aus us.UserStore, uname string) (bool, error) {

@@ -3,10 +3,10 @@ package adapters
 import (
 	"testing"
 
-	"github.com/mhd53/quanta-fitness-server/internal/random"
-	"github.com/mhd53/quanta-fitness-server/manager/athlete"
-	e "github.com/mhd53/quanta-fitness-server/planner/exercise"
-	wp "github.com/mhd53/quanta-fitness-server/planner/workoutplan"
+	"github.com/m0sys/quanta-fitness-server/internal/random"
+	"github.com/m0sys/quanta-fitness-server/manager/athlete"
+	e "github.com/m0sys/quanta-fitness-server/planner/exercise"
+	wp "github.com/m0sys/quanta-fitness-server/planner/workoutplan"
 	"github.com/stretchr/testify/require"
 )
 

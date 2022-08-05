@@ -3,8 +3,8 @@ package planning
 import (
 	"log"
 
-	e "github.com/mhd53/quanta-fitness-server/planner/exercise"
-	wp "github.com/mhd53/quanta-fitness-server/planner/workoutplan"
+	e "github.com/m0sys/quanta-fitness-server/planner/exercise"
+	wp "github.com/m0sys/quanta-fitness-server/planner/workoutplan"
 )
 
 type PlanningService struct {

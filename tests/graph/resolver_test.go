@@ -7,9 +7,9 @@ import (
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/mhd53/quanta-fitness-server/api/auth"
-	"github.com/mhd53/quanta-fitness-server/graph"
-	"github.com/mhd53/quanta-fitness-server/graph/generated"
+	"github.com/m0sys/quanta-fitness-server/api/auth"
+	"github.com/m0sys/quanta-fitness-server/graph"
+	"github.com/m0sys/quanta-fitness-server/graph/generated"
 )
 
 func TestAuthFlow(t *testing.T) {

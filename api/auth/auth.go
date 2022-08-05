@@ -3,9 +3,9 @@ package auth
 import (
 	"log"
 
-	serv "github.com/mhd53/quanta-fitness-server/internal/auth"
-	ustore "github.com/mhd53/quanta-fitness-server/internal/datastore/userstore"
-	"github.com/mhd53/quanta-fitness-server/pkg/crypto"
+	serv "github.com/m0sys/quanta-fitness-server/internal/auth"
+	ustore "github.com/m0sys/quanta-fitness-server/internal/datastore/userstore"
+	"github.com/m0sys/quanta-fitness-server/pkg/crypto"
 )
 
 var (

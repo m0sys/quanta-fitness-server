@@ -5,11 +5,11 @@ import (
 	"database/sql"
 
 	"github.com/google/uuid"
-	db "github.com/mhd53/quanta-fitness-server/internal/db/sqlc"
-	"github.com/mhd53/quanta-fitness-server/manager/athlete"
-	el "github.com/mhd53/quanta-fitness-server/tracker/exerciselog"
-	sl "github.com/mhd53/quanta-fitness-server/tracker/setlog"
-	wl "github.com/mhd53/quanta-fitness-server/tracker/workoutlog"
+	db "github.com/m0sys/quanta-fitness-server/internal/db/sqlc"
+	"github.com/m0sys/quanta-fitness-server/manager/athlete"
+	el "github.com/m0sys/quanta-fitness-server/tracker/exerciselog"
+	sl "github.com/m0sys/quanta-fitness-server/tracker/setlog"
+	wl "github.com/m0sys/quanta-fitness-server/tracker/workoutlog"
 )
 
 type PsqlTrainingRepository struct {

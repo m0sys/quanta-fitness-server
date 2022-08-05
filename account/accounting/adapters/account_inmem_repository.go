@@ -3,8 +3,8 @@ package adapters
 import (
 	"time"
 
-	a "github.com/mhd53/quanta-fitness-server/account/accounting"
-	"github.com/mhd53/quanta-fitness-server/account/user"
+	a "github.com/m0sys/quanta-fitness-server/account/accounting"
+	"github.com/m0sys/quanta-fitness-server/account/user"
 )
 
 type repo struct {

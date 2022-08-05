@@ -12,7 +12,7 @@ import (
 
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/99designs/gqlgen/graphql/introspection"
-	"github.com/mhd53/quanta-fitness-server/internal/api/gql/graph/model"
+	"github.com/m0sys/quanta-fitness-server/internal/api/gql/graph/model"
 	gqlparser "github.com/vektah/gqlparser/v2"
 	"github.com/vektah/gqlparser/v2/ast"
 )
@@ -379,7 +379,7 @@ func (ec *executionContext) field_Mutation_addExercise_args(ctx context.Context,
 	var arg0 model.NewExercise
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNNewExercise2githubᚗcomᚋmhd53ᚋquantaᚑfitnessᚑserverᚋinternalᚋapiᚋgqlᚋgraphᚋmodelᚐNewExercise(ctx, tmp)
+		arg0, err = ec.unmarshalNNewExercise2githubᚗcomᚋm0sysᚋquantaᚑfitnessᚑserverᚋinternalᚋapiᚋgqlᚋgraphᚋmodelᚐNewExercise(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -394,7 +394,7 @@ func (ec *executionContext) field_Mutation_createWorkoutPlan_args(ctx context.Co
 	var arg0 model.NewWorkoutPlan
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNNewWorkoutPlan2githubᚗcomᚋmhd53ᚋquantaᚑfitnessᚑserverᚋinternalᚋapiᚋgqlᚋgraphᚋmodelᚐNewWorkoutPlan(ctx, tmp)
+		arg0, err = ec.unmarshalNNewWorkoutPlan2githubᚗcomᚋm0sysᚋquantaᚑfitnessᚑserverᚋinternalᚋapiᚋgqlᚋgraphᚋmodelᚐNewWorkoutPlan(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -424,7 +424,7 @@ func (ec *executionContext) field_Mutation_editWorkoutPlanTitle_args(ctx context
 	var arg0 model.EditWorkoutPlanTitle
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNEditWorkoutPlanTitle2githubᚗcomᚋmhd53ᚋquantaᚑfitnessᚑserverᚋinternalᚋapiᚋgqlᚋgraphᚋmodelᚐEditWorkoutPlanTitle(ctx, tmp)
+		arg0, err = ec.unmarshalNEditWorkoutPlanTitle2githubᚗcomᚋm0sysᚋquantaᚑfitnessᚑserverᚋinternalᚋapiᚋgqlᚋgraphᚋmodelᚐEditWorkoutPlanTitle(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -809,7 +809,7 @@ func (ec *executionContext) _Mutation_createWorkoutPlan(ctx context.Context, fie
 	}
 	res := resTmp.(*model.WorkoutPlan)
 	fc.Result = res
-	return ec.marshalNWorkoutPlan2ᚖgithubᚗcomᚋmhd53ᚋquantaᚑfitnessᚑserverᚋinternalᚋapiᚋgqlᚋgraphᚋmodelᚐWorkoutPlan(ctx, field.Selections, res)
+	return ec.marshalNWorkoutPlan2ᚖgithubᚗcomᚋm0sysᚋquantaᚑfitnessᚑserverᚋinternalᚋapiᚋgqlᚋgraphᚋmodelᚐWorkoutPlan(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_editWorkoutPlanTitle(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -893,7 +893,7 @@ func (ec *executionContext) _Mutation_addExercise(ctx context.Context, field gra
 	}
 	res := resTmp.(*model.Exercise)
 	fc.Result = res
-	return ec.marshalNExercise2ᚖgithubᚗcomᚋmhd53ᚋquantaᚑfitnessᚑserverᚋinternalᚋapiᚋgqlᚋgraphᚋmodelᚐExercise(ctx, field.Selections, res)
+	return ec.marshalNExercise2ᚖgithubᚗcomᚋm0sysᚋquantaᚑfitnessᚑserverᚋinternalᚋapiᚋgqlᚋgraphᚋmodelᚐExercise(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_removeExercise(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -1044,7 +1044,7 @@ func (ec *executionContext) _Query_workoutPlans(ctx context.Context, field graph
 	}
 	res := resTmp.([]*model.WorkoutPlan)
 	fc.Result = res
-	return ec.marshalNWorkoutPlan2ᚕᚖgithubᚗcomᚋmhd53ᚋquantaᚑfitnessᚑserverᚋinternalᚋapiᚋgqlᚋgraphᚋmodelᚐWorkoutPlanᚄ(ctx, field.Selections, res)
+	return ec.marshalNWorkoutPlan2ᚕᚖgithubᚗcomᚋm0sysᚋquantaᚑfitnessᚑserverᚋinternalᚋapiᚋgqlᚋgraphᚋmodelᚐWorkoutPlanᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_exercises(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -1086,7 +1086,7 @@ func (ec *executionContext) _Query_exercises(ctx context.Context, field graphql.
 	}
 	res := resTmp.([]*model.Exercise)
 	fc.Result = res
-	return ec.marshalNExercise2ᚕᚖgithubᚗcomᚋmhd53ᚋquantaᚑfitnessᚑserverᚋinternalᚋapiᚋgqlᚋgraphᚋmodelᚐExerciseᚄ(ctx, field.Selections, res)
+	return ec.marshalNExercise2ᚕᚖgithubᚗcomᚋm0sysᚋquantaᚑfitnessᚑserverᚋinternalᚋapiᚋgqlᚋgraphᚋmodelᚐExerciseᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -2902,16 +2902,16 @@ func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.Se
 	return res
 }
 
-func (ec *executionContext) unmarshalNEditWorkoutPlanTitle2githubᚗcomᚋmhd53ᚋquantaᚑfitnessᚑserverᚋinternalᚋapiᚋgqlᚋgraphᚋmodelᚐEditWorkoutPlanTitle(ctx context.Context, v interface{}) (model.EditWorkoutPlanTitle, error) {
+func (ec *executionContext) unmarshalNEditWorkoutPlanTitle2githubᚗcomᚋm0sysᚋquantaᚑfitnessᚑserverᚋinternalᚋapiᚋgqlᚋgraphᚋmodelᚐEditWorkoutPlanTitle(ctx context.Context, v interface{}) (model.EditWorkoutPlanTitle, error) {
 	res, err := ec.unmarshalInputEditWorkoutPlanTitle(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNExercise2githubᚗcomᚋmhd53ᚋquantaᚑfitnessᚑserverᚋinternalᚋapiᚋgqlᚋgraphᚋmodelᚐExercise(ctx context.Context, sel ast.SelectionSet, v model.Exercise) graphql.Marshaler {
+func (ec *executionContext) marshalNExercise2githubᚗcomᚋm0sysᚋquantaᚑfitnessᚑserverᚋinternalᚋapiᚋgqlᚋgraphᚋmodelᚐExercise(ctx context.Context, sel ast.SelectionSet, v model.Exercise) graphql.Marshaler {
 	return ec._Exercise(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNExercise2ᚕᚖgithubᚗcomᚋmhd53ᚋquantaᚑfitnessᚑserverᚋinternalᚋapiᚋgqlᚋgraphᚋmodelᚐExerciseᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Exercise) graphql.Marshaler {
+func (ec *executionContext) marshalNExercise2ᚕᚖgithubᚗcomᚋm0sysᚋquantaᚑfitnessᚑserverᚋinternalᚋapiᚋgqlᚋgraphᚋmodelᚐExerciseᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Exercise) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -2935,7 +2935,7 @@ func (ec *executionContext) marshalNExercise2ᚕᚖgithubᚗcomᚋmhd53ᚋquanta
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNExercise2ᚖgithubᚗcomᚋmhd53ᚋquantaᚑfitnessᚑserverᚋinternalᚋapiᚋgqlᚋgraphᚋmodelᚐExercise(ctx, sel, v[i])
+			ret[i] = ec.marshalNExercise2ᚖgithubᚗcomᚋm0sysᚋquantaᚑfitnessᚑserverᚋinternalᚋapiᚋgqlᚋgraphᚋmodelᚐExercise(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -2948,7 +2948,7 @@ func (ec *executionContext) marshalNExercise2ᚕᚖgithubᚗcomᚋmhd53ᚋquanta
 	return ret
 }
 
-func (ec *executionContext) marshalNExercise2ᚖgithubᚗcomᚋmhd53ᚋquantaᚑfitnessᚑserverᚋinternalᚋapiᚋgqlᚋgraphᚋmodelᚐExercise(ctx context.Context, sel ast.SelectionSet, v *model.Exercise) graphql.Marshaler {
+func (ec *executionContext) marshalNExercise2ᚖgithubᚗcomᚋm0sysᚋquantaᚑfitnessᚑserverᚋinternalᚋapiᚋgqlᚋgraphᚋmodelᚐExercise(ctx context.Context, sel ast.SelectionSet, v *model.Exercise) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -3003,12 +3003,12 @@ func (ec *executionContext) marshalNInt2int(ctx context.Context, sel ast.Selecti
 	return res
 }
 
-func (ec *executionContext) unmarshalNNewExercise2githubᚗcomᚋmhd53ᚋquantaᚑfitnessᚑserverᚋinternalᚋapiᚋgqlᚋgraphᚋmodelᚐNewExercise(ctx context.Context, v interface{}) (model.NewExercise, error) {
+func (ec *executionContext) unmarshalNNewExercise2githubᚗcomᚋm0sysᚋquantaᚑfitnessᚑserverᚋinternalᚋapiᚋgqlᚋgraphᚋmodelᚐNewExercise(ctx context.Context, v interface{}) (model.NewExercise, error) {
 	res, err := ec.unmarshalInputNewExercise(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalNNewWorkoutPlan2githubᚗcomᚋmhd53ᚋquantaᚑfitnessᚑserverᚋinternalᚋapiᚋgqlᚋgraphᚋmodelᚐNewWorkoutPlan(ctx context.Context, v interface{}) (model.NewWorkoutPlan, error) {
+func (ec *executionContext) unmarshalNNewWorkoutPlan2githubᚗcomᚋm0sysᚋquantaᚑfitnessᚑserverᚋinternalᚋapiᚋgqlᚋgraphᚋmodelᚐNewWorkoutPlan(ctx context.Context, v interface{}) (model.NewWorkoutPlan, error) {
 	res, err := ec.unmarshalInputNewWorkoutPlan(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
@@ -3028,11 +3028,11 @@ func (ec *executionContext) marshalNString2string(ctx context.Context, sel ast.S
 	return res
 }
 
-func (ec *executionContext) marshalNWorkoutPlan2githubᚗcomᚋmhd53ᚋquantaᚑfitnessᚑserverᚋinternalᚋapiᚋgqlᚋgraphᚋmodelᚐWorkoutPlan(ctx context.Context, sel ast.SelectionSet, v model.WorkoutPlan) graphql.Marshaler {
+func (ec *executionContext) marshalNWorkoutPlan2githubᚗcomᚋm0sysᚋquantaᚑfitnessᚑserverᚋinternalᚋapiᚋgqlᚋgraphᚋmodelᚐWorkoutPlan(ctx context.Context, sel ast.SelectionSet, v model.WorkoutPlan) graphql.Marshaler {
 	return ec._WorkoutPlan(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNWorkoutPlan2ᚕᚖgithubᚗcomᚋmhd53ᚋquantaᚑfitnessᚑserverᚋinternalᚋapiᚋgqlᚋgraphᚋmodelᚐWorkoutPlanᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.WorkoutPlan) graphql.Marshaler {
+func (ec *executionContext) marshalNWorkoutPlan2ᚕᚖgithubᚗcomᚋm0sysᚋquantaᚑfitnessᚑserverᚋinternalᚋapiᚋgqlᚋgraphᚋmodelᚐWorkoutPlanᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.WorkoutPlan) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -3056,7 +3056,7 @@ func (ec *executionContext) marshalNWorkoutPlan2ᚕᚖgithubᚗcomᚋmhd53ᚋqua
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNWorkoutPlan2ᚖgithubᚗcomᚋmhd53ᚋquantaᚑfitnessᚑserverᚋinternalᚋapiᚋgqlᚋgraphᚋmodelᚐWorkoutPlan(ctx, sel, v[i])
+			ret[i] = ec.marshalNWorkoutPlan2ᚖgithubᚗcomᚋm0sysᚋquantaᚑfitnessᚑserverᚋinternalᚋapiᚋgqlᚋgraphᚋmodelᚐWorkoutPlan(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -3069,7 +3069,7 @@ func (ec *executionContext) marshalNWorkoutPlan2ᚕᚖgithubᚗcomᚋmhd53ᚋqua
 	return ret
 }
 
-func (ec *executionContext) marshalNWorkoutPlan2ᚖgithubᚗcomᚋmhd53ᚋquantaᚑfitnessᚑserverᚋinternalᚋapiᚋgqlᚋgraphᚋmodelᚐWorkoutPlan(ctx context.Context, sel ast.SelectionSet, v *model.WorkoutPlan) graphql.Marshaler {
+func (ec *executionContext) marshalNWorkoutPlan2ᚖgithubᚗcomᚋm0sysᚋquantaᚑfitnessᚑserverᚋinternalᚋapiᚋgqlᚋgraphᚋmodelᚐWorkoutPlan(ctx context.Context, sel ast.SelectionSet, v *model.WorkoutPlan) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")

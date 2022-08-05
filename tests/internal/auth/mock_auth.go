@@ -1,8 +1,8 @@
 package authtests
 
 import (
-	"github.com/mhd53/quanta-fitness-server/internal/entity"
-	"github.com/mhd53/quanta-fitness-server/pkg/crypto"
+	"github.com/m0sys/quanta-fitness-server/internal/entity"
+	"github.com/m0sys/quanta-fitness-server/pkg/crypto"
 )
 
 const (

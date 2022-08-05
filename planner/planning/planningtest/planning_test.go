@@ -3,10 +3,10 @@ package planningtest
 import (
 	"testing"
 
-	"github.com/mhd53/quanta-fitness-server/internal/random"
-	"github.com/mhd53/quanta-fitness-server/manager/athlete"
-	p "github.com/mhd53/quanta-fitness-server/planner/planning"
-	"github.com/mhd53/quanta-fitness-server/planner/planning/adapters"
+	"github.com/m0sys/quanta-fitness-server/internal/random"
+	"github.com/m0sys/quanta-fitness-server/manager/athlete"
+	p "github.com/m0sys/quanta-fitness-server/planner/planning"
+	"github.com/m0sys/quanta-fitness-server/planner/planning/adapters"
 	"github.com/stretchr/testify/require"
 )
 

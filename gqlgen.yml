@@ -36,7 +36,7 @@ resolver:
 # gqlgen will search for any type names in the schema in these go packages
 # if they match it will use them, otherwise it will generate them.
 autobind:
-  - "github.com/mhd53/quanta-fitness-server/internal/api/gql/graph/model"
+  - "github.com/m0sys/quanta-fitness-server/internal/api/gql/graph/model"
 
 # This section declares type mapping between the GraphQL and go type systems
 #

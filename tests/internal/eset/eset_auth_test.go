@@ -4,16 +4,16 @@ import (
 	"github.com/stretchr/testify/assert"
 	"testing"
 
-	esstore "github.com/mhd53/quanta-fitness-server/internal/datastore/esetstore"
-	estore "github.com/mhd53/quanta-fitness-server/internal/datastore/exercisestore"
-	ustore "github.com/mhd53/quanta-fitness-server/internal/datastore/userstore"
-	wstore "github.com/mhd53/quanta-fitness-server/internal/datastore/workoutstore"
-	"github.com/mhd53/quanta-fitness-server/internal/entity"
-	esserv "github.com/mhd53/quanta-fitness-server/internal/eset"
-	e "github.com/mhd53/quanta-fitness-server/internal/exercise"
-	w "github.com/mhd53/quanta-fitness-server/internal/workout"
-	ats "github.com/mhd53/quanta-fitness-server/tests/internal/auth"
-	ets "github.com/mhd53/quanta-fitness-server/tests/internal/exercise"
+	esstore "github.com/m0sys/quanta-fitness-server/internal/datastore/esetstore"
+	estore "github.com/m0sys/quanta-fitness-server/internal/datastore/exercisestore"
+	ustore "github.com/m0sys/quanta-fitness-server/internal/datastore/userstore"
+	wstore "github.com/m0sys/quanta-fitness-server/internal/datastore/workoutstore"
+	"github.com/m0sys/quanta-fitness-server/internal/entity"
+	esserv "github.com/m0sys/quanta-fitness-server/internal/eset"
+	e "github.com/m0sys/quanta-fitness-server/internal/exercise"
+	w "github.com/m0sys/quanta-fitness-server/internal/workout"
+	ats "github.com/m0sys/quanta-fitness-server/tests/internal/auth"
+	ets "github.com/m0sys/quanta-fitness-server/tests/internal/exercise"
 )
 
 func TestAuthorizeExerciseAccessWhenUnauthenticated(t *testing.T) {

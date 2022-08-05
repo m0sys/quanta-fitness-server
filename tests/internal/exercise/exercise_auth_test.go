@@ -4,15 +4,15 @@ import (
 	"github.com/stretchr/testify/assert"
 	"testing"
 
-	es "github.com/mhd53/quanta-fitness-server/internal/datastore/exercisestore"
-	us "github.com/mhd53/quanta-fitness-server/internal/datastore/userstore"
-	ws "github.com/mhd53/quanta-fitness-server/internal/datastore/workoutstore"
-	w "github.com/mhd53/quanta-fitness-server/internal/workout"
+	es "github.com/m0sys/quanta-fitness-server/internal/datastore/exercisestore"
+	us "github.com/m0sys/quanta-fitness-server/internal/datastore/userstore"
+	ws "github.com/m0sys/quanta-fitness-server/internal/datastore/workoutstore"
+	w "github.com/m0sys/quanta-fitness-server/internal/workout"
 
-	"github.com/mhd53/quanta-fitness-server/internal/entity"
-	e "github.com/mhd53/quanta-fitness-server/internal/exercise"
-	ats "github.com/mhd53/quanta-fitness-server/tests/internal/auth"
-	wts "github.com/mhd53/quanta-fitness-server/tests/internal/workout"
+	"github.com/m0sys/quanta-fitness-server/internal/entity"
+	e "github.com/m0sys/quanta-fitness-server/internal/exercise"
+	ats "github.com/m0sys/quanta-fitness-server/tests/internal/auth"
+	wts "github.com/m0sys/quanta-fitness-server/tests/internal/workout"
 )
 
 func TestAuthorizeWorkoutAccessWhenUnauthenticated(t *testing.T) {

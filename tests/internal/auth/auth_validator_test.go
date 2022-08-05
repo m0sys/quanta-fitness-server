@@ -4,8 +4,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"testing"
 
-	"github.com/mhd53/quanta-fitness-server/internal/auth"
-	us "github.com/mhd53/quanta-fitness-server/internal/datastore/userstore"
+	"github.com/m0sys/quanta-fitness-server/internal/auth"
+	us "github.com/m0sys/quanta-fitness-server/internal/datastore/userstore"
 )
 
 func TestValidateRegisterationMismatch(t *testing.T) {

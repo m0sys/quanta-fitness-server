@@ -3,10 +3,10 @@ package eset
 import (
 	"fmt"
 
-	ess "github.com/mhd53/quanta-fitness-server/internal/datastore/esetstore"
-	us "github.com/mhd53/quanta-fitness-server/internal/datastore/userstore"
-	e "github.com/mhd53/quanta-fitness-server/internal/exercise"
-	"github.com/mhd53/quanta-fitness-server/internal/util"
+	ess "github.com/m0sys/quanta-fitness-server/internal/datastore/esetstore"
+	us "github.com/m0sys/quanta-fitness-server/internal/datastore/userstore"
+	e "github.com/m0sys/quanta-fitness-server/internal/exercise"
+	"github.com/m0sys/quanta-fitness-server/internal/util"
 )
 
 type EsetAuth interface {

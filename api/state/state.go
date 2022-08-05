@@ -1,10 +1,10 @@
 package state
 
 import (
-	esstore "github.com/mhd53/quanta-fitness-server/internal/datastore/esetstore"
-	estore "github.com/mhd53/quanta-fitness-server/internal/datastore/exercisestore"
-	ustore "github.com/mhd53/quanta-fitness-server/internal/datastore/userstore"
-	wstore "github.com/mhd53/quanta-fitness-server/internal/datastore/workoutstore"
+	esstore "github.com/m0sys/quanta-fitness-server/internal/datastore/esetstore"
+	estore "github.com/m0sys/quanta-fitness-server/internal/datastore/exercisestore"
+	ustore "github.com/m0sys/quanta-fitness-server/internal/datastore/userstore"
+	wstore "github.com/m0sys/quanta-fitness-server/internal/datastore/workoutstore"
 )
 
 type ServerState struct {

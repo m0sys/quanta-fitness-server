@@ -7,10 +7,10 @@ import (
 
 	"github.com/google/uuid"
 
-	db "github.com/mhd53/quanta-fitness-server/internal/db/sqlc"
-	"github.com/mhd53/quanta-fitness-server/manager/athlete"
-	e "github.com/mhd53/quanta-fitness-server/planner/exercise"
-	wp "github.com/mhd53/quanta-fitness-server/planner/workoutplan"
+	db "github.com/m0sys/quanta-fitness-server/internal/db/sqlc"
+	"github.com/m0sys/quanta-fitness-server/manager/athlete"
+	e "github.com/m0sys/quanta-fitness-server/planner/exercise"
+	wp "github.com/m0sys/quanta-fitness-server/planner/workoutplan"
 )
 
 type PsqlPlanningRepository struct {

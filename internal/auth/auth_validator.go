@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"github.com/go-playground/validator/v10"
 
-	"github.com/mhd53/quanta-fitness-server/internal/datastore/userstore"
-	"github.com/mhd53/quanta-fitness-server/pkg/crypto"
+	"github.com/m0sys/quanta-fitness-server/internal/datastore/userstore"
+	"github.com/m0sys/quanta-fitness-server/pkg/crypto"
 )
 
 var (

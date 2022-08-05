@@ -3,10 +3,10 @@ package managiningtest
 import (
 	"testing"
 
-	"github.com/mhd53/quanta-fitness-server/account/user"
-	"github.com/mhd53/quanta-fitness-server/internal/random"
-	m "github.com/mhd53/quanta-fitness-server/manager/managing"
-	"github.com/mhd53/quanta-fitness-server/manager/managing/adapters"
+	"github.com/m0sys/quanta-fitness-server/account/user"
+	"github.com/m0sys/quanta-fitness-server/internal/random"
+	m "github.com/m0sys/quanta-fitness-server/manager/managing"
+	"github.com/m0sys/quanta-fitness-server/manager/managing/adapters"
 	"github.com/stretchr/testify/require"
 )
 

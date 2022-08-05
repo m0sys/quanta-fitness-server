@@ -3,13 +3,13 @@ package exercise
 import (
 	"fmt"
 
-	estore "github.com/mhd53/quanta-fitness-server/internal/datastore/exercisestore"
-	ustore "github.com/mhd53/quanta-fitness-server/internal/datastore/userstore"
-	wstore "github.com/mhd53/quanta-fitness-server/internal/datastore/workoutstore"
-	"github.com/mhd53/quanta-fitness-server/internal/entity"
-	serv "github.com/mhd53/quanta-fitness-server/internal/exercise"
-	wServ "github.com/mhd53/quanta-fitness-server/internal/workout"
-	"github.com/mhd53/quanta-fitness-server/pkg/format"
+	estore "github.com/m0sys/quanta-fitness-server/internal/datastore/exercisestore"
+	ustore "github.com/m0sys/quanta-fitness-server/internal/datastore/userstore"
+	wstore "github.com/m0sys/quanta-fitness-server/internal/datastore/workoutstore"
+	"github.com/m0sys/quanta-fitness-server/internal/entity"
+	serv "github.com/m0sys/quanta-fitness-server/internal/exercise"
+	wServ "github.com/m0sys/quanta-fitness-server/internal/workout"
+	"github.com/m0sys/quanta-fitness-server/pkg/format"
 )
 
 var (

@@ -9,8 +9,8 @@ import (
 
 	_ "github.com/lib/pq"
 
-	"github.com/mhd53/quanta-fitness-server/config"
-	db "github.com/mhd53/quanta-fitness-server/internal/db/sqlc"
+	"github.com/m0sys/quanta-fitness-server/config"
+	db "github.com/m0sys/quanta-fitness-server/internal/db/sqlc"
 )
 
 var (

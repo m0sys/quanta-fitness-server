@@ -13,7 +13,7 @@ import (
 
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/99designs/gqlgen/graphql/introspection"
-	"github.com/mhd53/quanta-fitness-server/graph/model"
+	"github.com/m0sys/quanta-fitness-server/graph/model"
 	gqlparser "github.com/vektah/gqlparser/v2"
 	"github.com/vektah/gqlparser/v2/ast"
 )
@@ -754,7 +754,7 @@ func (ec *executionContext) field_Mutation_addEsetToExercise_args(ctx context.Co
 	var arg0 model.NewEset
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNNewEset2githubᚗcomᚋmhd53ᚋquantaᚑfitnessᚑserverᚋgraphᚋmodelᚐNewEset(ctx, tmp)
+		arg0, err = ec.unmarshalNNewEset2githubᚗcomᚋm0sysᚋquantaᚑfitnessᚑserverᚋgraphᚋmodelᚐNewEset(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -769,7 +769,7 @@ func (ec *executionContext) field_Mutation_addExerciseToWorkout_args(ctx context
 	var arg0 model.NewExercise
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNNewExercise2githubᚗcomᚋmhd53ᚋquantaᚑfitnessᚑserverᚋgraphᚋmodelᚐNewExercise(ctx, tmp)
+		arg0, err = ec.unmarshalNNewExercise2githubᚗcomᚋm0sysᚋquantaᚑfitnessᚑserverᚋgraphᚋmodelᚐNewExercise(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -784,7 +784,7 @@ func (ec *executionContext) field_Mutation_createWorkout_args(ctx context.Contex
 	var arg0 model.NewWorkout
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNNewWorkout2githubᚗcomᚋmhd53ᚋquantaᚑfitnessᚑserverᚋgraphᚋmodelᚐNewWorkout(ctx, tmp)
+		arg0, err = ec.unmarshalNNewWorkout2githubᚗcomᚋm0sysᚋquantaᚑfitnessᚑserverᚋgraphᚋmodelᚐNewWorkout(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -844,7 +844,7 @@ func (ec *executionContext) field_Mutation_login_args(ctx context.Context, rawAr
 	var arg0 model.Login
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNLogin2githubᚗcomᚋmhd53ᚋquantaᚑfitnessᚑserverᚋgraphᚋmodelᚐLogin(ctx, tmp)
+		arg0, err = ec.unmarshalNLogin2githubᚗcomᚋm0sysᚋquantaᚑfitnessᚑserverᚋgraphᚋmodelᚐLogin(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -859,7 +859,7 @@ func (ec *executionContext) field_Mutation_register_args(ctx context.Context, ra
 	var arg0 model.NewUser
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNNewUser2githubᚗcomᚋmhd53ᚋquantaᚑfitnessᚑserverᚋgraphᚋmodelᚐNewUser(ctx, tmp)
+		arg0, err = ec.unmarshalNNewUser2githubᚗcomᚋm0sysᚋquantaᚑfitnessᚑserverᚋgraphᚋmodelᚐNewUser(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -874,7 +874,7 @@ func (ec *executionContext) field_Mutation_updateEset_args(ctx context.Context, 
 	var arg0 model.EsetUpdate
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNEsetUpdate2githubᚗcomᚋmhd53ᚋquantaᚑfitnessᚑserverᚋgraphᚋmodelᚐEsetUpdate(ctx, tmp)
+		arg0, err = ec.unmarshalNEsetUpdate2githubᚗcomᚋm0sysᚋquantaᚑfitnessᚑserverᚋgraphᚋmodelᚐEsetUpdate(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -889,7 +889,7 @@ func (ec *executionContext) field_Mutation_updateExercise_args(ctx context.Conte
 	var arg0 model.ExerciseUpdate
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNExerciseUpdate2githubᚗcomᚋmhd53ᚋquantaᚑfitnessᚑserverᚋgraphᚋmodelᚐExerciseUpdate(ctx, tmp)
+		arg0, err = ec.unmarshalNExerciseUpdate2githubᚗcomᚋm0sysᚋquantaᚑfitnessᚑserverᚋgraphᚋmodelᚐExerciseUpdate(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -904,7 +904,7 @@ func (ec *executionContext) field_Mutation_updateWorkout_args(ctx context.Contex
 	var arg0 model.WorkoutUpdate
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNWorkoutUpdate2githubᚗcomᚋmhd53ᚋquantaᚑfitnessᚑserverᚋgraphᚋmodelᚐWorkoutUpdate(ctx, tmp)
+		arg0, err = ec.unmarshalNWorkoutUpdate2githubᚗcomᚋm0sysᚋquantaᚑfitnessᚑserverᚋgraphᚋmodelᚐWorkoutUpdate(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -1193,7 +1193,7 @@ func (ec *executionContext) _Eset_user(ctx context.Context, field graphql.Collec
 	}
 	res := resTmp.(*model.PublicUser)
 	fc.Result = res
-	return ec.marshalNPublicUser2ᚖgithubᚗcomᚋmhd53ᚋquantaᚑfitnessᚑserverᚋgraphᚋmodelᚐPublicUser(ctx, field.Selections, res)
+	return ec.marshalNPublicUser2ᚖgithubᚗcomᚋm0sysᚋquantaᚑfitnessᚑserverᚋgraphᚋmodelᚐPublicUser(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Eset_actualRepCount(ctx context.Context, field graphql.CollectedField, obj *model.Eset) (ret graphql.Marshaler) {
@@ -1508,7 +1508,7 @@ func (ec *executionContext) _Exercise_user(ctx context.Context, field graphql.Co
 	}
 	res := resTmp.(*model.PublicUser)
 	fc.Result = res
-	return ec.marshalNPublicUser2ᚖgithubᚗcomᚋmhd53ᚋquantaᚑfitnessᚑserverᚋgraphᚋmodelᚐPublicUser(ctx, field.Selections, res)
+	return ec.marshalNPublicUser2ᚖgithubᚗcomᚋm0sysᚋquantaᚑfitnessᚑserverᚋgraphᚋmodelᚐPublicUser(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Exercise_weight(ctx context.Context, field graphql.CollectedField, obj *model.Exercise) (ret graphql.Marshaler) {
@@ -1760,7 +1760,7 @@ func (ec *executionContext) _Mutation_register(ctx context.Context, field graphq
 	}
 	res := resTmp.(*model.Auth)
 	fc.Result = res
-	return ec.marshalNAuth2ᚖgithubᚗcomᚋmhd53ᚋquantaᚑfitnessᚑserverᚋgraphᚋmodelᚐAuth(ctx, field.Selections, res)
+	return ec.marshalNAuth2ᚖgithubᚗcomᚋm0sysᚋquantaᚑfitnessᚑserverᚋgraphᚋmodelᚐAuth(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_login(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -1802,7 +1802,7 @@ func (ec *executionContext) _Mutation_login(ctx context.Context, field graphql.C
 	}
 	res := resTmp.(*model.Auth)
 	fc.Result = res
-	return ec.marshalNAuth2ᚖgithubᚗcomᚋmhd53ᚋquantaᚑfitnessᚑserverᚋgraphᚋmodelᚐAuth(ctx, field.Selections, res)
+	return ec.marshalNAuth2ᚖgithubᚗcomᚋm0sysᚋquantaᚑfitnessᚑserverᚋgraphᚋmodelᚐAuth(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_createWorkout(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -1844,7 +1844,7 @@ func (ec *executionContext) _Mutation_createWorkout(ctx context.Context, field g
 	}
 	res := resTmp.(*model.Workout)
 	fc.Result = res
-	return ec.marshalNWorkout2ᚖgithubᚗcomᚋmhd53ᚋquantaᚑfitnessᚑserverᚋgraphᚋmodelᚐWorkout(ctx, field.Selections, res)
+	return ec.marshalNWorkout2ᚖgithubᚗcomᚋm0sysᚋquantaᚑfitnessᚑserverᚋgraphᚋmodelᚐWorkout(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_updateWorkout(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -1970,7 +1970,7 @@ func (ec *executionContext) _Mutation_addExerciseToWorkout(ctx context.Context, 
 	}
 	res := resTmp.(*model.Exercise)
 	fc.Result = res
-	return ec.marshalNExercise2ᚖgithubᚗcomᚋmhd53ᚋquantaᚑfitnessᚑserverᚋgraphᚋmodelᚐExercise(ctx, field.Selections, res)
+	return ec.marshalNExercise2ᚖgithubᚗcomᚋm0sysᚋquantaᚑfitnessᚑserverᚋgraphᚋmodelᚐExercise(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_updateExercise(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -2096,7 +2096,7 @@ func (ec *executionContext) _Mutation_addEsetToExercise(ctx context.Context, fie
 	}
 	res := resTmp.(*model.Eset)
 	fc.Result = res
-	return ec.marshalNEset2ᚖgithubᚗcomᚋmhd53ᚋquantaᚑfitnessᚑserverᚋgraphᚋmodelᚐEset(ctx, field.Selections, res)
+	return ec.marshalNEset2ᚖgithubᚗcomᚋm0sysᚋquantaᚑfitnessᚑserverᚋgraphᚋmodelᚐEset(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_updateEset(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -2355,7 +2355,7 @@ func (ec *executionContext) _Query_users(ctx context.Context, field graphql.Coll
 	}
 	res := resTmp.([]*model.PublicUser)
 	fc.Result = res
-	return ec.marshalNPublicUser2ᚕᚖgithubᚗcomᚋmhd53ᚋquantaᚑfitnessᚑserverᚋgraphᚋmodelᚐPublicUserᚄ(ctx, field.Selections, res)
+	return ec.marshalNPublicUser2ᚕᚖgithubᚗcomᚋm0sysᚋquantaᚑfitnessᚑserverᚋgraphᚋmodelᚐPublicUserᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_workouts(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -2397,7 +2397,7 @@ func (ec *executionContext) _Query_workouts(ctx context.Context, field graphql.C
 	}
 	res := resTmp.([]*model.Workout)
 	fc.Result = res
-	return ec.marshalNWorkout2ᚕᚖgithubᚗcomᚋmhd53ᚋquantaᚑfitnessᚑserverᚋgraphᚋmodelᚐWorkoutᚄ(ctx, field.Selections, res)
+	return ec.marshalNWorkout2ᚕᚖgithubᚗcomᚋm0sysᚋquantaᚑfitnessᚑserverᚋgraphᚋmodelᚐWorkoutᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_workout(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -2436,7 +2436,7 @@ func (ec *executionContext) _Query_workout(ctx context.Context, field graphql.Co
 	}
 	res := resTmp.(*model.Workout)
 	fc.Result = res
-	return ec.marshalOWorkout2ᚖgithubᚗcomᚋmhd53ᚋquantaᚑfitnessᚑserverᚋgraphᚋmodelᚐWorkout(ctx, field.Selections, res)
+	return ec.marshalOWorkout2ᚖgithubᚗcomᚋm0sysᚋquantaᚑfitnessᚑserverᚋgraphᚋmodelᚐWorkout(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_exercise(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -2475,7 +2475,7 @@ func (ec *executionContext) _Query_exercise(ctx context.Context, field graphql.C
 	}
 	res := resTmp.(*model.Exercise)
 	fc.Result = res
-	return ec.marshalOExercise2ᚖgithubᚗcomᚋmhd53ᚋquantaᚑfitnessᚑserverᚋgraphᚋmodelᚐExercise(ctx, field.Selections, res)
+	return ec.marshalOExercise2ᚖgithubᚗcomᚋm0sysᚋquantaᚑfitnessᚑserverᚋgraphᚋmodelᚐExercise(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_exercises(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -2517,7 +2517,7 @@ func (ec *executionContext) _Query_exercises(ctx context.Context, field graphql.
 	}
 	res := resTmp.([]*model.Exercise)
 	fc.Result = res
-	return ec.marshalNExercise2ᚕᚖgithubᚗcomᚋmhd53ᚋquantaᚑfitnessᚑserverᚋgraphᚋmodelᚐExerciseᚄ(ctx, field.Selections, res)
+	return ec.marshalNExercise2ᚕᚖgithubᚗcomᚋm0sysᚋquantaᚑfitnessᚑserverᚋgraphᚋmodelᚐExerciseᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_eset(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -2556,7 +2556,7 @@ func (ec *executionContext) _Query_eset(ctx context.Context, field graphql.Colle
 	}
 	res := resTmp.(*model.Eset)
 	fc.Result = res
-	return ec.marshalOEset2ᚖgithubᚗcomᚋmhd53ᚋquantaᚑfitnessᚑserverᚋgraphᚋmodelᚐEset(ctx, field.Selections, res)
+	return ec.marshalOEset2ᚖgithubᚗcomᚋm0sysᚋquantaᚑfitnessᚑserverᚋgraphᚋmodelᚐEset(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_esets(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -2598,7 +2598,7 @@ func (ec *executionContext) _Query_esets(ctx context.Context, field graphql.Coll
 	}
 	res := resTmp.([]*model.Eset)
 	fc.Result = res
-	return ec.marshalNEset2ᚕᚖgithubᚗcomᚋmhd53ᚋquantaᚑfitnessᚑserverᚋgraphᚋmodelᚐEsetᚄ(ctx, field.Selections, res)
+	return ec.marshalNEset2ᚕᚖgithubᚗcomᚋm0sysᚋquantaᚑfitnessᚑserverᚋgraphᚋmodelᚐEsetᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -2844,7 +2844,7 @@ func (ec *executionContext) _Workout_user(ctx context.Context, field graphql.Col
 	}
 	res := resTmp.(*model.PublicUser)
 	fc.Result = res
-	return ec.marshalNPublicUser2ᚖgithubᚗcomᚋmhd53ᚋquantaᚑfitnessᚑserverᚋgraphᚋmodelᚐPublicUser(ctx, field.Selections, res)
+	return ec.marshalNPublicUser2ᚖgithubᚗcomᚋm0sysᚋquantaᚑfitnessᚑserverᚋgraphᚋmodelᚐPublicUser(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) ___Directive_name(ctx context.Context, field graphql.CollectedField, obj *introspection.Directive) (ret graphql.Marshaler) {
@@ -4941,11 +4941,11 @@ func (ec *executionContext) ___Type(ctx context.Context, sel ast.SelectionSet, o
 
 // region    ***************************** type.gotpl *****************************
 
-func (ec *executionContext) marshalNAuth2githubᚗcomᚋmhd53ᚋquantaᚑfitnessᚑserverᚋgraphᚋmodelᚐAuth(ctx context.Context, sel ast.SelectionSet, v model.Auth) graphql.Marshaler {
+func (ec *executionContext) marshalNAuth2githubᚗcomᚋm0sysᚋquantaᚑfitnessᚑserverᚋgraphᚋmodelᚐAuth(ctx context.Context, sel ast.SelectionSet, v model.Auth) graphql.Marshaler {
 	return ec._Auth(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNAuth2ᚖgithubᚗcomᚋmhd53ᚋquantaᚑfitnessᚑserverᚋgraphᚋmodelᚐAuth(ctx context.Context, sel ast.SelectionSet, v *model.Auth) graphql.Marshaler {
+func (ec *executionContext) marshalNAuth2ᚖgithubᚗcomᚋm0sysᚋquantaᚑfitnessᚑserverᚋgraphᚋmodelᚐAuth(ctx context.Context, sel ast.SelectionSet, v *model.Auth) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -4970,11 +4970,11 @@ func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.Se
 	return res
 }
 
-func (ec *executionContext) marshalNEset2githubᚗcomᚋmhd53ᚋquantaᚑfitnessᚑserverᚋgraphᚋmodelᚐEset(ctx context.Context, sel ast.SelectionSet, v model.Eset) graphql.Marshaler {
+func (ec *executionContext) marshalNEset2githubᚗcomᚋm0sysᚋquantaᚑfitnessᚑserverᚋgraphᚋmodelᚐEset(ctx context.Context, sel ast.SelectionSet, v model.Eset) graphql.Marshaler {
 	return ec._Eset(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNEset2ᚕᚖgithubᚗcomᚋmhd53ᚋquantaᚑfitnessᚑserverᚋgraphᚋmodelᚐEsetᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Eset) graphql.Marshaler {
+func (ec *executionContext) marshalNEset2ᚕᚖgithubᚗcomᚋm0sysᚋquantaᚑfitnessᚑserverᚋgraphᚋmodelᚐEsetᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Eset) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -4998,7 +4998,7 @@ func (ec *executionContext) marshalNEset2ᚕᚖgithubᚗcomᚋmhd53ᚋquantaᚑf
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNEset2ᚖgithubᚗcomᚋmhd53ᚋquantaᚑfitnessᚑserverᚋgraphᚋmodelᚐEset(ctx, sel, v[i])
+			ret[i] = ec.marshalNEset2ᚖgithubᚗcomᚋm0sysᚋquantaᚑfitnessᚑserverᚋgraphᚋmodelᚐEset(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -5011,7 +5011,7 @@ func (ec *executionContext) marshalNEset2ᚕᚖgithubᚗcomᚋmhd53ᚋquantaᚑf
 	return ret
 }
 
-func (ec *executionContext) marshalNEset2ᚖgithubᚗcomᚋmhd53ᚋquantaᚑfitnessᚑserverᚋgraphᚋmodelᚐEset(ctx context.Context, sel ast.SelectionSet, v *model.Eset) graphql.Marshaler {
+func (ec *executionContext) marshalNEset2ᚖgithubᚗcomᚋm0sysᚋquantaᚑfitnessᚑserverᚋgraphᚋmodelᚐEset(ctx context.Context, sel ast.SelectionSet, v *model.Eset) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -5021,16 +5021,16 @@ func (ec *executionContext) marshalNEset2ᚖgithubᚗcomᚋmhd53ᚋquantaᚑfitn
 	return ec._Eset(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNEsetUpdate2githubᚗcomᚋmhd53ᚋquantaᚑfitnessᚑserverᚋgraphᚋmodelᚐEsetUpdate(ctx context.Context, v interface{}) (model.EsetUpdate, error) {
+func (ec *executionContext) unmarshalNEsetUpdate2githubᚗcomᚋm0sysᚋquantaᚑfitnessᚑserverᚋgraphᚋmodelᚐEsetUpdate(ctx context.Context, v interface{}) (model.EsetUpdate, error) {
 	res, err := ec.unmarshalInputEsetUpdate(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNExercise2githubᚗcomᚋmhd53ᚋquantaᚑfitnessᚑserverᚋgraphᚋmodelᚐExercise(ctx context.Context, sel ast.SelectionSet, v model.Exercise) graphql.Marshaler {
+func (ec *executionContext) marshalNExercise2githubᚗcomᚋm0sysᚋquantaᚑfitnessᚑserverᚋgraphᚋmodelᚐExercise(ctx context.Context, sel ast.SelectionSet, v model.Exercise) graphql.Marshaler {
 	return ec._Exercise(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNExercise2ᚕᚖgithubᚗcomᚋmhd53ᚋquantaᚑfitnessᚑserverᚋgraphᚋmodelᚐExerciseᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Exercise) graphql.Marshaler {
+func (ec *executionContext) marshalNExercise2ᚕᚖgithubᚗcomᚋm0sysᚋquantaᚑfitnessᚑserverᚋgraphᚋmodelᚐExerciseᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Exercise) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -5054,7 +5054,7 @@ func (ec *executionContext) marshalNExercise2ᚕᚖgithubᚗcomᚋmhd53ᚋquanta
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNExercise2ᚖgithubᚗcomᚋmhd53ᚋquantaᚑfitnessᚑserverᚋgraphᚋmodelᚐExercise(ctx, sel, v[i])
+			ret[i] = ec.marshalNExercise2ᚖgithubᚗcomᚋm0sysᚋquantaᚑfitnessᚑserverᚋgraphᚋmodelᚐExercise(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -5067,7 +5067,7 @@ func (ec *executionContext) marshalNExercise2ᚕᚖgithubᚗcomᚋmhd53ᚋquanta
 	return ret
 }
 
-func (ec *executionContext) marshalNExercise2ᚖgithubᚗcomᚋmhd53ᚋquantaᚑfitnessᚑserverᚋgraphᚋmodelᚐExercise(ctx context.Context, sel ast.SelectionSet, v *model.Exercise) graphql.Marshaler {
+func (ec *executionContext) marshalNExercise2ᚖgithubᚗcomᚋm0sysᚋquantaᚑfitnessᚑserverᚋgraphᚋmodelᚐExercise(ctx context.Context, sel ast.SelectionSet, v *model.Exercise) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -5077,7 +5077,7 @@ func (ec *executionContext) marshalNExercise2ᚖgithubᚗcomᚋmhd53ᚋquantaᚑ
 	return ec._Exercise(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNExerciseUpdate2githubᚗcomᚋmhd53ᚋquantaᚑfitnessᚑserverᚋgraphᚋmodelᚐExerciseUpdate(ctx context.Context, v interface{}) (model.ExerciseUpdate, error) {
+func (ec *executionContext) unmarshalNExerciseUpdate2githubᚗcomᚋm0sysᚋquantaᚑfitnessᚑserverᚋgraphᚋmodelᚐExerciseUpdate(ctx context.Context, v interface{}) (model.ExerciseUpdate, error) {
 	res, err := ec.unmarshalInputExerciseUpdate(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
@@ -5127,32 +5127,32 @@ func (ec *executionContext) marshalNInt2int(ctx context.Context, sel ast.Selecti
 	return res
 }
 
-func (ec *executionContext) unmarshalNLogin2githubᚗcomᚋmhd53ᚋquantaᚑfitnessᚑserverᚋgraphᚋmodelᚐLogin(ctx context.Context, v interface{}) (model.Login, error) {
+func (ec *executionContext) unmarshalNLogin2githubᚗcomᚋm0sysᚋquantaᚑfitnessᚑserverᚋgraphᚋmodelᚐLogin(ctx context.Context, v interface{}) (model.Login, error) {
 	res, err := ec.unmarshalInputLogin(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalNNewEset2githubᚗcomᚋmhd53ᚋquantaᚑfitnessᚑserverᚋgraphᚋmodelᚐNewEset(ctx context.Context, v interface{}) (model.NewEset, error) {
+func (ec *executionContext) unmarshalNNewEset2githubᚗcomᚋm0sysᚋquantaᚑfitnessᚑserverᚋgraphᚋmodelᚐNewEset(ctx context.Context, v interface{}) (model.NewEset, error) {
 	res, err := ec.unmarshalInputNewEset(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalNNewExercise2githubᚗcomᚋmhd53ᚋquantaᚑfitnessᚑserverᚋgraphᚋmodelᚐNewExercise(ctx context.Context, v interface{}) (model.NewExercise, error) {
+func (ec *executionContext) unmarshalNNewExercise2githubᚗcomᚋm0sysᚋquantaᚑfitnessᚑserverᚋgraphᚋmodelᚐNewExercise(ctx context.Context, v interface{}) (model.NewExercise, error) {
 	res, err := ec.unmarshalInputNewExercise(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalNNewUser2githubᚗcomᚋmhd53ᚋquantaᚑfitnessᚑserverᚋgraphᚋmodelᚐNewUser(ctx context.Context, v interface{}) (model.NewUser, error) {
+func (ec *executionContext) unmarshalNNewUser2githubᚗcomᚋm0sysᚋquantaᚑfitnessᚑserverᚋgraphᚋmodelᚐNewUser(ctx context.Context, v interface{}) (model.NewUser, error) {
 	res, err := ec.unmarshalInputNewUser(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalNNewWorkout2githubᚗcomᚋmhd53ᚋquantaᚑfitnessᚑserverᚋgraphᚋmodelᚐNewWorkout(ctx context.Context, v interface{}) (model.NewWorkout, error) {
+func (ec *executionContext) unmarshalNNewWorkout2githubᚗcomᚋm0sysᚋquantaᚑfitnessᚑserverᚋgraphᚋmodelᚐNewWorkout(ctx context.Context, v interface{}) (model.NewWorkout, error) {
 	res, err := ec.unmarshalInputNewWorkout(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNPublicUser2ᚕᚖgithubᚗcomᚋmhd53ᚋquantaᚑfitnessᚑserverᚋgraphᚋmodelᚐPublicUserᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.PublicUser) graphql.Marshaler {
+func (ec *executionContext) marshalNPublicUser2ᚕᚖgithubᚗcomᚋm0sysᚋquantaᚑfitnessᚑserverᚋgraphᚋmodelᚐPublicUserᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.PublicUser) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -5176,7 +5176,7 @@ func (ec *executionContext) marshalNPublicUser2ᚕᚖgithubᚗcomᚋmhd53ᚋquan
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNPublicUser2ᚖgithubᚗcomᚋmhd53ᚋquantaᚑfitnessᚑserverᚋgraphᚋmodelᚐPublicUser(ctx, sel, v[i])
+			ret[i] = ec.marshalNPublicUser2ᚖgithubᚗcomᚋm0sysᚋquantaᚑfitnessᚑserverᚋgraphᚋmodelᚐPublicUser(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -5189,7 +5189,7 @@ func (ec *executionContext) marshalNPublicUser2ᚕᚖgithubᚗcomᚋmhd53ᚋquan
 	return ret
 }
 
-func (ec *executionContext) marshalNPublicUser2ᚖgithubᚗcomᚋmhd53ᚋquantaᚑfitnessᚑserverᚋgraphᚋmodelᚐPublicUser(ctx context.Context, sel ast.SelectionSet, v *model.PublicUser) graphql.Marshaler {
+func (ec *executionContext) marshalNPublicUser2ᚖgithubᚗcomᚋm0sysᚋquantaᚑfitnessᚑserverᚋgraphᚋmodelᚐPublicUser(ctx context.Context, sel ast.SelectionSet, v *model.PublicUser) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -5229,11 +5229,11 @@ func (ec *executionContext) marshalNTime2timeᚐTime(ctx context.Context, sel as
 	return res
 }
 
-func (ec *executionContext) marshalNWorkout2githubᚗcomᚋmhd53ᚋquantaᚑfitnessᚑserverᚋgraphᚋmodelᚐWorkout(ctx context.Context, sel ast.SelectionSet, v model.Workout) graphql.Marshaler {
+func (ec *executionContext) marshalNWorkout2githubᚗcomᚋm0sysᚋquantaᚑfitnessᚑserverᚋgraphᚋmodelᚐWorkout(ctx context.Context, sel ast.SelectionSet, v model.Workout) graphql.Marshaler {
 	return ec._Workout(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNWorkout2ᚕᚖgithubᚗcomᚋmhd53ᚋquantaᚑfitnessᚑserverᚋgraphᚋmodelᚐWorkoutᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Workout) graphql.Marshaler {
+func (ec *executionContext) marshalNWorkout2ᚕᚖgithubᚗcomᚋm0sysᚋquantaᚑfitnessᚑserverᚋgraphᚋmodelᚐWorkoutᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Workout) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -5257,7 +5257,7 @@ func (ec *executionContext) marshalNWorkout2ᚕᚖgithubᚗcomᚋmhd53ᚋquanta�
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNWorkout2ᚖgithubᚗcomᚋmhd53ᚋquantaᚑfitnessᚑserverᚋgraphᚋmodelᚐWorkout(ctx, sel, v[i])
+			ret[i] = ec.marshalNWorkout2ᚖgithubᚗcomᚋm0sysᚋquantaᚑfitnessᚑserverᚋgraphᚋmodelᚐWorkout(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -5270,7 +5270,7 @@ func (ec *executionContext) marshalNWorkout2ᚕᚖgithubᚗcomᚋmhd53ᚋquanta�
 	return ret
 }
 
-func (ec *executionContext) marshalNWorkout2ᚖgithubᚗcomᚋmhd53ᚋquantaᚑfitnessᚑserverᚋgraphᚋmodelᚐWorkout(ctx context.Context, sel ast.SelectionSet, v *model.Workout) graphql.Marshaler {
+func (ec *executionContext) marshalNWorkout2ᚖgithubᚗcomᚋm0sysᚋquantaᚑfitnessᚑserverᚋgraphᚋmodelᚐWorkout(ctx context.Context, sel ast.SelectionSet, v *model.Workout) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -5280,7 +5280,7 @@ func (ec *executionContext) marshalNWorkout2ᚖgithubᚗcomᚋmhd53ᚋquantaᚑf
 	return ec._Workout(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNWorkoutUpdate2githubᚗcomᚋmhd53ᚋquantaᚑfitnessᚑserverᚋgraphᚋmodelᚐWorkoutUpdate(ctx context.Context, v interface{}) (model.WorkoutUpdate, error) {
+func (ec *executionContext) unmarshalNWorkoutUpdate2githubᚗcomᚋm0sysᚋquantaᚑfitnessᚑserverᚋgraphᚋmodelᚐWorkoutUpdate(ctx context.Context, v interface{}) (model.WorkoutUpdate, error) {
 	res, err := ec.unmarshalInputWorkoutUpdate(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
@@ -5538,14 +5538,14 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 	return graphql.MarshalBoolean(*v)
 }
 
-func (ec *executionContext) marshalOEset2ᚖgithubᚗcomᚋmhd53ᚋquantaᚑfitnessᚑserverᚋgraphᚋmodelᚐEset(ctx context.Context, sel ast.SelectionSet, v *model.Eset) graphql.Marshaler {
+func (ec *executionContext) marshalOEset2ᚖgithubᚗcomᚋm0sysᚋquantaᚑfitnessᚑserverᚋgraphᚋmodelᚐEset(ctx context.Context, sel ast.SelectionSet, v *model.Eset) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return ec._Eset(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalOExercise2ᚖgithubᚗcomᚋmhd53ᚋquantaᚑfitnessᚑserverᚋgraphᚋmodelᚐExercise(ctx context.Context, sel ast.SelectionSet, v *model.Exercise) graphql.Marshaler {
+func (ec *executionContext) marshalOExercise2ᚖgithubᚗcomᚋm0sysᚋquantaᚑfitnessᚑserverᚋgraphᚋmodelᚐExercise(ctx context.Context, sel ast.SelectionSet, v *model.Exercise) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
@@ -5576,7 +5576,7 @@ func (ec *executionContext) marshalOString2ᚖstring(ctx context.Context, sel as
 	return graphql.MarshalString(*v)
 }
 
-func (ec *executionContext) marshalOWorkout2ᚖgithubᚗcomᚋmhd53ᚋquantaᚑfitnessᚑserverᚋgraphᚋmodelᚐWorkout(ctx context.Context, sel ast.SelectionSet, v *model.Workout) graphql.Marshaler {
+func (ec *executionContext) marshalOWorkout2ᚖgithubᚗcomᚋm0sysᚋquantaᚑfitnessᚑserverᚋgraphᚋmodelᚐWorkout(ctx context.Context, sel ast.SelectionSet, v *model.Workout) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}

@@ -1,8 +1,8 @@
 package exercisetest
 
 import (
-	"github.com/mhd53/quanta-fitness-server/internal/entity"
-	ats "github.com/mhd53/quanta-fitness-server/tests/internal/auth"
+	"github.com/m0sys/quanta-fitness-server/internal/entity"
+	ats "github.com/m0sys/quanta-fitness-server/tests/internal/auth"
 )
 
 const (

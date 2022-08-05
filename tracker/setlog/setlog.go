@@ -1,8 +1,8 @@
 package setlog
 
 import (
-	"github.com/mhd53/quanta-fitness-server/pkg/uuid"
-	"github.com/mhd53/quanta-fitness-server/units"
+	"github.com/m0sys/quanta-fitness-server/pkg/uuid"
+	"github.com/m0sys/quanta-fitness-server/units"
 )
 
 type SetLog struct {

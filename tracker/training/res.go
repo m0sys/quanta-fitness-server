@@ -3,7 +3,7 @@ package training
 import (
 	"time"
 
-	"github.com/mhd53/quanta-fitness-server/units"
+	"github.com/m0sys/quanta-fitness-server/units"
 )
 
 type ExerciseLogRes struct {

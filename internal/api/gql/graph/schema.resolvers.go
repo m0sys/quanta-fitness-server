@@ -7,9 +7,9 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/mhd53/quanta-fitness-server/internal/api/gql/graph/generated"
-	"github.com/mhd53/quanta-fitness-server/internal/api/gql/graph/model"
-	p "github.com/mhd53/quanta-fitness-server/planner/planning"
+	"github.com/m0sys/quanta-fitness-server/internal/api/gql/graph/generated"
+	"github.com/m0sys/quanta-fitness-server/internal/api/gql/graph/model"
+	p "github.com/m0sys/quanta-fitness-server/planner/planning"
 )
 
 func (r *mutationResolver) CreateWorkoutPlan(ctx context.Context, input model.NewWorkoutPlan) (*model.WorkoutPlan, error) {

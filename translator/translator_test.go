@@ -3,14 +3,14 @@ package translator
 import (
 	"testing"
 
-	"github.com/mhd53/quanta-fitness-server/internal/random"
-	"github.com/mhd53/quanta-fitness-server/manager/athlete"
-	p "github.com/mhd53/quanta-fitness-server/planner/planning"
-	pa "github.com/mhd53/quanta-fitness-server/planner/planning/adapters"
-	el "github.com/mhd53/quanta-fitness-server/tracker/exerciselog"
-	ts "github.com/mhd53/quanta-fitness-server/tracker/training"
-	ta "github.com/mhd53/quanta-fitness-server/tracker/training/adapters"
-	wl "github.com/mhd53/quanta-fitness-server/tracker/workoutlog"
+	"github.com/m0sys/quanta-fitness-server/internal/random"
+	"github.com/m0sys/quanta-fitness-server/manager/athlete"
+	p "github.com/m0sys/quanta-fitness-server/planner/planning"
+	pa "github.com/m0sys/quanta-fitness-server/planner/planning/adapters"
+	el "github.com/m0sys/quanta-fitness-server/tracker/exerciselog"
+	ts "github.com/m0sys/quanta-fitness-server/tracker/training"
+	ta "github.com/m0sys/quanta-fitness-server/tracker/training/adapters"
+	wl "github.com/m0sys/quanta-fitness-server/tracker/workoutlog"
 	"github.com/stretchr/testify/require"
 )
 

@@ -3,9 +3,9 @@ package accountingtest
 import (
 	"testing"
 
-	a "github.com/mhd53/quanta-fitness-server/account/accounting"
-	"github.com/mhd53/quanta-fitness-server/account/accounting/adapters"
-	"github.com/mhd53/quanta-fitness-server/internal/random"
+	a "github.com/m0sys/quanta-fitness-server/account/accounting"
+	"github.com/m0sys/quanta-fitness-server/account/accounting/adapters"
+	"github.com/m0sys/quanta-fitness-server/internal/random"
 	"github.com/stretchr/testify/require"
 )
 

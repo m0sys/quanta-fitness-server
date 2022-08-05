@@ -1,9 +1,9 @@
 package graph
 
 import (
-	"github.com/mhd53/quanta-fitness-server/internal/api/gql/graph/generated"
-	p "github.com/mhd53/quanta-fitness-server/planner/planning"
-	pa "github.com/mhd53/quanta-fitness-server/planner/planning/adapters"
+	"github.com/m0sys/quanta-fitness-server/internal/api/gql/graph/generated"
+	p "github.com/m0sys/quanta-fitness-server/planner/planning"
+	pa "github.com/m0sys/quanta-fitness-server/planner/planning/adapters"
 )
 
 // This file will not be regenerated automatically.

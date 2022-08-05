@@ -4,10 +4,10 @@ import (
 	"github.com/stretchr/testify/assert"
 	"testing"
 
-	"github.com/mhd53/quanta-fitness-server/api/auth"
-	wapi "github.com/mhd53/quanta-fitness-server/api/workout"
-	ustore "github.com/mhd53/quanta-fitness-server/internal/datastore/userstore"
-	wstore "github.com/mhd53/quanta-fitness-server/internal/datastore/workoutstore"
+	"github.com/m0sys/quanta-fitness-server/api/auth"
+	wapi "github.com/m0sys/quanta-fitness-server/api/workout"
+	ustore "github.com/m0sys/quanta-fitness-server/internal/datastore/userstore"
+	wstore "github.com/m0sys/quanta-fitness-server/internal/datastore/workoutstore"
 )
 
 func TestCreateWorkoutWhenInvalidToken(t *testing.T) {

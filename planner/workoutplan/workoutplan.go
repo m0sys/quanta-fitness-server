@@ -3,7 +3,7 @@ package workoutplan
 import (
 	"errors"
 
-	"github.com/mhd53/quanta-fitness-server/pkg/uuid"
+	"github.com/m0sys/quanta-fitness-server/pkg/uuid"
 )
 
 type WorkoutPlan struct {

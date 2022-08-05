@@ -1,6 +1,6 @@
 package planning
 
-import "github.com/mhd53/quanta-fitness-server/units"
+import "github.com/m0sys/quanta-fitness-server/units"
 
 type WorkoutPlanRes struct {
 	ID        string

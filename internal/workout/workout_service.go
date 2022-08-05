@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"log"
 
-	ws "github.com/mhd53/quanta-fitness-server/internal/datastore/workoutstore"
-	"github.com/mhd53/quanta-fitness-server/internal/entity"
+	ws "github.com/m0sys/quanta-fitness-server/internal/datastore/workoutstore"
+	"github.com/m0sys/quanta-fitness-server/internal/entity"
 )
 
 type WorkoutService interface {

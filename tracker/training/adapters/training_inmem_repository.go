@@ -5,10 +5,10 @@ import (
 	"sort"
 	"time"
 
-	elg "github.com/mhd53/quanta-fitness-server/tracker/exerciselog"
-	sl "github.com/mhd53/quanta-fitness-server/tracker/setlog"
-	t "github.com/mhd53/quanta-fitness-server/tracker/training"
-	wl "github.com/mhd53/quanta-fitness-server/tracker/workoutlog"
+	elg "github.com/m0sys/quanta-fitness-server/tracker/exerciselog"
+	sl "github.com/m0sys/quanta-fitness-server/tracker/setlog"
+	t "github.com/m0sys/quanta-fitness-server/tracker/training"
+	wl "github.com/m0sys/quanta-fitness-server/tracker/workoutlog"
 )
 
 type repo struct {

@@ -3,9 +3,9 @@ package training
 import (
 	"log"
 
-	el "github.com/mhd53/quanta-fitness-server/tracker/exerciselog"
-	sl "github.com/mhd53/quanta-fitness-server/tracker/setlog"
-	wl "github.com/mhd53/quanta-fitness-server/tracker/workoutlog"
+	el "github.com/m0sys/quanta-fitness-server/tracker/exerciselog"
+	sl "github.com/m0sys/quanta-fitness-server/tracker/setlog"
+	wl "github.com/m0sys/quanta-fitness-server/tracker/workoutlog"
 )
 
 type TrainingService struct {

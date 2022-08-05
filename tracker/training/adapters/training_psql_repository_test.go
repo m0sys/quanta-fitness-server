@@ -3,11 +3,11 @@ package adapters
 import (
 	"testing"
 
-	"github.com/mhd53/quanta-fitness-server/internal/random"
-	"github.com/mhd53/quanta-fitness-server/manager/athlete"
-	el "github.com/mhd53/quanta-fitness-server/tracker/exerciselog"
-	sl "github.com/mhd53/quanta-fitness-server/tracker/setlog"
-	wl "github.com/mhd53/quanta-fitness-server/tracker/workoutlog"
+	"github.com/m0sys/quanta-fitness-server/internal/random"
+	"github.com/m0sys/quanta-fitness-server/manager/athlete"
+	el "github.com/m0sys/quanta-fitness-server/tracker/exerciselog"
+	sl "github.com/m0sys/quanta-fitness-server/tracker/setlog"
+	wl "github.com/m0sys/quanta-fitness-server/tracker/workoutlog"
 	"github.com/stretchr/testify/require"
 )
 

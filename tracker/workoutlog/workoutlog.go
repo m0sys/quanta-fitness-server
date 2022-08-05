@@ -3,7 +3,7 @@ package workoutlog
 import (
 	"time"
 
-	"github.com/mhd53/quanta-fitness-server/pkg/uuid"
+	"github.com/m0sys/quanta-fitness-server/pkg/uuid"
 )
 
 type WorkoutLog struct {

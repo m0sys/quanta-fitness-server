@@ -4,8 +4,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"testing"
 
-	"github.com/mhd53/quanta-fitness-server/internal/entity"
-	e "github.com/mhd53/quanta-fitness-server/internal/exercise"
+	"github.com/m0sys/quanta-fitness-server/internal/entity"
+	e "github.com/m0sys/quanta-fitness-server/internal/exercise"
 )
 
 func TestValidateCreateExerciseWhenNameTooLong(t *testing.T) {

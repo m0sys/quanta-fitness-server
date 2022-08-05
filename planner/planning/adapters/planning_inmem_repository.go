@@ -4,10 +4,10 @@ import (
 	"errors"
 	"time"
 
-	"github.com/mhd53/quanta-fitness-server/planner/exercise"
-	e "github.com/mhd53/quanta-fitness-server/planner/exercise"
-	p "github.com/mhd53/quanta-fitness-server/planner/planning"
-	wp "github.com/mhd53/quanta-fitness-server/planner/workoutplan"
+	"github.com/m0sys/quanta-fitness-server/planner/exercise"
+	e "github.com/m0sys/quanta-fitness-server/planner/exercise"
+	p "github.com/m0sys/quanta-fitness-server/planner/planning"
+	wp "github.com/m0sys/quanta-fitness-server/planner/workoutplan"
 )
 
 type repo struct {

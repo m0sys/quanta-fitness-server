@@ -9,10 +9,10 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/mhd53/quanta-fitness-server/api/auth"
-	"github.com/mhd53/quanta-fitness-server/graph/generated"
-	"github.com/mhd53/quanta-fitness-server/graph/model"
-	"github.com/mhd53/quanta-fitness-server/internal/entity"
+	"github.com/m0sys/quanta-fitness-server/api/auth"
+	"github.com/m0sys/quanta-fitness-server/graph/generated"
+	"github.com/m0sys/quanta-fitness-server/graph/model"
+	"github.com/m0sys/quanta-fitness-server/internal/entity"
 )
 
 func (r *mutationResolver) Register(ctx context.Context, input model.NewUser) (*model.Auth, error) {

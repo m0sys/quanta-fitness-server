@@ -1,9 +1,9 @@
 package training
 
 import (
-	elg "github.com/mhd53/quanta-fitness-server/tracker/exerciselog"
-	sl "github.com/mhd53/quanta-fitness-server/tracker/setlog"
-	wl "github.com/mhd53/quanta-fitness-server/tracker/workoutlog"
+	elg "github.com/m0sys/quanta-fitness-server/tracker/exerciselog"
+	sl "github.com/m0sys/quanta-fitness-server/tracker/setlog"
+	wl "github.com/m0sys/quanta-fitness-server/tracker/workoutlog"
 )
 
 type Repository interface {

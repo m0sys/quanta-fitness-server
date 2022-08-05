@@ -1,8 +1,8 @@
 package managing
 
 import (
-	"github.com/mhd53/quanta-fitness-server/account/user"
-	"github.com/mhd53/quanta-fitness-server/manager/athlete"
+	"github.com/m0sys/quanta-fitness-server/account/user"
+	"github.com/m0sys/quanta-fitness-server/manager/athlete"
 )
 
 // Repository repo for persisting all Athlete related data.

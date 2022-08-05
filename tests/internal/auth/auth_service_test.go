@@ -4,10 +4,10 @@ import (
 	"github.com/stretchr/testify/assert"
 	"testing"
 
-	"github.com/mhd53/quanta-fitness-server/internal/auth"
-	us "github.com/mhd53/quanta-fitness-server/internal/datastore/userstore"
-	"github.com/mhd53/quanta-fitness-server/internal/entity"
-	"github.com/mhd53/quanta-fitness-server/pkg/crypto"
+	"github.com/m0sys/quanta-fitness-server/internal/auth"
+	us "github.com/m0sys/quanta-fitness-server/internal/datastore/userstore"
+	"github.com/m0sys/quanta-fitness-server/internal/entity"
+	"github.com/m0sys/quanta-fitness-server/pkg/crypto"
 )
 
 func TestRegisterWhenUserExists(t *testing.T) {

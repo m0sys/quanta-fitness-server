@@ -2,7 +2,7 @@
 Manager manages all personal use cases related to Athlete.
 E.g. personal weight, height, etc...
 
-@Author: mhd53
+@Author: m0sys
 @Date: 2021/4/25
 */
 
@@ -11,8 +11,8 @@ package managing
 import (
 	"log"
 
-	"github.com/mhd53/quanta-fitness-server/account/user"
-	"github.com/mhd53/quanta-fitness-server/manager/athlete"
+	"github.com/m0sys/quanta-fitness-server/account/user"
+	"github.com/m0sys/quanta-fitness-server/manager/athlete"
 )
 
 // AthleteManager manages Athlete's personal data such as weight.

@@ -1,6 +1,6 @@
 package accounting
 
-import "github.com/mhd53/quanta-fitness-server/account/user"
+import "github.com/m0sys/quanta-fitness-server/account/user"
 
 type Repository interface {
 	FindUserByUname(uname string) (user.User, bool, error)

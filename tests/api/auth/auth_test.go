@@ -4,8 +4,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"testing"
 
-	"github.com/mhd53/quanta-fitness-server/api/auth"
-	ustore "github.com/mhd53/quanta-fitness-server/internal/datastore/userstore"
+	"github.com/m0sys/quanta-fitness-server/api/auth"
+	ustore "github.com/m0sys/quanta-fitness-server/internal/datastore/userstore"
 )
 
 func TestRegisterNewUserWhenUserExists(t *testing.T) {

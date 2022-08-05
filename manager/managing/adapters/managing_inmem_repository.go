@@ -3,9 +3,9 @@ package adapters
 import (
 	"time"
 
-	"github.com/mhd53/quanta-fitness-server/account/user"
-	"github.com/mhd53/quanta-fitness-server/manager/athlete"
-	m "github.com/mhd53/quanta-fitness-server/manager/managing"
+	"github.com/m0sys/quanta-fitness-server/account/user"
+	"github.com/m0sys/quanta-fitness-server/manager/athlete"
+	m "github.com/m0sys/quanta-fitness-server/manager/managing"
 )
 
 type repo struct {

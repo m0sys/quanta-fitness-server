@@ -3,9 +3,9 @@ package workout
 import (
 	"fmt"
 
-	us "github.com/mhd53/quanta-fitness-server/internal/datastore/userstore"
-	ws "github.com/mhd53/quanta-fitness-server/internal/datastore/workoutstore"
-	"github.com/mhd53/quanta-fitness-server/internal/util"
+	us "github.com/m0sys/quanta-fitness-server/internal/datastore/userstore"
+	ws "github.com/m0sys/quanta-fitness-server/internal/datastore/workoutstore"
+	"github.com/m0sys/quanta-fitness-server/internal/util"
 )
 
 type WorkoutAuth interface {

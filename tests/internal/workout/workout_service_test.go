@@ -4,11 +4,11 @@ import (
 	"github.com/stretchr/testify/assert"
 	"testing"
 
-	us "github.com/mhd53/quanta-fitness-server/internal/datastore/userstore"
-	ws "github.com/mhd53/quanta-fitness-server/internal/datastore/workoutstore"
-	"github.com/mhd53/quanta-fitness-server/internal/entity"
-	w "github.com/mhd53/quanta-fitness-server/internal/workout"
-	ats "github.com/mhd53/quanta-fitness-server/tests/internal/auth"
+	us "github.com/m0sys/quanta-fitness-server/internal/datastore/userstore"
+	ws "github.com/m0sys/quanta-fitness-server/internal/datastore/workoutstore"
+	"github.com/m0sys/quanta-fitness-server/internal/entity"
+	w "github.com/m0sys/quanta-fitness-server/internal/workout"
+	ats "github.com/m0sys/quanta-fitness-server/tests/internal/auth"
 )
 
 func TestCreateWorkoutWhenUnauthorized(t *testing.T) {

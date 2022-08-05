@@ -1,7 +1,7 @@
 package esetstore
 
 import (
-	"github.com/mhd53/quanta-fitness-server/internal/entity"
+	"github.com/m0sys/quanta-fitness-server/internal/entity"
 )
 
 type EsetStore interface {

@@ -1,4 +1,4 @@
-module github.com/mhd53/quanta-fitness-server
+module github.com/m0sys/quanta-fitness-server
 
 go 1.16
 

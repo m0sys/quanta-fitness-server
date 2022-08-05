@@ -5,8 +5,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/mhd53/quanta-fitness-server/database/psql/psqlus"
-	"github.com/mhd53/quanta-fitness-server/internal/entity"
+	"github.com/m0sys/quanta-fitness-server/database/psql/psqlus"
+	"github.com/m0sys/quanta-fitness-server/internal/entity"
 )
 
 func TestSave(t *testing.T) {

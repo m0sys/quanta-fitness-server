@@ -10,10 +10,10 @@ import (
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
 
-	// "github.com/mhd53/quanta-fitness-server/api/auth"
-	// "github.com/mhd53/quanta-fitness-server/database/psql"
-	"github.com/mhd53/quanta-fitness-server/internal/api/gql/graph"
-	"github.com/mhd53/quanta-fitness-server/internal/api/gql/graph/generated"
+	// "github.com/m0sys/quanta-fitness-server/api/auth"
+	// "github.com/m0sys/quanta-fitness-server/database/psql"
+	"github.com/m0sys/quanta-fitness-server/internal/api/gql/graph"
+	"github.com/m0sys/quanta-fitness-server/internal/api/gql/graph/generated"
 )
 
 const defaultPort = "8080"

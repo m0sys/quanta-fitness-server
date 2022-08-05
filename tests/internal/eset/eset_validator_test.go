@@ -4,8 +4,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"testing"
 
-	"github.com/mhd53/quanta-fitness-server/internal/entity"
-	es "github.com/mhd53/quanta-fitness-server/internal/eset"
+	"github.com/m0sys/quanta-fitness-server/internal/entity"
+	es "github.com/m0sys/quanta-fitness-server/internal/eset"
 )
 
 func TestValidateAddEsetToExerciseWhenNegativeActualRC(t *testing.T) {

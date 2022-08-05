@@ -4,7 +4,7 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/mhd53/quanta-fitness-server/pkg/crypto"
+	"github.com/m0sys/quanta-fitness-server/pkg/crypto"
 )
 
 var userCtxKey = &contextKey{"uname"}

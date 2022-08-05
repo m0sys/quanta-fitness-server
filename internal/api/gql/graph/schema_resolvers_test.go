@@ -5,8 +5,8 @@ import (
 
 	"github.com/99designs/gqlgen/client"
 	"github.com/99designs/gqlgen/graphql/handler"
-	"github.com/mhd53/quanta-fitness-server/internal/api/gql/graph"
-	"github.com/mhd53/quanta-fitness-server/internal/api/gql/graph/generated"
+	"github.com/m0sys/quanta-fitness-server/internal/api/gql/graph"
+	"github.com/m0sys/quanta-fitness-server/internal/api/gql/graph/generated"
 	"github.com/stretchr/testify/assert"
 )
 

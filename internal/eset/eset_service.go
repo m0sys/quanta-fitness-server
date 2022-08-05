@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"log"
 
-	store "github.com/mhd53/quanta-fitness-server/internal/datastore/esetstore"
-	"github.com/mhd53/quanta-fitness-server/internal/entity"
+	store "github.com/m0sys/quanta-fitness-server/internal/datastore/esetstore"
+	"github.com/m0sys/quanta-fitness-server/internal/entity"
 )
 
 type EsetService interface {

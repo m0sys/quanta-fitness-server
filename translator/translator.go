@@ -3,10 +3,10 @@ package translator
 import (
 	"log"
 
-	p "github.com/mhd53/quanta-fitness-server/planner/planning"
-	elg "github.com/mhd53/quanta-fitness-server/tracker/exerciselog"
-	t "github.com/mhd53/quanta-fitness-server/tracker/training"
-	wl "github.com/mhd53/quanta-fitness-server/tracker/workoutlog"
+	p "github.com/m0sys/quanta-fitness-server/planner/planning"
+	elg "github.com/m0sys/quanta-fitness-server/tracker/exerciselog"
+	t "github.com/m0sys/quanta-fitness-server/tracker/training"
+	wl "github.com/m0sys/quanta-fitness-server/tracker/workoutlog"
 )
 
 type WorkoutTranslator struct {
