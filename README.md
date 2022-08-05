@@ -3,7 +3,7 @@
   <img alt="Version" src="https://img.shields.io/badge/version-0.1-blue.svg?cacheSeconds=2592000" />
 </p>
 
-> This is the server application for the [*quantum of utility*](https://github.com/mhd53/quanta-fitness). Soon to evolve into a  *quanta of utility* to make it possible for any man to achieve his  **ultimate male body**.
+> This is the server application for the first *quantum of utility*. Soon to evolve into a *quanta of utility* to make it possible for any man to achieve his  **ultimate male body**.
 
 > Innovation is saying no to 1,000 things - and saying yes to ONE Thing. -- Moe & Steve 💡
 
@@ -20,10 +20,9 @@
 
 ## Author
 
-👤 **mhd53**
+👤 **m0sys**
 
-* Website: [Moe](moedarabi.com)
-* Github: [@mhd53](https://github.com/mhd53)
+* Github: [@m0sys](https://github.com/m0sys)
 
 ## Show your support
 
