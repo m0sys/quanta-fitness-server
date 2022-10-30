@@ -18,7 +18,7 @@
 
 ```
 
-This project is mostly an attempt to put into practice all the knowledge gathered on [Clean Architecture](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html){:target="\_blank"} and [SOLID](https://en.wikipedia.org/wiki/SOLID){:target="\_blank"} to create a software that can be extended easily in the long term. The project was abandoned after realizing that the world doesn't need another fitness app; it needs a robot instead.
+This project is mostly an attempt to put into practice all the knowledge gathered on <a href="https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html" target="_blank">Clean Architecture</a> and <a href="https://en.wikipedia.org/wiki/SOLID" target="_blank">SOLID</a> to create a software that can be extended easily in the long term. The project was abandoned after realizing that the world doesn't need another fitness app; it needs a robot instead.
 
 ## How to Run & Test
 
